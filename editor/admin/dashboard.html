@@ -53,6 +53,9 @@
       <a href="#" class="nav-item" id="exportBtn">
         <span class="nav-icon">⬇</span> Export ZIP
       </a>
+      <a href="#" class="nav-item super-only" id="deployBtn" style="display:none;color:#22c55e">
+        <span class="nav-icon">🚀</span> Publish Live
+      </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -200,6 +203,27 @@
       };
       await apiFetch('/api/export', 'POST');
     });
+
+    // Publish Live (super admin — FTP deploy to Hostinger)
+    const deployBtn = document.getElementById('deployBtn');
+    if (deployBtn) {
+      deployBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!confirm('This will rebuild the site and publish it LIVE to akadigital.net. Continue?')) return;
+        const log = document.getElementById('buildLog');
+        const txt = document.getElementById('buildLogText');
+        log.style.display = 'block';
+        txt.textContent = 'Publishing to akadigital.net…\n';
+        const es = new EventSource('/api/deploy');
+        es.onmessage = ev => {
+          const d = JSON.parse(ev.data);
+          txt.textContent += d.msg + '\n';
+          if (d.status === 'done') { txt.textContent += '\n✓ Site is now live!\n'; es.close(); }
+          if (d.status === 'error') { txt.textContent += '\n✗ ' + d.msg + '\n'; es.close(); }
+        };
+        await apiFetch('/api/deploy', 'POST');
+      });
+    }
 
     // ── Load blog posts ──────────────────────────────────────────────────
     apiFetch('/api/blogs').then(blogs => {

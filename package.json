@@ -16,6 +16,9 @@
     "export:build": "npm run build && node scripts/export-build.js",
     "export:all": "npm run export:css && npm run export:json && npm run export:assets && npm run export:build"
   },
+  "dependencies": {
+    "basic-ftp": "^5.3.1"
+  },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0",
     "@tailwindcss/forms": "^0.5.7",

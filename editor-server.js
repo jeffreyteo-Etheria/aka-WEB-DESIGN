@@ -626,20 +626,69 @@ http.createServer(async (req, res) => {
       if (!fs.existsSync(path.join(ROOT, 'dist', 'index.html'))) {
         return j(res, 400, { error: 'Run build first' });
       }
-      const date    = new Date().toISOString().slice(0,10).replace(/-/g,'');
-      const zipName = `akadigital-hostinger-deploy-${date}.zip`;
-      const zipPath = path.join(ROOT, 'exports', zipName);
-      fs.mkdirSync(path.join(ROOT, 'exports'), { recursive: true });
-      exec(`powershell -Command "Compress-Archive -Force -Path 'dist\\*' -DestinationPath '${zipPath}'"`, { cwd: ROOT }, (err) => {
-        // fallback to node zip via streaming
-      });
       res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*' });
       res.write(`data: ${JSON.stringify({ status: 'building', msg: 'Packaging for Hostinger...' })}\n\n`);
-      exec(`powershell -Command "Compress-Archive -Force -Path dist\\* -DestinationPath exports\\${zipName}"`, { cwd: ROOT }, (err, stdout, stderr) => {
+      const date    = new Date().toISOString().slice(0,10).replace(/-/g,'');
+      const zipName = `akadigital-hostinger-deploy-${date}.zip`;
+      fs.mkdirSync(path.join(ROOT, 'exports'), { recursive: true });
+      const zipCmd = process.platform === 'win32'
+        ? `powershell -Command "Compress-Archive -Force -Path dist\\* -DestinationPath exports\\${zipName}"`
+        : `cd dist && zip -r ../exports/${zipName} .`;
+      exec(zipCmd, { cwd: ROOT }, (err) => {
+        if (err) res.write(`data: ${JSON.stringify({ status: 'error', msg: err.message.slice(0, 400) })}\n\n`);
+        else     res.write(`data: ${JSON.stringify({ status: 'done',  msg: `ZIP ready: exports/${zipName}` })}\n\n`);
+        res.end();
+      });
+      return;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DEPLOY TO HOSTINGER VIA FTP  (super admin only)
+       Env vars required: FTP_HOST, FTP_USER, FTP_PASS
+       Optional:          FTP_DIR (default: /public_html)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/deploy' && m === 'POST') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+
+      const FTP_HOST = process.env.FTP_HOST || '';
+      const FTP_USER = process.env.FTP_USER || '';
+      const FTP_PASS = process.env.FTP_PASS || '';
+      const FTP_DIR  = process.env.FTP_DIR  || '/public_html';
+
+      if (!FTP_HOST || !FTP_USER || !FTP_PASS) {
+        return j(res, 400, {
+          error: 'FTP credentials not set. Add FTP_HOST, FTP_USER, FTP_PASS as environment variables in Render dashboard.',
+        });
+      }
+
+      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*' });
+      const send = (status, msg) => res.write(`data: ${JSON.stringify({ status, msg })}\n\n`);
+
+      send('building', 'Building site...');
+
+      exec('npm run build', { cwd: ROOT }, async (err, stdout, stderr) => {
         if (err) {
-          res.write(`data: ${JSON.stringify({ status: 'error', msg: err.message.slice(0, 400) })}\n\n`);
-        } else {
-          res.write(`data: ${JSON.stringify({ status: 'done', msg: `ZIP ready: exports/${zipName}` })}\n\n`);
+          send('error', 'Build failed: ' + (stderr || err.message).slice(0, 500));
+          return res.end();
+        }
+        send('deploying', 'Build complete. Connecting to Hostinger FTP...');
+
+        try {
+          const ftp    = require('basic-ftp');
+          const client = new ftp.Client(60000);
+          client.ftp.verbose = false;
+
+          await client.access({ host: FTP_HOST, user: FTP_USER, password: FTP_PASS, secure: false });
+          send('deploying', 'Connected. Uploading files to ' + FTP_DIR + '...');
+
+          await client.ensureDir(FTP_DIR);
+          await client.uploadFromDir(path.join(ROOT, 'dist'), FTP_DIR);
+          client.close();
+
+          send('done', 'Live! Site deployed to akadigital.net');
+        } catch (ftpErr) {
+          send('error', 'FTP error: ' + ftpErr.message);
         }
         res.end();
       });
