@@ -1,0 +1,99 @@
+[
+  {
+    "slug":        "crm-automation",
+    "title":       "CRM & Marketing Automation",
+    "short_title": "CRM Automation",
+    "icon":        "autorenew",
+    "tagline":     "Automate. Personalise. Convert.",
+    "description": "Build intelligent customer journeys that engage at every touchpoint. From lead scoring to lifecycle automation, we implement and manage the platforms that turn data into revenue.",
+    "hero_image":  "https://img.youtube.com/vi/G-NXwgCEKG4/maxresdefault.jpg",
+    "hero_image_2": "/images/case-studies/diana-cool-fresh-1.png",
+    "partners":    ["Netcore", "OneSignal"],
+    "benefits": [
+      "Unified customer profiles across all channels",
+      "Automated lifecycle marketing journeys",
+      "Lead scoring and sales pipeline acceleration",
+      "Omnichannel campaign orchestration"
+    ],
+    "use_cases": [
+      "E-commerce abandoned cart recovery",
+      "Financial product cross-sell sequences",
+      "SaaS onboarding drip campaigns",
+      "Loyalty programme re-engagement"
+    ],
+    "href": "/solutions/crm-automation"
+  },
+  {
+    "slug":        "digital-programmatic",
+    "title":       "Digital Marketing & Programmatic",
+    "short_title": "Programmatic Ads",
+    "icon":        "ads_click",
+    "tagline":     "Precision-targeted advertising at scale.",
+    "description": "Reach the right audience at the right moment with programmatic precision. We manage end-to-end digital advertising campaigns across SEA markets with full transparency and real-time optimisation.",
+    "hero_image":  "/images/case-studies/ferrari.png",
+    "hero_image_2": "/images/case-studies/dynabook-ads-1.gif",
+    "partners":    ["Adjust"],
+    "industries":  ["E-commerce", "Tech Brand", "FMCG", "Beauty & Healthcare", "Medical Tech", "Retail & Shopping"],
+    "channels":    ["Audio / Spotify", "Display", "Video", "Connected TV", "DOOH LED Billboards"],
+    "benefits": [
+      "Programmatic display and video advertising",
+      "Cross-channel audience targeting and segmentation",
+      "Real-time campaign optimisation and A/B testing",
+      "Full-funnel attribution and performance reporting"
+    ],
+    "use_cases": [
+      "App install campaigns",
+      "Brand awareness across SEA markets",
+      "Performance-driven lead generation",
+      "Retargeting and audience nurturing"
+    ],
+    "href": "/solutions/digital-programmatic"
+  },
+  {
+    "slug":        "geo-ai-seo",
+    "title":       "GEO / AI / SGO / AEO / SEO",
+    "short_title": "GEO & AI Search",
+    "icon":        "travel_explore",
+    "tagline":     "Dominate the future of search.",
+    "description": "Go beyond traditional SEO. We help brands appear in AI-generated answers, voice search, and next-generation search engines — from Google AI Overviews to ChatGPT Search and Perplexity AI.",
+    "hero_image":  "/images/activities/MartechSummit2025/MartechSummit2025_0001.jpeg",
+    "partners":    [],
+    "benefits": [
+      "Generative Engine Optimisation (GEO)",
+      "Answer Engine Optimisation (AEO)",
+      "AI-native content strategy and structuring",
+      "Technical SEO, Core Web Vitals, and schema markup"
+    ],
+    "use_cases": [
+      "B2B thought leadership visibility in AI answers",
+      "Product discovery in AI shopping results",
+      "Local SEO for SEA market presence",
+      "Content audits for LLM indexability"
+    ],
+    "href": "/solutions/geo-ai-seo"
+  },
+  {
+    "slug":        "social-media",
+    "title":       "Social Media Marketing",
+    "short_title": "Social Media",
+    "icon":        "share",
+    "tagline":     "AI-driven social growth.",
+    "description": "Build communities, grow reach, and drive conversions across Facebook, Instagram, TikTok, LinkedIn, and more. Our AI-driven approach ensures content, targeting, and creative work together.",
+    "hero_image":  "/images/case-studies/lotteria-vn1.png",
+    "hero_image_2": "/images/case-studies/eu-holidays-social.png",
+    "partners":    [],
+    "benefits": [
+      "Data-driven content strategy and creation",
+      "Paid social advertising management",
+      "KOL and influencer partnership management",
+      "Community management and brand engagement"
+    ],
+    "use_cases": [
+      "Brand launch campaigns across SEA",
+      "Influencer seeding for product launches",
+      "B2B LinkedIn thought leadership programmes",
+      "TikTok growth for consumer brands"
+    ],
+    "href": "/solutions/social-media"
+  }
+]

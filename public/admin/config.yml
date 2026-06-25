@@ -1,0 +1,189 @@
+# ============================================================
+# Decap CMS Configuration — AKA Digital Website
+# Docs: https://decapcms.org/docs/configuration-options/
+# ============================================================
+
+# Backend: GitHub via Netlify Identity
+# Change to `git-gateway` if using Netlify, or `github` for a custom domain
+backend:
+  name: git-gateway
+  branch: main
+
+# Allow editorial workflow (drafts → review → published)
+publish_mode: editorial_workflow
+
+# Media uploads go to public/images/uploads/
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+# ============================================================
+# COLLECTIONS
+# ============================================================
+collections:
+
+  # ----------------------------------------------------------
+  # BLOG POSTS
+  # ----------------------------------------------------------
+  - name: "blog"
+    label: "Blog Posts"
+    label_singular: "Blog Post"
+    folder: "src/blog"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: "postSlug"
+    fields:
+      - { label: "Layout", name: "layout", widget: "hidden", default: "layouts/blog-post.njk" }
+      - { label: "Post Slug (URL)", name: "postSlug", widget: "string", hint: "URL-safe slug e.g. my-blog-post-title" }
+      - { label: "SEO Title", name: "title", widget: "string" }
+      - { label: "Meta Description", name: "description", widget: "text" }
+      - { label: "Permalink", name: "permalink", widget: "hidden", default: "/blog/{{postSlug}}/index.html" }
+
+  # ----------------------------------------------------------
+  # BLOG DATA (the actual articles stored in blogs.json)
+  # ----------------------------------------------------------
+  - name: "blog_data"
+    label: "Blog Articles (Content)"
+    label_singular: "Blog Article"
+    file: "src/_data/blogs.json"
+    fields:
+      - label: "Articles"
+        name: "articles"
+        widget: "list"
+        fields:
+          - { label: "Slug (URL)", name: "slug", widget: "string" }
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Excerpt", name: "excerpt", widget: "text" }
+          - { label: "Cover Image URL", name: "cover_image", widget: "string" }
+          - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+          - { label: "Author", name: "author", widget: "string" }
+          - { label: "Author Title", name: "author_title", widget: "string" }
+          - { label: "Category", name: "category", widget: "select", options: ["AI & Search", "CRM & Automation", "Programmatic", "Social Media", "MarTech", "Events"] }
+          - { label: "Read Time (min)", name: "read_time", widget: "number" }
+          - { label: "Featured", name: "featured", widget: "boolean", default: false }
+          - { label: "Tags", name: "tags", widget: "list" }
+          - { label: "Article Body (HTML)", name: "body_html", widget: "markdown" }
+
+  # ----------------------------------------------------------
+  # CASE STUDIES
+  # ----------------------------------------------------------
+  - name: "case_studies"
+    label: "Case Studies"
+    label_singular: "Case Study"
+    file: "src/_data/case_studies.json"
+    fields:
+      - label: "Case Studies"
+        name: "case_studies"
+        widget: "list"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string" }
+          - { label: "Client", name: "client", widget: "string" }
+          - { label: "Industry", name: "industry", widget: "string" }
+          - { label: "Country", name: "country", widget: "string" }
+          - { label: "Year", name: "year", widget: "number" }
+          - { label: "Award", name: "award", widget: "string", required: false }
+          - { label: "Featured", name: "featured", widget: "boolean", default: true }
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Summary", name: "summary", widget: "text" }
+          - { label: "Cover Image", name: "cover_image", widget: "image" }
+          - { label: "YouTube Video ID", name: "video_youtube", widget: "string", required: false }
+          - { label: "Video Thumbnail URL", name: "video_thumbnail", widget: "string", required: false }
+          - { label: "Challenge", name: "challenge", widget: "text" }
+          - { label: "Approach", name: "approach", widget: "text" }
+          - { label: "Outcome", name: "outcome", widget: "text" }
+          - label: "Results"
+            name: "results"
+            widget: "list"
+            fields:
+              - { label: "Metric", name: "metric", widget: "string" }
+              - { label: "Value", name: "value", widget: "string" }
+              - { label: "Context", name: "context", widget: "string" }
+          - { label: "Tags", name: "tags", widget: "list" }
+
+  # ----------------------------------------------------------
+  # SITE SETTINGS (hero, media mentions, activities, clients)
+  # ----------------------------------------------------------
+  - name: "sitedata"
+    label: "Site Content"
+    files:
+      - label: "Homepage Hero"
+        name: "hero"
+        file: "src/_data/sitedata.json"
+        fields:
+          - label: "Hero Section"
+            name: "hero"
+            widget: "object"
+            fields:
+              - { label: "Eyebrow Text", name: "eyebrow", widget: "string" }
+              - { label: "Headline", name: "headline", widget: "string" }
+              - { label: "Headline Accent", name: "headline_accent", widget: "string" }
+              - { label: "Subheadline", name: "subheadline", widget: "text" }
+              - { label: "Primary CTA Text", name: "cta_primary", widget: "string" }
+              - { label: "Primary CTA URL", name: "cta_primary_href", widget: "string" }
+              - { label: "Secondary CTA Text", name: "cta_secondary", widget: "string" }
+              - { label: "Secondary CTA URL", name: "cta_secondary_href", widget: "string" }
+
+  # ----------------------------------------------------------
+  # TEAM
+  # ----------------------------------------------------------
+  - name: "team"
+    label: "Team Members"
+    file: "src/_data/team.json"
+    fields:
+      - label: "Team"
+        name: "team"
+        widget: "list"
+        fields:
+          - { label: "Full Name", name: "name", widget: "string" }
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Email", name: "email", widget: "string" }
+          - { label: "Phone", name: "phone", widget: "string" }
+          - { label: "Country", name: "country", widget: "string" }
+          - { label: "Country Code", name: "country_code", widget: "string" }
+          - { label: "Photo", name: "photo", widget: "image" }
+          - { label: "LinkedIn URL", name: "linkedin", widget: "string", required: false }
+          - { label: "Bio", name: "bio", widget: "text" }
+
+  # ----------------------------------------------------------
+  # PARTNERS
+  # ----------------------------------------------------------
+  - name: "partners"
+    label: "Tech Partners"
+    file: "src/_data/partners.json"
+    fields:
+      - label: "Partners"
+        name: "partners"
+        widget: "list"
+        fields:
+          - { label: "Name", name: "name", widget: "string" }
+          - { label: "Logo", name: "logo", widget: "image" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Category", name: "category", widget: "string" }
+          - { label: "Website URL", name: "href", widget: "string" }
+          - { label: "Featured", name: "featured", widget: "boolean" }
+          - { label: "Exclusivity Note", name: "exclusive_note", widget: "string", hint: "e.g. Vietnam Exclusive Partner OR Licensed Partner — Southeast Asia" }
+
+  # ----------------------------------------------------------
+  # INSIGHTS / EVENTS
+  # ----------------------------------------------------------
+  - name: "insights"
+    label: "Insights & Events"
+    file: "src/_data/insights.json"
+    fields:
+      - label: "Insights"
+        name: "insights"
+        widget: "list"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string" }
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Excerpt", name: "excerpt", widget: "text" }
+          - { label: "Cover Image", name: "cover_image", widget: "image" }
+          - { label: "Date", name: "date", widget: "string" }
+          - { label: "Author", name: "author", widget: "string" }
+          - { label: "Category", name: "category", widget: "string" }
+          - { label: "Featured", name: "featured", widget: "boolean" }
+          - { label: "Tags", name: "tags", widget: "list" }
+          - { label: "Intro Body", name: "body_intro", widget: "text" }
+          - label: "Key Takeaways"
+            name: "key_takeaways"
+            widget: "list"
+            field: { label: "Takeaway", name: "item", widget: "string" }

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog Post — AKA Digital CMS</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body class="cms-body">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">AKA</div>
+      <div><div class="logo-name">AKA Digital</div><div class="logo-sub">CMS</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Content</div>
+      <a href="/admin/dashboard" class="nav-item">← Dashboard</a>
+      <a href="/admin/blog-form" class="nav-item active">✎ Blog Post</a>
+      <a href="/admin/events-form" class="nav-item">◷ Event</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-badge" id="userBadge">—</div>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title" id="formTitle">New Blog Post</h1>
+        <p class="page-sub">Fill in the fields below and click Publish.</p>
+      </div>
+    </header>
+
+    <div id="statusBanner" class="status-banner" style="display:none"></div>
+
+    <form id="blogForm" class="cms-form">
+
+      <!-- Row 1: Title -->
+      <div class="form-group full">
+        <label>Post Title <span class="req">*</span></label>
+        <input id="title" type="text" placeholder="e.g. How to Build a First-Party Data Strategy in Vietnam" required />
+      </div>
+
+      <!-- Row 2: Slug (auto-filled) -->
+      <div class="form-group full">
+        <label>URL Slug <span class="hint">— auto-generated, editable</span></label>
+        <div class="slug-row">
+          <span class="slug-prefix">/blog/</span>
+          <input id="slug" type="text" placeholder="how-to-build-first-party-data" />
+        </div>
+      </div>
+
+      <!-- Row 3: Excerpt -->
+      <div class="form-group full">
+        <label>Excerpt <span class="req">*</span></label>
+        <textarea id="excerpt" rows="2" placeholder="One or two sentences summarising the article. Shown in cards and Google search results."></textarea>
+      </div>
+
+      <!-- Row 4: Cover image -->
+      <div class="form-group">
+        <label>Cover Image</label>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="coverFile" accept="image/*" style="display:none" />
+          <img id="coverPreview" src="" alt="" style="display:none;max-height:120px;border-radius:8px;" />
+          <div id="uploadPrompt">
+            <div class="upload-icon">⬆</div>
+            <div>Click to upload or paste image URL below</div>
+          </div>
+        </div>
+        <input id="cover_image" type="text" placeholder="or paste image URL: /images/uploads/..." style="margin-top:8px" />
+      </div>
+
+      <!-- Row 5: Meta fields -->
+      <div class="form-group">
+        <label>Author Name</label>
+        <input id="author" type="text" placeholder="Jeffrey Teo" value="AKA Digital Team" />
+      </div>
+      <div class="form-group">
+        <label>Author Title</label>
+        <input id="author_title" type="text" placeholder="Managing Partner, AKA Digital" value="AKA Digital" />
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input id="date" type="date" />
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="category">
+          <option>AI &amp; Search</option>
+          <option>CRM &amp; Automation</option>
+          <option>Data Strategy</option>
+          <option>Programmatic</option>
+          <option>Social Media</option>
+          <option selected>MarTech</option>
+          <option>Industry Report</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Read Time (minutes)</label>
+        <input id="read_time" type="number" value="5" min="1" max="60" />
+      </div>
+      <div class="form-group">
+        <label>Tags <span class="hint">— comma separated</span></label>
+        <input id="tags" type="text" placeholder="MarTech, AI, Vietnam, CDP" />
+      </div>
+      <div class="form-group">
+        <label>Featured post?</label>
+        <label class="toggle-label">
+          <input id="featured" type="checkbox" />
+          <span class="toggle-track"></span>
+          Show in featured section
+        </label>
+      </div>
+
+      <!-- Body HTML -->
+      <div class="form-group full">
+        <div class="body-tabs">
+          <button type="button" class="tab active" data-tab="write">Write (HTML)</button>
+          <button type="button" class="tab" data-tab="preview">Preview</button>
+        </div>
+        <textarea id="body_html" rows="18" placeholder="<p>Start writing your article here...</p>&#10;&#10;<h2>Section Heading</h2>&#10;<p>Body content...</p>&#10;&#10;<ul>&#10;  <li>Bullet point</li>&#10;</ul>"></textarea>
+        <div id="bodyPreview" class="body-preview" style="display:none"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions full">
+        <button type="submit" class="btn-primary" id="publishBtn">Publish Post</button>
+        <a href="/admin/dashboard" class="btn-ghost">Cancel</a>
+        <span id="formStatus" class="form-status"></span>
+      </div>
+
+    </form>
+  </main>
+
+  <script src="/admin/admin.js"></script>
+  <script>
+    requireAuth();
+    document.getElementById('userBadge').textContent = localStorage.getItem('aka_cms_user');
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // Set default date to today
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+    // Auto-slugify title
+    document.getElementById('title').addEventListener('input', function() {
+      document.getElementById('slug').value = slugify(this.value);
+    });
+
+    // Image upload
+    const uploadZone = document.getElementById('uploadZone');
+    const coverFile  = document.getElementById('coverFile');
+    const coverImg   = document.getElementById('cover_image');
+    const preview    = document.getElementById('coverPreview');
+    const prompt     = document.getElementById('uploadPrompt');
+
+    uploadZone.addEventListener('click', () => coverFile.click());
+    coverFile.addEventListener('change', async () => {
+      const file = coverFile.files[0];
+      if (!file) return;
+      const base64 = await toBase64(file);
+      const r = await apiFetch('/api/upload', 'POST', { base64, filename: file.name });
+      if (r.url) {
+        coverImg.value = r.url;
+        preview.src = r.url;
+        preview.style.display = 'block';
+        prompt.style.display  = 'none';
+      }
+    });
+
+    coverImg.addEventListener('input', () => {
+      if (coverImg.value) {
+        preview.src = coverImg.value;
+        preview.style.display = 'block';
+        prompt.style.display  = 'none';
+      }
+    });
+
+    // Tab toggle (Write / Preview)
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const isPreview = tab.dataset.tab === 'preview';
+        document.getElementById('body_html').style.display  = isPreview ? 'none' : '';
+        document.getElementById('bodyPreview').style.display = isPreview ? '' : 'none';
+        if (isPreview) {
+          document.getElementById('bodyPreview').innerHTML = document.getElementById('body_html').value;
+        }
+      });
+    });
+
+    // Check if editing existing post
+    const params = new URLSearchParams(location.search);
+    const editSlug = params.get('edit');
+
+    if (editSlug) {
+      document.getElementById('formTitle').textContent = 'Edit Blog Post';
+      apiFetch('/api/blogs').then(blogs => {
+        const post = blogs.find(b => b.slug === editSlug);
+        if (!post) return;
+        document.getElementById('title').value       = post.title;
+        document.getElementById('slug').value        = post.slug;
+        document.getElementById('excerpt').value     = post.excerpt;
+        document.getElementById('cover_image').value = post.cover_image;
+        document.getElementById('author').value      = post.author;
+        document.getElementById('author_title').value= post.author_title;
+        document.getElementById('date').value        = post.date;
+        document.getElementById('category').value    = post.category;
+        document.getElementById('read_time').value   = post.read_time;
+        document.getElementById('tags').value        = Array.isArray(post.tags) ? post.tags.join(', ') : '';
+        document.getElementById('featured').checked  = post.featured;
+        document.getElementById('body_html').value   = post.body_html;
+        if (post.cover_image) {
+          preview.src = post.cover_image;
+          preview.style.display = 'block';
+          prompt.style.display  = 'none';
+        }
+      });
+    }
+
+    // Submit
+    document.getElementById('blogForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('publishBtn');
+      const status = document.getElementById('formStatus');
+      btn.disabled = true;
+      btn.textContent = editSlug ? 'Saving…' : 'Publishing…';
+
+      const payload = {
+        slug:         document.getElementById('slug').value || slugify(document.getElementById('title').value),
+        title:        document.getElementById('title').value,
+        excerpt:      document.getElementById('excerpt').value,
+        cover_image:  document.getElementById('cover_image').value,
+        author:       document.getElementById('author').value,
+        author_title: document.getElementById('author_title').value,
+        date:         document.getElementById('date').value,
+        category:     document.getElementById('category').value,
+        read_time:    parseInt(document.getElementById('read_time').value) || 5,
+        tags:         document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
+        featured:     document.getElementById('featured').checked,
+        body_html:    document.getElementById('body_html').value,
+      };
+
+      try {
+        const method  = editSlug ? 'PUT' : 'POST';
+        const url     = editSlug ? `/api/blogs/${editSlug}` : '/api/blogs/new';
+        const result  = await apiFetch(url, method, payload);
+
+        if (result.ok) {
+          status.textContent = '✓ Saved! Triggering build…';
+          status.className   = 'form-status success';
+
+          // Auto-build
+          const es = new EventSource('/api/build');
+          es.onmessage = ev => {
+            const d = JSON.parse(ev.data);
+            status.textContent = '⚙ ' + d.msg;
+            if (d.status === 'done') {
+              status.textContent = '✓ Published and built! ';
+              const a = document.createElement('a');
+              a.href = '/admin/dashboard';
+              a.textContent = '← Back to dashboard';
+              status.appendChild(a);
+              es.close();
+            }
+            if (d.status === 'error') {
+              status.textContent = '⚠ Build error — check terminal';
+              status.className   = 'form-status error';
+              es.close();
+            }
+          };
+        } else {
+          status.textContent = '⚠ ' + (result.error || 'Error saving');
+          status.className   = 'form-status error';
+        }
+      } catch (err) {
+        status.textContent = '⚠ Network error';
+        status.className   = 'form-status error';
+      }
+
+      btn.disabled = false;
+      btn.textContent = editSlug ? 'Save Changes' : 'Publish Post';
+    });
+  </script>
+</body>
+</html>

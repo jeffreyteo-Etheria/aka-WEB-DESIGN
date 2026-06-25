@@ -1,0 +1,522 @@
+/* ============================================================
+   AKA Digital — Main Stylesheet
+   Built with Tailwind CSS v3 (compiled locally, no CDN)
+   ============================================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------
+   Self-hosted fonts
+   Files live in /public/fonts/
+   Playfair Display + JetBrains Mono loaded via Google Fonts CDN in base.njk
+   Inter remains self-hosted below.
+   ------------------------------------------------------------ */
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/Inter-VariableFont_opsz,wght.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ------------------------------------------------------------
+   Base layer
+   ------------------------------------------------------------ */
+@layer base {
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Playfair Display", Georgia, serif;
+  }
+
+  /* Remove tap highlight on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ------------------------------------------------------------
+   Component layer — reusable utility classes
+   ------------------------------------------------------------ */
+@layer components {
+
+  /* Container */
+  .section-container {
+    @apply max-w-container mx-auto px-4 md:px-gutter;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-action-yellow text-on-secondary-fixed font-bold rounded-lg
+           transition-all active:scale-95 uppercase tracking-widest
+           inline-flex items-center justify-center gap-2
+           px-8 py-4 text-label-md;
+  }
+
+  .btn-secondary {
+    @apply border-2 border-on-surface text-on-surface font-bold rounded-lg
+           transition-all hover:bg-on-surface hover:text-background
+           inline-flex items-center justify-center gap-2
+           px-8 py-4 text-label-md;
+  }
+
+  .btn-ghost {
+    @apply text-primary font-bold text-label-md
+           inline-flex items-center gap-2
+           hover:gap-3 transition-all;
+  }
+
+  /* Hide scrollbar on horizontal carousels (mobile) */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+
+  /* ── Google Translate protection rules ──────────────────────
+     Prevent GT from injecting layout-breaking <font> wrappers
+     inside buttons, and keep icon spans at their natural size.
+  ─────────────────────────────────────────────────────────── */
+
+  /* Material Symbols icons: never translate, never resize */
+  .material-symbols-outlined,
+  .material-symbols-rounded,
+  .material-symbols-sharp,
+  .material-icons,
+  .material-icons-outlined {
+    font-size: inherit;
+    translate: none;
+  }
+
+  /* GT wraps translated text in <font> tags which can cause
+     block-level reflow inside flex buttons — neutralise them */
+  .btn-primary > font,
+  .btn-primary > span > font,
+  .btn-secondary > font,
+  .btn-secondary > span > font,
+  .btn-ghost > font,
+  .btn-ghost > span > font {
+    display: contents;
+    font-size: inherit;
+    font-family: inherit;
+  }
+
+  /* Card — solution / feature */
+  .card {
+    @apply bg-white border border-outline-variant/20 rounded-xl p-6
+           hover:border-primary transition-all duration-200
+           hover:-translate-y-1
+           hover:shadow-[0_8px_32px_rgba(66,86,219,0.08)];
+  }
+
+  /* Input field — minimalist bottom-border style */
+  .input-field {
+    @apply w-full bg-[#F1F5F9] border-0 border-b-2 border-transparent
+           focus:border-primary focus:ring-0
+           px-4 py-4 rounded-t-lg transition-all text-on-surface;
+  }
+
+  /* Eyebrow label (text above a headline) */
+  .eyebrow {
+    @apply text-label-md font-bold text-primary tracking-widest uppercase;
+  }
+
+  /* Section divider bar */
+  .divider-bar {
+    @apply w-12 h-1 bg-primary;
+  }
+
+  /* Scrollable row without scrollbar chrome */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Material Symbols icon config */
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    vertical-align: middle;
+    line-height: 1;
+    user-select: none;
+  }
+
+  /* Logo strip — grayscale hover effect */
+  .logo-strip {
+    @apply opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300;
+  }
+
+  /* Active nav item in mobile bottom bar */
+  .mobile-nav-item.active {
+    @apply text-primary;
+  }
+  .mobile-nav-item.active .material-symbols-outlined {
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+  }
+
+  /* Partner logo image — grayscale at rest, full colour on group-hover */
+  .partner-img {
+    @apply grayscale opacity-70 transition-all duration-300;
+  }
+  .group:hover .partner-img {
+    @apply grayscale-0 opacity-100;
+  }
+
+  /* Section intro — centred eyebrow + headline block */
+  .section-intro {
+    @apply text-center mb-12;
+  }
+
+  /* Process step connector (arrow between steps on desktop) */
+  .step-connector {
+    @apply hidden md:flex items-center justify-center text-outline-variant;
+  }
+}
+
+/* ------------------------------------------------------------
+   Blog / Article prose styles (replaces @tailwindcss/typography)
+   ------------------------------------------------------------ */
+.prose {
+  color: #454654;
+  line-height: 1.75;
+  font-size: 1.0625rem;
+  max-width: 72ch;
+}
+.prose h2 {
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1b23;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+.prose h3 {
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1b23;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose p { margin-bottom: 1.25rem; }
+.prose a { color: #1B3A7A; text-decoration: none; }
+.prose a:hover { text-decoration: underline; }
+.prose strong { color: #1a1b23; font-weight: 700; }
+.prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+.prose li { margin-bottom: 0.5rem; }
+.prose ul li { list-style-type: disc; }
+.prose ol li { list-style-type: decimal; }
+.prose table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.9375rem; }
+.prose th { background: #F6F9F5; font-weight: 700; color: #1a1b23; padding: 0.75rem 1rem; text-align: left; border-bottom: 2px solid #c5c5d7; }
+.prose td { padding: 0.625rem 1rem; border-bottom: 1px solid #e3e1ed; vertical-align: top; }
+.prose tr:last-child td { border-bottom: none; }
+.prose blockquote { border-left: 4px solid #1B3A7A; padding-left: 1.25rem; margin: 1.5rem 0; font-style: italic; color: #454654; }
+.prose code { background: #eeecf8; color: #1B3A7A; padding: 0.1em 0.4em; border-radius: 0.25rem; font-size: 0.875em; }
+.prose pre { background: #1a1b23; color: #e3e1ed; padding: 1.25rem; border-radius: 0.75rem; overflow-x: auto; margin-bottom: 1.25rem; }
+.prose pre code { background: none; color: inherit; padding: 0; }
+.prose img { border-radius: 0.75rem; max-width: 100%; height: auto; margin: 1.5rem 0; }
+
+/* ------------------------------------------------------------
+   Utility layer extras
+   ------------------------------------------------------------ */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Frosted glass card */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/10;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ------------------------------------------------------------
+   Hover & interaction micro-animations
+   ------------------------------------------------------------ */
+
+/* Primary button — lift + glow pulse on hover */
+.btn-primary {
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.18s ease,
+              background-color 0.15s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 28px rgba(245, 196, 0, 0.40);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+}
+
+/* Secondary button — lift on hover */
+.btn-secondary {
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.18s ease,
+              background-color 0.15s ease,
+              color 0.15s ease;
+}
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Ghost / arrow links — arrow slides right on hover */
+.btn-ghost {
+  transition: gap 0.2s ease, color 0.15s ease;
+}
+.btn-ghost .material-symbols-outlined {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-ghost:hover .material-symbols-outlined {
+  transform: translateX(5px);
+}
+
+/* Cards — smooth lift */
+.card {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.22s ease,
+              border-color 0.15s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(27, 58, 122, 0.10);
+}
+
+/* Nav links — underline slide-in */
+nav a, .mobile-nav-item {
+  position: relative;
+}
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width 0.2s ease;
+  border-radius: 2px;
+}
+nav a:hover::after {
+  width: 100%;
+}
+
+/* Case study cards & partner cards — image scale on hover */
+.group:hover .group-hover\:scale-105 {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Stat / data cards — subtle glow on hover */
+[class*="bg-white/5"]:hover,
+[class*="bg-action-yellow/10"]:hover {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Logo marquee items — pop on hover */
+.marquee-outer .shrink-0 {
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.marquee-outer .shrink-0:hover {
+  transform: scale(1.12);
+}
+
+/* ------------------------------------------------------------
+   Case study card — Ken Burns slow pan/zoom on static images
+   ------------------------------------------------------------ */
+@keyframes kenburns {
+  0%   { transform: scale(1.00) translate(0%, 0%); }
+  50%  { transform: scale(1.07) translate(-1.5%, -1%); }
+  100% { transform: scale(1.00) translate(0%, 0%); }
+}
+
+.cs-img-animate {
+  animation: kenburns 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* On hover, pause the Ken Burns and jump to a clean scale */
+.group:hover .cs-img-animate {
+  animation-play-state: paused;
+  transform: scale(1.05) !important;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------
+   Scroll-reveal entrance animations
+   ------------------------------------------------------------ */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal-up.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered delay helpers */
+.reveal-up[style*="animation-delay:0.1s"]  { transition-delay: 0.10s; }
+.reveal-up[style*="animation-delay:0.15s"] { transition-delay: 0.15s; }
+.reveal-up[style*="animation-delay:0.2s"]  { transition-delay: 0.20s; }
+.reveal-up[style*="animation-delay:0.25s"] { transition-delay: 0.25s; }
+.reveal-up[style*="animation-delay:0.3s"]  { transition-delay: 0.30s; }
+.reveal-up[style*="animation-delay:0.4s"]  { transition-delay: 0.40s; }
+
+/* ------------------------------------------------------------
+   Custom keyframe animations
+   ------------------------------------------------------------ */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes grow {
+  from { width: 0 !important; }
+}
+
+@keyframes scrollLine {
+  0%, 100% { opacity: 0.4; transform: scaleY(0.6); }
+  50%       { opacity: 0.8; transform: scaleY(1); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(245, 209, 0, 0.3); }
+  50%       { box-shadow: 0 0 40px rgba(245, 209, 0, 0.6); }
+}
+
+/* Counter animation */
+.counter {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Marquee container — always single row, never wraps */
+.marquee-track {
+  display: flex;
+  flex-wrap: nowrap;
+  will-change: transform;
+}
+.marquee-outer:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ------------------------------------------------------------
+   Localisation fixes — VN / KO / ZH layout corrections
+   Applied when i18n.js sets the lang attribute on <html>
+   ------------------------------------------------------------ */
+
+/* Vietnamese — longer words, diacritical marks need more vertical room */
+:is(html[lang="vi"]) body {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+:is(html[lang="vi"]) h1,
+:is(html[lang="vi"]) h2,
+:is(html[lang="vi"]) h3 {
+  line-height: 1.3;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+:is(html[lang="vi"]) p {
+  line-height: 1.85;
+  overflow-wrap: break-word;
+}
+:is(html[lang="vi"]) .flex {
+  flex-wrap: wrap;
+}
+:is(html[lang="vi"]) .grid {
+  row-gap: 1.25rem;
+}
+:is(html[lang="vi"]) .card,
+:is(html[lang="vi"]) [class*="rounded"] {
+  overflow: visible;
+}
+:is(html[lang="vi"]) .text-balance {
+  text-wrap: pretty;
+}
+
+/* Korean — compact glyphs; small font sizes look cramped */
+:is(html[lang="ko"]) body {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+:is(html[lang="ko"]) h1,
+:is(html[lang="ko"]) h2,
+:is(html[lang="ko"]) h3 {
+  line-height: 1.45;
+  word-break: keep-all;
+}
+:is(html[lang="ko"]) p {
+  line-height: 1.9;
+  word-break: keep-all;
+}
+:is(html[lang="ko"]) .flex {
+  flex-wrap: wrap;
+}
+:is(html[lang="ko"]) .grid {
+  row-gap: 1.25rem;
+}
+
+/* Chinese Simplified — square glyphs need consistent vertical spacing */
+:is(html[lang="zh-Hans"]) body {
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+:is(html[lang="zh-Hans"]) h1,
+:is(html[lang="zh-Hans"]) h2,
+:is(html[lang="zh-Hans"]) h3 {
+  line-height: 1.5;
+}
+:is(html[lang="zh-Hans"]) p {
+  line-height: 1.9;
+}
+:is(html[lang="zh-Hans"]) .flex {
+  flex-wrap: wrap;
+}
+:is(html[lang="zh-Hans"]) .grid {
+  row-gap: 1.25rem;
+}
+
+/* Shared: prevent fixed-height containers from clipping translated text */
+:is(html[lang="vi"], html[lang="ko"], html[lang="zh-Hans"]) .card {
+  height: auto !important;
+  min-height: 0;
+}
+:is(html[lang="vi"], html[lang="ko"], html[lang="zh-Hans"]) [class*="h-14"],
+:is(html[lang="vi"], html[lang="ko"], html[lang="zh-Hans"]) [class*="h-16"],
+:is(html[lang="vi"], html[lang="ko"], html[lang="zh-Hans"]) [class*="h-20"] {
+  height: auto;
+  min-height: 3.5rem;
+}
+:is(html[lang="vi"], html[lang="ko"], html[lang="zh-Hans"]) .whitespace-nowrap {
+  white-space: normal !important;
+}
+:is(html[lang="vi"], html[lang="ko"], html[lang="zh-Hans"]) [class*="truncate"] {
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+}

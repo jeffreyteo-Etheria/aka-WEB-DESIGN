@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Event — AKA Digital CMS</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body class="cms-body">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">AKA</div>
+      <div><div class="logo-name">AKA Digital</div><div class="logo-sub">CMS</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Content</div>
+      <a href="/admin/dashboard" class="nav-item">← Dashboard</a>
+      <a href="/admin/blog-form" class="nav-item">✎ Blog Post</a>
+      <a href="/admin/events-form" class="nav-item active">◷ Event</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-badge" id="userBadge">—</div>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title" id="formTitle">New Event / Summit</h1>
+        <p class="page-sub">Add a summit, webinar, conference, or workshop to the site.</p>
+      </div>
+    </header>
+
+    <div id="statusBanner" class="status-banner" style="display:none"></div>
+
+    <form id="eventForm" class="cms-form">
+
+      <div class="form-group full">
+        <label>Event Title <span class="req">*</span></label>
+        <input id="title" type="text" placeholder="e.g. Martech Summit 2027 — AI Agents & Growth" required />
+      </div>
+
+      <div class="form-group full">
+        <label>URL Slug</label>
+        <div class="slug-row">
+          <span class="slug-prefix">/events/</span>
+          <input id="slug" type="text" placeholder="martech-summit-2027" />
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <label>Description <span class="req">*</span></label>
+        <textarea id="description" rows="3" placeholder="Brief description shown in event cards and the activities section of the homepage."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Event Date <span class="req">*</span></label>
+        <input id="date" type="date" required />
+      </div>
+
+      <div class="form-group">
+        <label>Location</label>
+        <input id="location" type="text" placeholder="Ho Chi Minh City, Vietnam" />
+      </div>
+
+      <div class="form-group">
+        <label>Event Type</label>
+        <select id="type">
+          <option>Summit</option>
+          <option>Conference</option>
+          <option>Workshop</option>
+          <option>Webinar</option>
+          <option>Awards</option>
+          <option>Networking</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Registration / Info Link</label>
+        <input id="href" type="text" placeholder="/contact or https://..." value="/contact" />
+      </div>
+
+      <div class="form-group">
+        <label>Cover Image</label>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="coverFile" accept="image/*" style="display:none" />
+          <img id="coverPreview" src="" alt="" style="display:none;max-height:120px;border-radius:8px;" />
+          <div id="uploadPrompt">
+            <div class="upload-icon">⬆</div>
+            <div>Click to upload or paste URL below</div>
+          </div>
+        </div>
+        <input id="image" type="text" placeholder="or paste image URL" style="margin-top:8px" />
+      </div>
+
+      <div class="form-group">
+        <label>Featured?</label>
+        <label class="toggle-label">
+          <input id="featured" type="checkbox" />
+          <span class="toggle-track"></span>
+          Show as featured event
+        </label>
+      </div>
+
+      <div class="form-actions full">
+        <button type="submit" class="btn-primary" id="publishBtn">Save Event</button>
+        <a href="/admin/dashboard" class="btn-ghost">Cancel</a>
+        <span id="formStatus" class="form-status"></span>
+      </div>
+
+    </form>
+  </main>
+
+  <script src="/admin/admin.js"></script>
+  <script>
+    requireAuth();
+    document.getElementById('userBadge').textContent = localStorage.getItem('aka_cms_user');
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+    document.getElementById('title').addEventListener('input', function() {
+      document.getElementById('slug').value = slugify(this.value);
+    });
+
+    // Image upload
+    const uploadZone = document.getElementById('uploadZone');
+    const coverFile  = document.getElementById('coverFile');
+    const imageUrl   = document.getElementById('image');
+    const preview    = document.getElementById('coverPreview');
+    const prompt     = document.getElementById('uploadPrompt');
+
+    uploadZone.addEventListener('click', () => coverFile.click());
+    coverFile.addEventListener('change', async () => {
+      const file = coverFile.files[0];
+      if (!file) return;
+      const base64 = await toBase64(file);
+      const r = await apiFetch('/api/upload', 'POST', { base64, filename: file.name });
+      if (r.url) {
+        imageUrl.value = r.url;
+        preview.src = r.url;
+        preview.style.display = 'block';
+        prompt.style.display  = 'none';
+      }
+    });
+
+    imageUrl.addEventListener('input', () => {
+      if (imageUrl.value) {
+        preview.src = imageUrl.value;
+        preview.style.display = 'block';
+        prompt.style.display  = 'none';
+      }
+    });
+
+    // Edit mode
+    const editSlug = new URLSearchParams(location.search).get('edit');
+    if (editSlug) {
+      document.getElementById('formTitle').textContent = 'Edit Event';
+      apiFetch('/api/events').then(events => {
+        const ev = events.find(e => e.slug === editSlug);
+        if (!ev) return;
+        document.getElementById('title').value       = ev.title;
+        document.getElementById('slug').value        = ev.slug;
+        document.getElementById('description').value = ev.description;
+        document.getElementById('date').value        = ev.date;
+        document.getElementById('location').value    = ev.location;
+        document.getElementById('type').value        = ev.type;
+        document.getElementById('href').value        = ev.href;
+        document.getElementById('image').value       = ev.image;
+        document.getElementById('featured').checked  = ev.featured;
+        if (ev.image) {
+          preview.src = ev.image;
+          preview.style.display = 'block';
+          prompt.style.display  = 'none';
+        }
+      });
+    }
+
+    document.getElementById('eventForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn    = document.getElementById('publishBtn');
+      const status = document.getElementById('formStatus');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      const payload = {
+        slug:        document.getElementById('slug').value || slugify(document.getElementById('title').value),
+        title:       document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        date:        document.getElementById('date').value,
+        location:    document.getElementById('location').value,
+        type:        document.getElementById('type').value,
+        href:        document.getElementById('href').value,
+        image:       document.getElementById('image').value,
+        featured:    document.getElementById('featured').checked,
+      };
+
+      try {
+        const method = editSlug ? 'PUT' : 'POST';
+        const url    = editSlug ? `/api/events/${editSlug}` : '/api/events/new';
+        const result = await apiFetch(url, method, payload);
+
+        if (result.ok) {
+          status.textContent = '✓ Saved! Building site…';
+          status.className   = 'form-status success';
+          const es = new EventSource('/api/build');
+          es.onmessage = ev => {
+            const d = JSON.parse(ev.data);
+            status.textContent = '⚙ ' + d.msg;
+            if (d.status === 'done') {
+              status.textContent = '✓ Event published! ';
+              const a = document.createElement('a');
+              a.href = '/admin/dashboard';
+              a.textContent = '← Back to dashboard';
+              status.appendChild(a);
+              es.close();
+            }
+            if (d.status === 'error') {
+              status.textContent = '⚠ Build error — check terminal';
+              status.className   = 'form-status error';
+              es.close();
+            }
+          };
+        } else {
+          status.textContent = '⚠ ' + (result.error || 'Error');
+          status.className   = 'form-status error';
+        }
+      } catch {
+        status.textContent = '⚠ Network error';
+        status.className   = 'form-status error';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save Event';
+    });
+  </script>
+</body>
+</html>

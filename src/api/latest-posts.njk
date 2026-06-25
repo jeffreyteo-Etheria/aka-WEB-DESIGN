@@ -1,0 +1,19 @@
+---
+permalink: /api/latest-posts.json
+eleventyExcludeFromCollections: true
+---
+[{% for post in blogs | sort(false, true, "date") %}{% if loop.index <= 10 %}
+  {
+    "slug":        "{{ post.slug }}",
+    "title":       {{ post.title | dump | safe }},
+    "excerpt":     {{ post.excerpt | dump | safe }},
+    "date":        "{{ post.date }}",
+    "author":      {{ post.author | dump | safe }},
+    "category":    {{ post.category | dump | safe }},
+    "cover_image": "{{ post.cover_image }}",
+    "url":         "/blog/{{ post.slug }}/",
+    "tags":        {{ post.tags | dump | safe }},
+    "read_time":   {{ post.read_time or 5 }},
+    "featured":    {{ "true" if post.featured else "false" }}
+  }{% if not loop.last and loop.index < 10 %},{% endif %}{% endif %}{% endfor %}
+]

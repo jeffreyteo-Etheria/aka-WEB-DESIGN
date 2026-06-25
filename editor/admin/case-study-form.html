@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Study — AKA Digital CMS</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body class="cms-body">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">AKA</div>
+      <div>
+        <div class="logo-name">AKA Digital</div>
+        <div class="logo-sub">CMS Dashboard</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Content</div>
+      <a href="/admin/dashboard" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a>
+      <a href="/admin/blog-form" class="nav-item"><span class="nav-icon">✎</span> Blog Post</a>
+      <a href="/admin/case-study-form" class="nav-item active"><span class="nav-icon">◆</span> Case Study</a>
+      <a href="/admin/events-form" class="nav-item"><span class="nav-icon">◷</span> Event</a>
+      <a href="/admin/job-form" class="nav-item"><span class="nav-icon">◎</span> Job / Career</a>
+      <div class="nav-section">Tools</div>
+      <a href="#" class="nav-item" id="buildBtn"><span class="nav-icon">⚙</span> Build Site</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-badge" id="userBadge">—</div>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title" id="formTitle">New Case Study</h1>
+        <p class="page-sub">Add a new client success story to the Case Studies page.</p>
+      </div>
+    </header>
+
+    <div id="buildLog" class="build-log" style="display:none">
+      <div class="build-log-header">Build Output</div>
+      <div id="buildLogText" class="build-log-text"></div>
+    </div>
+
+    <form id="csForm" class="form-card" autocomplete="off">
+
+      <!-- ─── Basic Info ──────────────────────────────────────────── -->
+      <div class="form-section-title">Basic Information</div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label class="form-label">Client Name <span class="req">*</span></label>
+          <input type="text" id="client" class="form-input" placeholder="e.g. FE Credit" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Title <span class="req">*</span></label>
+          <input type="text" id="title" class="form-input" placeholder="Campaign headline" required />
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label class="form-label">URL Slug</label>
+          <input type="text" id="slug" class="form-input" placeholder="auto-generated from title" />
+          <p class="form-hint">Leave blank to auto-generate. Cannot be changed after publish.</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Award (optional)</label>
+          <input type="text" id="award" class="form-input" placeholder="e.g. MMA Smarties Silver 2024" />
+        </div>
+      </div>
+
+      <div class="form-row three-col">
+        <div class="form-group">
+          <label class="form-label">Industry</label>
+          <input type="text" id="industry" class="form-input" placeholder="e.g. Financial Services" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          <input type="text" id="country" class="form-input" placeholder="e.g. Vietnam" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Year</label>
+          <input type="number" id="year" class="form-input" placeholder="2025" min="2018" max="2030" />
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="category" class="form-input">
+            <option value="crm-automation">CRM & Automation</option>
+            <option value="digital-programmatic">Digital & Programmatic</option>
+            <option value="geo-ai-seo">GEO / AI / SEO</option>
+            <option value="social-influencer">Social Media & Influencer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category Label</label>
+          <input type="text" id="category_label" class="form-input" placeholder="Shown on card badge" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Summary <span class="req">*</span></label>
+          <textarea id="summary" class="form-input" rows="3" placeholder="2–3 sentence overview of the case study…"></textarea>
+        </div>
+      </div>
+
+      <!-- ─── Media ──────────────────────────────────────────────── -->
+      <div class="form-section-title">Cover Image / Video</div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label class="form-label">Cover Image URL</label>
+          <input type="text" id="cover_image" class="form-input" placeholder="/images/case-studies/client-name.jpg" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Video Thumbnail URL</label>
+          <input type="text" id="video_thumbnail" class="form-input" placeholder="Same as cover image if no video" />
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label class="form-label">YouTube Video ID (optional)</label>
+          <input type="text" id="video_youtube" class="form-input" placeholder="e.g. dQw4w9WgXcQ" />
+          <p class="form-hint">The part after youtube.com/watch?v=</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Local Video Cover (optional)</label>
+          <input type="text" id="video_cover" class="form-input" placeholder="/videos/case-studies/client-video.mp4" />
+          <p class="form-hint">Used for autoplay card on homepage</p>
+        </div>
+      </div>
+
+      <div class="upload-zone" id="uploadZone">
+        <span class="material-icons-outlined" style="font-size:2rem;color:#aaa">cloud_upload</span>
+        <p>Drop an image here or <label for="fileInput" style="color:var(--aka-yellow);cursor:pointer;text-decoration:underline">browse</label></p>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" />
+        <p id="uploadStatus" class="form-hint" style="margin-top:4px"></p>
+      </div>
+
+      <!-- ─── Case Study Body ────────────────────────────────────── -->
+      <div class="form-section-title">Case Study Content</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">The Challenge</label>
+          <textarea id="challenge" class="form-input" rows="4" placeholder="What business problem or challenge did the client face?"></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Our Approach</label>
+          <textarea id="approach" class="form-input" rows="4" placeholder="How did AKA Digital tackle the challenge?"></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">The Outcome</label>
+          <textarea id="outcome" class="form-input" rows="3" placeholder="What was achieved? Include key results and impact."></textarea>
+        </div>
+      </div>
+
+      <!-- ─── Results Metrics ────────────────────────────────────── -->
+      <div class="form-section-title">Key Results (up to 3 metrics)</div>
+
+      <div id="resultsGrid" class="results-grid">
+        <div class="result-row">
+          <input type="text" class="form-input result-metric" placeholder="e.g. Engagement Rate" />
+          <input type="text" class="form-input result-value" placeholder="e.g. +42%" />
+          <input type="text" class="form-input result-context" placeholder="e.g. YoY improvement" />
+        </div>
+        <div class="result-row">
+          <input type="text" class="form-input result-metric" placeholder="Metric 2" />
+          <input type="text" class="form-input result-value" placeholder="Value" />
+          <input type="text" class="form-input result-context" placeholder="Context" />
+        </div>
+        <div class="result-row">
+          <input type="text" class="form-input result-metric" placeholder="Metric 3" />
+          <input type="text" class="form-input result-value" placeholder="Value" />
+          <input type="text" class="form-input result-context" placeholder="Context" />
+        </div>
+      </div>
+      <p class="form-hint" style="margin-top:6px">Metric · Value · Context — leave blank to skip a row</p>
+
+      <!-- ─── Tags & Settings ────────────────────────────────────── -->
+      <div class="form-section-title">Tags & Visibility</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tags (comma-separated)</label>
+          <input type="text" id="tags" class="form-input" placeholder="e.g. CRM, Vietnam, Financial Services" />
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group toggle-group">
+          <label class="toggle-label">
+            <div class="toggle-switch">
+              <input type="checkbox" id="featured" />
+              <span class="toggle-slider"></span>
+            </div>
+            Featured (shown in Case Studies grid)
+          </label>
+        </div>
+        <div class="form-group toggle-group">
+          <label class="toggle-label">
+            <div class="toggle-switch">
+              <input type="checkbox" id="featured_home" />
+              <span class="toggle-slider"></span>
+            </div>
+            Feature on Homepage
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" id="submitBtn">Publish Case Study</button>
+        <a href="/admin/dashboard" class="btn-outline">Cancel</a>
+        <span id="saveStatus" class="save-status"></span>
+      </div>
+
+    </form>
+  </main>
+
+  <script src="/admin/admin.js"></script>
+  <script>
+    requireAuth();
+    document.getElementById('userBadge').textContent = localStorage.getItem('aka_cms_user');
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    const params = new URLSearchParams(location.search);
+    const editSlug = params.get('edit');
+    let existingData = null;
+
+    if (editSlug) {
+      document.getElementById('formTitle').textContent = 'Edit Case Study';
+      document.getElementById('submitBtn').textContent = 'Save Changes';
+      apiFetch('/api/case-studies').then(list => {
+        existingData = list.find(c => c.slug === editSlug);
+        if (!existingData) { alert('Case study not found'); return; }
+        const f = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v || ''; };
+        f('client', existingData.client); f('title', existingData.title);
+        f('slug', existingData.slug); f('award', existingData.award);
+        f('industry', existingData.industry); f('country', existingData.country);
+        f('year', existingData.year); f('category', existingData.category);
+        f('category_label', existingData.category_label); f('summary', existingData.summary);
+        f('cover_image', existingData.cover_image); f('video_thumbnail', existingData.video_thumbnail);
+        f('video_youtube', existingData.video_youtube); f('video_cover', existingData.video_cover);
+        f('challenge', existingData.challenge); f('approach', existingData.approach);
+        f('outcome', existingData.outcome);
+        f('tags', (existingData.tags || []).join(', '));
+        document.getElementById('featured').checked = !!existingData.featured;
+        document.getElementById('featured_home').checked = !!existingData.featured_home;
+        const rows = document.querySelectorAll('.result-row');
+        (existingData.results || []).forEach((r, i) => {
+          if (!rows[i]) return;
+          rows[i].querySelector('.result-metric').value = r.metric || '';
+          rows[i].querySelector('.result-value').value  = r.value  || '';
+          rows[i].querySelector('.result-context').value = r.context || '';
+        });
+      });
+    }
+
+    // Auto-slug from title
+    document.getElementById('title').addEventListener('input', e => {
+      if (!editSlug) document.getElementById('slug').value = slugify(e.target.value);
+    });
+
+    // Auto-fill category label from category select
+    const catLabels = {
+      'crm-automation': 'CRM & Automation',
+      'digital-programmatic': 'Digital & Programmatic',
+      'geo-ai-seo': 'GEO / AI / SEO',
+      'social-influencer': 'Social Media & Influencer',
+    };
+    document.getElementById('category').addEventListener('change', e => {
+      const lbl = document.getElementById('category_label');
+      if (!lbl.value) lbl.value = catLabels[e.target.value] || '';
+    });
+
+    // Image upload
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput  = document.getElementById('fileInput');
+    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = '#F5C400'; });
+    uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = ''; });
+    uploadZone.addEventListener('drop', async e => {
+      e.preventDefault(); uploadZone.style.borderColor = '';
+      const file = e.dataTransfer.files[0];
+      if (file) await handleUpload(file);
+    });
+    fileInput.addEventListener('change', async e => {
+      if (e.target.files[0]) await handleUpload(e.target.files[0]);
+    });
+    async function handleUpload(file) {
+      document.getElementById('uploadStatus').textContent = 'Uploading…';
+      const b64 = await toBase64(file);
+      const r = await apiFetch('/api/upload', 'POST', { base64: b64, filename: file.name });
+      if (r.url) {
+        document.getElementById('cover_image').value = r.url;
+        document.getElementById('video_thumbnail').value = r.url;
+        document.getElementById('uploadStatus').textContent = '✓ Uploaded: ' + r.url;
+      } else {
+        document.getElementById('uploadStatus').textContent = '✗ Upload failed';
+      }
+    }
+
+    // Submit
+    document.getElementById('csForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const status = document.getElementById('saveStatus');
+      btn.disabled = true; btn.textContent = 'Saving…';
+
+      const results = [];
+      document.querySelectorAll('.result-row').forEach(row => {
+        const metric  = row.querySelector('.result-metric').value.trim();
+        const value   = row.querySelector('.result-value').value.trim();
+        const context = row.querySelector('.result-context').value.trim();
+        if (metric && value) results.push({ metric, value, context });
+      });
+
+      const payload = {
+        client:         document.getElementById('client').value.trim(),
+        title:          document.getElementById('title').value.trim(),
+        slug:           document.getElementById('slug').value.trim() || slugify(document.getElementById('title').value),
+        award:          document.getElementById('award').value.trim(),
+        industry:       document.getElementById('industry').value.trim(),
+        country:        document.getElementById('country').value.trim(),
+        year:           parseInt(document.getElementById('year').value) || new Date().getFullYear(),
+        category:       document.getElementById('category').value,
+        category_label: document.getElementById('category_label').value.trim(),
+        summary:        document.getElementById('summary').value.trim(),
+        cover_image:    document.getElementById('cover_image').value.trim(),
+        video_thumbnail:document.getElementById('video_thumbnail').value.trim(),
+        video_youtube:  document.getElementById('video_youtube').value.trim(),
+        video_cover:    document.getElementById('video_cover').value.trim(),
+        challenge:      document.getElementById('challenge').value.trim(),
+        approach:       document.getElementById('approach').value.trim(),
+        outcome:        document.getElementById('outcome').value.trim(),
+        results,
+        tags:           document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
+        featured:       document.getElementById('featured').checked,
+        featured_home:  document.getElementById('featured_home').checked,
+      };
+
+      try {
+        let r;
+        if (editSlug) {
+          r = await apiFetch('/api/case-studies/' + editSlug, 'PUT', payload);
+        } else {
+          r = await apiFetch('/api/case-studies/new', 'POST', payload);
+        }
+        if (r.ok || r.slug) {
+          status.textContent = '✓ Saved!';
+          status.style.color = '#22c55e';
+          // Auto-build
+          const log = document.getElementById('buildLog');
+          const txt = document.getElementById('buildLogText');
+          log.style.display = 'block';
+          txt.textContent = 'Building site…\n';
+          const es = new EventSource('/api/build');
+          es.onmessage = ev => {
+            const d = JSON.parse(ev.data);
+            txt.textContent += d.msg + '\n';
+            if (d.status === 'done') {
+              es.close();
+              setTimeout(() => { location.href = '/admin/dashboard'; }, 1200);
+            }
+            if (d.status === 'error') es.close();
+          };
+          await apiFetch('/api/build', 'POST');
+        } else {
+          status.textContent = '✗ ' + (r.error || 'Save failed');
+          status.style.color = '#ef4444';
+          btn.disabled = false; btn.textContent = editSlug ? 'Save Changes' : 'Publish Case Study';
+        }
+      } catch(err) {
+        status.textContent = '✗ Error: ' + err.message;
+        status.style.color = '#ef4444';
+        btn.disabled = false; btn.textContent = editSlug ? 'Save Changes' : 'Publish Case Study';
+      }
+    });
+
+    document.getElementById('buildBtn').addEventListener('click', async e => {
+      e.preventDefault();
+      const log = document.getElementById('buildLog');
+      const txt = document.getElementById('buildLogText');
+      log.style.display = 'block';
+      txt.textContent = 'Building…\n';
+      const es = new EventSource('/api/build');
+      es.onmessage = ev => {
+        const d = JSON.parse(ev.data);
+        txt.textContent += d.msg + '\n';
+        if (d.status === 'done' || d.status === 'error') es.close();
+      };
+      await apiFetch('/api/build', 'POST');
+    });
+  </script>
+</body>
+</html>

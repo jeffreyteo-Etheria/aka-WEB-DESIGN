@@ -1,0 +1,178 @@
+---
+layout: layouts/base.njk
+title: Blog | MarTech Insights for Southeast Asia | AKA Digital
+description: MarTech strategies, GEO/AI search guides, CRM automation playbooks, and digital marketing insights from AKA Digital — Southeast Asia's leading B2B MarTech agency.
+permalink: /blog/index.html
+---
+
+<!-- Blog Hero -->
+<section class="relative py-24 bg-[#060F24] overflow-hidden">
+  <div class="absolute inset-0 opacity-[0.04]" style="background-image:radial-gradient(ellipse at 50% 100%, rgba(37,59,194,1) 0%, transparent 70%)"></div>
+  <div class="relative z-10 section-container text-center">
+    <div class="inline-flex items-center gap-2 bg-action-yellow text-on-secondary-fixed px-4 py-1.5 rounded-full text-label-md font-bold mb-6">
+      <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">edit_note</span>
+      Knowledge Hub
+    </div>
+    <h1 class="text-headline-lg md:text-headline-xl font-display text-white mb-6 text-balance">
+      MarTech Insights for<br/><span class="text-action-yellow">Southeast Asia</span>
+    </h1>
+    <p class="text-body-lg text-white/60 max-w-2xl mx-auto mb-8">
+      Strategy guides, platform deep-dives, and industry analysis from AKA Digital's team — helping enterprise marketers across Vietnam, Singapore, Indonesia, and Korea get more from their MarTech investment.
+    </p>
+    <!-- Category filter pills -->
+    <div class="flex flex-wrap justify-center gap-2 mt-6">
+      <button class="blog-filter active bg-primary text-on-primary px-4 py-2 rounded-full text-label-md font-bold transition-all" data-filter="all">All Topics</button>
+      <button class="blog-filter bg-white/10 text-white/70 hover:bg-white/20 px-4 py-2 rounded-full text-label-md font-bold transition-all" data-filter="AI & Search">AI & Search</button>
+      <button class="blog-filter bg-white/10 text-white/70 hover:bg-white/20 px-4 py-2 rounded-full text-label-md font-bold transition-all" data-filter="CRM & Automation">CRM & Automation</button>
+      <button class="blog-filter bg-white/10 text-white/70 hover:bg-white/20 px-4 py-2 rounded-full text-label-md font-bold transition-all" data-filter="Programmatic">Programmatic</button>
+      <button class="blog-filter bg-white/10 text-white/70 hover:bg-white/20 px-4 py-2 rounded-full text-label-md font-bold transition-all" data-filter="Social Media">Social Media</button>
+      <button class="blog-filter bg-white/10 text-white/70 hover:bg-white/20 px-4 py-2 rounded-full text-label-md font-bold transition-all" data-filter="MarTech">MarTech</button>
+    </div>
+  </div>
+</section>
+
+<!-- Featured article -->
+<section class="py-16 bg-surface-off-white">
+  <div class="section-container">
+    {% set featured = blogs | where("featured") | first %}
+    {% if featured %}
+      <div class="mb-8">
+        <p class="eyebrow mb-2">Featured Article</p>
+      </div>
+      <a href="/blog/{{ featured.slug }}" class="group block card overflow-hidden hover:shadow-[0_20px_60px_rgba(37,59,194,0.12)] hover:-translate-y-1 transition-all duration-300 md:flex">
+        <div class="md:w-1/2 aspect-video md:aspect-auto overflow-hidden bg-surface-container">
+          <img src="{{ featured.cover_image }}" alt="{{ featured.title }}"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
+        </div>
+        <div class="md:w-1/2 p-8 md:p-10 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <span class="bg-primary/10 text-primary text-label-md font-bold px-3 py-1 rounded-full">{{ featured.category }}</span>
+              <span class="text-on-surface-variant text-label-md">{{ featured.read_time }} min read</span>
+            </div>
+            <h2 class="text-headline-md font-display text-on-surface mb-4 text-balance group-hover:text-primary transition-colors">{{ featured.title }}</h2>
+            <p class="text-body-lg text-on-surface-variant leading-relaxed mb-6">{{ featured.excerpt }}</p>
+          </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="font-bold text-on-surface text-body-md">{{ featured.author }}</span>
+              <span class="text-on-surface-variant text-label-md block">{{ featured.date | dateFormat }}</span>
+            </div>
+            <span class="inline-flex items-center gap-1 text-primary font-bold text-label-md group-hover:gap-2 transition-all">
+              Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </span>
+          </div>
+        </div>
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+<!-- All articles grid -->
+<section class="py-16 bg-background" id="articles">
+  <div class="section-container">
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="blog-grid">
+      {% for post in blogs %}
+        <article class="group card overflow-hidden hover:shadow-[0_10px_40px_rgba(37,59,194,0.10)] hover:-translate-y-1 transition-all duration-300 flex flex-col blog-card" data-category="{{ post.category }}">
+          <a href="/blog/{{ post.slug }}" class="block aspect-[16/9] overflow-hidden bg-surface-container shrink-0">
+            <img src="{{ post.cover_image }}" alt="{{ post.title }}"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+          </a>
+          <div class="p-6 flex flex-col flex-1">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="bg-primary/10 text-primary text-label-md font-bold px-2.5 py-1 rounded-full text-xs">{{ post.category }}</span>
+              <span class="text-on-surface-variant text-label-md text-xs">{{ post.read_time }} min</span>
+            </div>
+            <a href="/blog/{{ post.slug }}">
+              <h2 class="font-display font-bold text-on-surface text-headline-sm mb-3 leading-snug group-hover:text-primary transition-colors line-clamp-2">{{ post.title }}</h2>
+            </a>
+            <p class="text-body-md text-on-surface-variant leading-relaxed flex-1 line-clamp-3 text-sm">{{ post.excerpt }}</p>
+            <div class="flex items-center justify-between pt-4 mt-4 border-t border-outline-variant/20">
+              <div>
+                <span class="font-bold text-on-surface text-label-md block">{{ post.author }}</span>
+                <span class="text-on-surface-variant text-label-md text-xs">{{ post.date | dateFormat }}</span>
+              </div>
+              <a href="/blog/{{ post.slug }}" class="flex items-center gap-1 text-primary font-bold text-label-md text-xs hover:gap-2 transition-all">
+                Read <span class="material-symbols-outlined text-sm">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+
+      <!-- Activities as articles (events) -->
+      {% for activity in sitedata.activities %}
+        <article class="group card overflow-hidden hover:shadow-[0_10px_40px_rgba(37,59,194,0.10)] hover:-translate-y-1 transition-all duration-300 flex flex-col blog-card" data-category="Event">
+          <a href="{{ activity.href }}" class="block aspect-[16/9] overflow-hidden bg-surface-container shrink-0">
+            <img src="{{ activity.image }}" alt="{{ activity.title }}"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+          </a>
+          <div class="p-6 flex flex-col flex-1">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="bg-action-yellow/15 text-on-surface text-label-md font-bold px-2.5 py-1 rounded-full text-xs">{{ activity.type }}</span>
+              <span class="text-on-surface-variant text-label-md text-xs">Event Recap</span>
+            </div>
+            <a href="{{ activity.href }}">
+              <h2 class="font-display font-bold text-on-surface text-headline-sm mb-3 leading-snug group-hover:text-primary transition-colors line-clamp-2">{{ activity.title }}</h2>
+            </a>
+            <p class="text-body-md text-on-surface-variant leading-relaxed flex-1 line-clamp-3 text-sm">{{ activity.description }}</p>
+            <div class="flex items-center justify-between pt-4 mt-4 border-t border-outline-variant/20">
+              <span class="text-on-surface-variant text-label-md text-xs">{{ activity.date }}</span>
+              <a href="{{ activity.href }}" class="flex items-center gap-1 text-primary font-bold text-label-md text-xs hover:gap-2 transition-all">
+                Read <span class="material-symbols-outlined text-sm">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter / lead capture -->
+<section class="py-20 bg-primary text-on-primary text-center">
+  <div class="section-container">
+    <span class="material-symbols-outlined text-4xl text-on-primary/40 mb-4 block">mail</span>
+    <h2 class="text-headline-md font-display mb-3">Get MarTech Insights in Your Inbox</h2>
+    <p class="text-body-lg text-on-primary/70 mb-8 max-w-md mx-auto">Monthly roundups, event invites, and platform strategy guides for B2B marketers in Southeast Asia.</p>
+    <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" name="newsletter" method="POST">
+      <input type="email" name="email" placeholder="Enter your work email" required
+        class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-action-yellow transition-colors" />
+      <button type="submit" class="bg-action-yellow text-on-secondary-fixed font-extrabold px-6 py-3 rounded-xl text-label-md uppercase tracking-wider hover:shadow-lg transition-all shrink-0">
+        Subscribe
+      </button>
+    </form>
+    <p class="text-on-primary/40 text-label-md mt-4">No spam, unsubscribe anytime.</p>
+  </div>
+</section>
+
+<script>
+  // Blog category filter
+  document.addEventListener('DOMContentLoaded', function () {
+    var filterBtns = document.querySelectorAll('.blog-filter');
+    var cards = document.querySelectorAll('.blog-card');
+
+    filterBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var filter = this.dataset.filter;
+
+        // Update button styles
+        filterBtns.forEach(function (b) {
+          b.classList.remove('active', 'bg-primary', 'text-on-primary');
+          b.classList.add('bg-white/10', 'text-white/70');
+        });
+        this.classList.add('active', 'bg-primary', 'text-on-primary');
+        this.classList.remove('bg-white/10', 'text-white/70');
+
+        // Filter cards
+        cards.forEach(function (card) {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  });
+</script>

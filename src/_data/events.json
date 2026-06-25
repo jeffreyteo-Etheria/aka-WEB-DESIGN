@@ -1,0 +1,13 @@
+[
+  {
+    "slug":        "martech-summit-2026",
+    "title":       "Martech Summit 2026 — Agentic AI & Intelligent Action",
+    "description": "AKA Digital's flagship annual summit returns in 2026. This year's theme: the Agentic AI ecosystem and how autonomous AI agents are transforming marketing operations across Southeast Asia.",
+    "date":        "2026-09-01",
+    "location":    "Ho Chi Minh City, Vietnam",
+    "type":        "Summit",
+    "image":       "/images/activities/2025 Martech Summit/Martech-summit-2025-from-data-chaos-to-performance-delivery.png",
+    "href":        "/contact",
+    "featured":    true
+  }
+]

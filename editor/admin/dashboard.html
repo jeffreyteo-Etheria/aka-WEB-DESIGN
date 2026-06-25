@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — AKA Digital CMS</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body class="cms-body">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">AKA</div>
+      <div>
+        <div class="logo-name">AKA Digital</div>
+        <div class="logo-sub">Content Hub</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">Content</div>
+      <a href="/admin/dashboard" class="nav-item active">
+        <span class="nav-icon">◈</span> Dashboard
+      </a>
+      <a href="/admin/blog-form" class="nav-item">
+        <span class="nav-icon">✎</span> New Blog Post
+      </a>
+      <a href="/admin/case-study-form" class="nav-item">
+        <span class="nav-icon">◆</span> New Case Study
+      </a>
+      <a href="/admin/events-form" class="nav-item">
+        <span class="nav-icon">◷</span> New Event
+      </a>
+      <a href="/admin/job-form" class="nav-item">
+        <span class="nav-icon">◎</span> New Job / Career
+      </a>
+
+      <div class="nav-section">CRM & Automation</div>
+      <a href="/admin/crm-hub" class="nav-item">
+        <span class="nav-icon">⬡</span> CRM Hub
+      </a>
+
+      <div class="nav-section super-only" style="display:none">Site Data</div>
+      <a href="http://localhost:3001" target="_blank" class="nav-item super-only" style="display:none">
+        <span class="nav-icon">◉</span> Visual Editor
+      </a>
+
+      <div class="nav-section" style="margin-top:auto">Tools</div>
+      <a href="#" class="nav-item" id="buildBtn">
+        <span class="nav-icon">⚙</span> Build Site
+      </a>
+      <a href="#" class="nav-item" id="exportBtn">
+        <span class="nav-icon">⬇</span> Export ZIP
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-badge" id="userBadge">—</div>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-sub">Welcome back. What would you like to publish today?</p>
+      </div>
+      <div class="header-actions">
+        <a href="/admin/blog-form" class="btn-primary">+ Blog Post</a>
+        <a href="/admin/case-study-form" class="btn-outline">+ Case Study</a>
+      </div>
+    </header>
+
+    <!-- Quick actions -->
+    <div class="quick-actions">
+      <a href="/admin/blog-form" class="quick-card">
+        <div class="quick-icon blog-icon">✎</div>
+        <div class="quick-label">Blog Post</div>
+        <div class="quick-desc">Write and publish a new article</div>
+      </a>
+      <a href="/admin/case-study-form" class="quick-card">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#0B1F4B,#1a3a7a);color:#F5C400">◆</div>
+        <div class="quick-label">Case Study</div>
+        <div class="quick-desc">Add a new client success story</div>
+      </a>
+      <a href="/admin/events-form" class="quick-card">
+        <div class="quick-icon event-icon">◷</div>
+        <div class="quick-label">Event / Summit</div>
+        <div class="quick-desc">Add a summit, webinar or workshop</div>
+      </a>
+      <a href="/admin/job-form" class="quick-card">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:#F5C400">◎</div>
+        <div class="quick-label">Job Opening</div>
+        <div class="quick-desc">Post a new role on Careers page</div>
+      </a>
+      <a href="/admin/crm-hub" class="quick-card">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#064e3b,#065f46);color:#34d399">⬡</div>
+        <div class="quick-label">CRM Hub</div>
+        <div class="quick-desc">CRM, automation &amp; social publishing</div>
+      </a>
+    </div>
+
+    <!-- Build log -->
+    <div id="buildLog" class="build-log" style="display:none">
+      <div class="build-log-header">Build Output</div>
+      <div id="buildLogText" class="build-log-text"></div>
+    </div>
+
+    <!-- Blog post list -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2>Blog Posts</h2>
+        <a href="/admin/blog-form" class="btn-sm">+ New</a>
+      </div>
+      <div id="blogList" class="content-list">
+        <div class="loading">Loading…</div>
+      </div>
+    </section>
+
+    <!-- Case studies list -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2>Case Studies</h2>
+        <a href="/admin/case-study-form" class="btn-sm">+ New</a>
+      </div>
+      <div id="csList" class="content-list">
+        <div class="loading">Loading…</div>
+      </div>
+    </section>
+
+    <!-- Events list -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2>Events</h2>
+        <a href="/admin/events-form" class="btn-sm">+ New</a>
+      </div>
+      <div id="eventList" class="content-list">
+        <div class="loading">Loading…</div>
+      </div>
+    </section>
+
+    <!-- Jobs list -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2>Job Openings</h2>
+        <a href="/admin/job-form" class="btn-sm">+ New</a>
+      </div>
+      <div id="jobList" class="content-list">
+        <div class="loading">Loading…</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/admin/admin.js"></script>
+  <script>
+    requireAuth();
+    const role = localStorage.getItem('aka_cms_role');
+
+    if (role === 'super') {
+      document.querySelectorAll('.super-only').forEach(el => el.style.display = '');
+    }
+
+    document.getElementById('userBadge').textContent =
+      `${localStorage.getItem('aka_cms_user')} (${role})`;
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // Build
+    document.getElementById('buildBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const log = document.getElementById('buildLog');
+      const txt = document.getElementById('buildLogText');
+      log.style.display = 'block';
+      txt.textContent = 'Starting build…\n';
+      const es = new EventSource('/api/build');
+      es.onmessage = ev => {
+        const d = JSON.parse(ev.data);
+        txt.textContent += d.msg + '\n';
+        if (d.status === 'done' || d.status === 'error') es.close();
+      };
+      await apiFetch('/api/build', 'POST');
+    });
+
+    // Export ZIP
+    document.getElementById('exportBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const log = document.getElementById('buildLog');
+      const txt = document.getElementById('buildLogText');
+      log.style.display = 'block';
+      txt.textContent = 'Building + packaging…\n';
+      const es = new EventSource('/api/export');
+      es.onmessage = ev => {
+        const d = JSON.parse(ev.data);
+        txt.textContent += d.msg + '\n';
+        if (d.status === 'done' || d.status === 'error') es.close();
+      };
+      await apiFetch('/api/export', 'POST');
+    });
+
+    // ── Load blog posts ──────────────────────────────────────────────────
+    apiFetch('/api/blogs').then(blogs => {
+      const el = document.getElementById('blogList');
+      if (!blogs || !blogs.length) { el.innerHTML = '<p class="empty">No blog posts yet.</p>'; return; }
+      el.innerHTML = blogs.slice(0, 8).map(b => `
+        <div class="list-item">
+          <div class="list-item-info">
+            <span class="list-item-title">${b.title}</span>
+            <span class="list-item-meta">${b.category} · ${b.date} · ${b.read_time} min read</span>
+          </div>
+          <div class="list-item-actions">
+            <a href="/admin/blog-form?edit=${b.slug}" class="btn-xs">Edit</a>
+            ${role === 'super' ? `<button class="btn-xs danger" onclick="delBlog('${b.slug}')">Delete</button>` : ''}
+          </div>
+        </div>`).join('');
+    });
+
+    // ── Load case studies ────────────────────────────────────────────────
+    apiFetch('/api/case-studies').then(list => {
+      const el = document.getElementById('csList');
+      if (!list || !list.length) { el.innerHTML = '<p class="empty">No case studies yet.</p>'; return; }
+      el.innerHTML = list.slice(0, 10).map(c => `
+        <div class="list-item">
+          <div class="list-item-info">
+            <span class="list-item-title">${c.client}: ${c.title}</span>
+            <span class="list-item-meta">${c.category_label || c.category} · ${c.country} · ${c.year}</span>
+          </div>
+          <div class="list-item-actions">
+            <a href="/admin/case-study-form?edit=${c.slug}" class="btn-xs">Edit</a>
+            ${role === 'super' ? `<button class="btn-xs danger" onclick="delCase('${c.slug}')">Delete</button>` : ''}
+          </div>
+        </div>`).join('');
+    });
+
+    // ── Load events ──────────────────────────────────────────────────────
+    apiFetch('/api/events').then(events => {
+      const el = document.getElementById('eventList');
+      if (!events || !events.length) { el.innerHTML = '<p class="empty">No events yet.</p>'; return; }
+      el.innerHTML = events.map(ev => `
+        <div class="list-item">
+          <div class="list-item-info">
+            <span class="list-item-title">${ev.title}</span>
+            <span class="list-item-meta">${ev.type} · ${ev.date} · ${ev.location}</span>
+          </div>
+          <div class="list-item-actions">
+            <a href="/admin/events-form?edit=${ev.slug}" class="btn-xs">Edit</a>
+            ${role === 'super' ? `<button class="btn-xs danger" onclick="delEvent('${ev.slug}')">Delete</button>` : ''}
+          </div>
+        </div>`).join('');
+    });
+
+    // ── Load jobs ────────────────────────────────────────────────────────
+    apiFetch('/api/jobs').then(jobs => {
+      const el = document.getElementById('jobList');
+      if (!jobs || !jobs.length) { el.innerHTML = '<p class="empty">No job openings yet.</p>'; return; }
+      el.innerHTML = jobs.map(j => `
+        <div class="list-item">
+          <div class="list-item-info">
+            <span class="list-item-title">${j.title}</span>
+            <span class="list-item-meta">${j.location} · ${j.type} · ${j.active ? '<span style="color:#22c55e">Active</span>' : '<span style="color:#ef4444">Hidden</span>'}</span>
+          </div>
+          <div class="list-item-actions">
+            <a href="/admin/job-form?edit=${j.slug}" class="btn-xs">Edit</a>
+            ${role === 'super' ? `<button class="btn-xs danger" onclick="delJob('${j.slug}')">Delete</button>` : ''}
+          </div>
+        </div>`).join('');
+    });
+
+    // ── Delete helpers ───────────────────────────────────────────────────
+    async function delBlog(slug) {
+      if (!confirm(`Delete blog post "${slug}"? This cannot be undone.`)) return;
+      await apiFetch('/api/blogs/' + slug, 'DELETE');
+      location.reload();
+    }
+    async function delCase(slug) {
+      if (!confirm(`Delete case study "${slug}"? This cannot be undone.`)) return;
+      await apiFetch('/api/case-studies/' + slug, 'DELETE');
+      location.reload();
+    }
+    async function delEvent(slug) {
+      if (!confirm(`Delete event "${slug}"? This cannot be undone.`)) return;
+      await apiFetch('/api/events/' + slug, 'DELETE');
+      location.reload();
+    }
+    async function delJob(slug) {
+      if (!confirm(`Delete job "${slug}"? This cannot be undone.`)) return;
+      await apiFetch('/api/jobs/' + slug, 'DELETE');
+      location.reload();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+node_modules/
+dist/
+public/css/
+exports/
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.env
+.env.local
+
+# Large binary assets — keep locally, do not push to GitHub
+ASSETS/
+
+# User uploads via CMS
+public/images/uploads/
+
+# Editor runtime state
+src/_data/_edits.json
+
+# Temp / OS files
+*.tmp
+*.bak
+~$*
+
+public/images/
+public/videos/
+public/fonts/

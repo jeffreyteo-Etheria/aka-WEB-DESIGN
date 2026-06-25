@@ -1,0 +1,183 @@
+---
+layout: layouts/base.njk
+title: Careers | AKA Digital
+description: Join AKA Digital — Southeast Asia's leading B2B MarTech agency. We are always looking for talented marketers, technologists, and business development professionals.
+---
+
+<!-- Hero -->
+<section class="relative py-24 bg-on-surface text-inverse-on-surface overflow-hidden">
+  <div class="absolute inset-0 z-0">
+    <img src="/images/activities/Look-back-Martech-Summit-2024/Martech2024-0014.jpeg" alt="" role="presentation"
+         class="w-full h-full object-cover opacity-15" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-r from-on-surface via-on-surface/85 to-on-surface/60"></div>
+  </div>
+  <div class="relative z-10 section-container">
+    <p class="eyebrow text-primary-fixed mb-4">Join the Team</p>
+    <h1 class="text-headline-lg font-display text-inverse-on-surface mb-6 max-w-2xl text-balance">
+      Build the Future of MarTech in Southeast Asia
+    </h1>
+    <p class="text-body-lg text-inverse-on-surface/80 max-w-xl">
+      We're a small, high-impact team working with the region's leading brands and platforms. If you're passionate about data, marketing technology, and making things happen — we'd love to hear from you.
+    </p>
+  </div>
+</section>
+
+<!-- Why AKA -->
+<section class="py-16 md:py-24">
+  <div class="section-container">
+    <p class="eyebrow mb-4">Why AKA Digital</p>
+    <h2 class="text-headline-md font-display text-on-surface mb-12 max-w-xl text-balance">
+      Work with the best platforms. Work with the best clients.
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="card p-8">
+        <span class="material-symbols-outlined text-3xl text-primary mb-4 block">public</span>
+        <h3 class="text-headline-sm font-display text-on-surface mb-2">Regional Scope</h3>
+        <p class="text-body-md text-on-surface-variant">Work across Singapore, Vietnam, Thailand, Indonesia, and the broader SEA market.</p>
+      </div>
+      <div class="card p-8">
+        <span class="material-symbols-outlined text-3xl text-primary mb-4 block">trending_up</span>
+        <h3 class="text-headline-sm font-display text-on-surface mb-2">Fast Growth</h3>
+        <p class="text-body-md text-on-surface-variant">We're growing. Your role will evolve with the business, and we invest in your professional development.</p>
+      </div>
+      <div class="card p-8">
+        <span class="material-symbols-outlined text-3xl text-primary mb-4 block">hub</span>
+        <h3 class="text-headline-sm font-display text-on-surface mb-2">Elite Tech Stack</h3>
+        <p class="text-body-md text-on-surface-variant">Work hands-on with Mixpanel, mParticle, OneSignal, Adjust, Netcore, and AB Tasty — platforms used by the world's top companies.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Open roles -->
+<section class="py-16 bg-surface-off-white" id="open-roles">
+  <div class="section-container">
+    <p class="eyebrow mb-4">Open Positions</p>
+    <h2 class="text-headline-md font-display text-on-surface mb-8">Current Openings</h2>
+
+    <div class="space-y-4">
+      {% for job in jobs %}
+        {% if job.active %}
+        <div class="card flex items-start md:items-center justify-between gap-4 p-6 md:p-8 flex-col md:flex-row">
+          <div>
+            <h3 class="text-headline-sm font-display text-on-surface">{{ job.title }}</h3>
+            <p class="text-body-md text-on-surface-variant mt-1">{{ job.location }} · {{ job.type }}</p>
+            {% if job.description %}
+            <p class="text-body-sm text-on-surface-variant/70 mt-2 max-w-lg">{{ job.description | truncate(150) }}</p>
+            {% endif %}
+          </div>
+          <button onclick="openApplyModal('{{ job.title }}')" class="btn-secondary whitespace-nowrap shrink-0">Apply Now</button>
+        </div>
+        {% endif %}
+      {% else %}
+        <div class="card border-dashed flex items-center gap-4 p-6 opacity-50">
+          <span class="material-symbols-outlined text-2xl text-on-surface-variant">hourglass_empty</span>
+          <p class="text-body-md text-on-surface-variant">No active openings at the moment — check back soon or send a speculative application below.</p>
+        </div>
+      {% endfor %}
+      <div class="card border-dashed flex items-center gap-4 p-6 opacity-50">
+        <span class="material-symbols-outlined text-2xl text-on-surface-variant">add</span>
+        <p class="text-body-md text-on-surface-variant">More roles coming soon — check back or send a speculative application</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Speculative CTA -->
+<section class="py-20 text-center">
+  <div class="section-container">
+    <h2 class="text-headline-md font-display text-on-surface mb-4">Don't see your role?</h2>
+    <p class="text-body-lg text-on-surface-variant mb-8 max-w-md mx-auto">
+      We're always interested in talented people. Send us your CV and tell us what you bring.
+    </p>
+    <button onclick="openApplyModal('Speculative Application')" class="btn-primary">
+      Send Speculative Application
+    </button>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     APPLY MODAL
+     ============================================================ -->
+<div id="apply-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm" aria-modal="true" role="dialog">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 relative">
+    <button onclick="closeApplyModal()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-off-white transition-colors" aria-label="Close">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+
+    <h2 class="text-headline-sm font-display text-on-surface mb-2">Apply for <span id="modal-role-title" class="text-primary"></span></h2>
+    <p class="text-body-md text-on-surface-variant mb-6">Send us your resume and contact details — we'll be in touch within 3 business days.</p>
+
+    <form id="apply-form" class="space-y-4">
+      <input type="hidden" id="apply-role" name="role" />
+      <div class="flex flex-col gap-1.5">
+        <label class="text-label-md text-on-surface-variant uppercase tracking-wider">Full Name <span class="text-error">*</span></label>
+        <input type="text" name="name" id="apply-name" placeholder="Your full name" required class="input-field" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-label-md text-on-surface-variant uppercase tracking-wider">Email <span class="text-error">*</span></label>
+        <input type="email" name="email" id="apply-email" placeholder="you@company.com" required class="input-field" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-label-md text-on-surface-variant uppercase tracking-wider">Phone / WhatsApp</label>
+        <input type="tel" name="phone" id="apply-phone" placeholder="+65 / +84 / +82" class="input-field" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-label-md text-on-surface-variant uppercase tracking-wider">LinkedIn Profile URL</label>
+        <input type="url" name="linkedin" id="apply-linkedin" placeholder="https://linkedin.com/in/yourname" class="input-field" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-label-md text-on-surface-variant uppercase tracking-wider">Cover Note</label>
+        <textarea name="cover" id="apply-cover" rows="3" placeholder="Tell us briefly about yourself and why you're a great fit..." class="input-field resize-none"></textarea>
+      </div>
+      <div class="pt-2">
+        <button type="button" onclick="submitApplication()" class="btn-primary w-full justify-center">
+          Submit Application
+          <span class="material-symbols-outlined text-base">send</span>
+        </button>
+        <p class="text-label-md text-on-surface-variant text-center mt-3">Your application will be sent directly to Hello@akadigital.net</p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openApplyModal(role) {
+  document.getElementById('modal-role-title').textContent = role;
+  document.getElementById('apply-role').value = role;
+  const modal = document.getElementById('apply-modal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+}
+function closeApplyModal() {
+  const modal = document.getElementById('apply-modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+function submitApplication() {
+  const name    = document.getElementById('apply-name').value.trim();
+  const email   = document.getElementById('apply-email').value.trim();
+  const phone   = document.getElementById('apply-phone').value.trim();
+  const linkedin= document.getElementById('apply-linkedin').value.trim();
+  const cover   = document.getElementById('apply-cover').value.trim();
+  const role    = document.getElementById('apply-role').value;
+  if (!name || !email) { alert('Please enter your name and email.'); return; }
+  const subject = encodeURIComponent('Application: ' + role + ' — ' + name);
+  const body    = encodeURIComponent(
+    'Role: ' + role + '\n\n' +
+    'Name: ' + name + '\n' +
+    'Email: ' + email + '\n' +
+    'Phone: ' + (phone || 'Not provided') + '\n' +
+    'LinkedIn: ' + (linkedin || 'Not provided') + '\n\n' +
+    'Cover Note:\n' + (cover || 'No cover note provided.')
+  );
+  window.location.href = 'mailto:Hello@akadigital.net?subject=' + subject + '&body=' + body;
+  closeApplyModal();
+}
+document.getElementById('apply-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeApplyModal();
+});
+</script>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AKA Digital — CMS Login</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="/images/logo/aka-logo.png" alt="AKA Digital" onerror="this.style.display='none'" />
+      <h1>AKA Digital</h1>
+      <p>Content Management</p>
+    </div>
+
+    <form id="loginForm" class="login-form">
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username"
+               placeholder="admin or team" required />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password"
+               placeholder="••••••••••••" required />
+      </div>
+      <div id="loginError" class="error-msg" style="display:none"></div>
+      <button type="submit" class="btn-primary" id="loginBtn">Sign In</button>
+    </form>
+  </div>
+
+  <script>
+    // Redirect if already logged in
+    const tok = localStorage.getItem('aka_cms_token');
+    if (tok) {
+      fetch('/api/status', { headers: { 'X-Editor-Token': tok } })
+        .then(r => r.json()).then(d => { if (d.authed) location.href = '/admin/dashboard'; });
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('loginError');
+      btn.textContent = 'Signing in…';
+      btn.disabled = true;
+      err.style.display = 'none';
+
+      try {
+        const r = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value.trim(),
+            password: document.getElementById('password').value,
+          }),
+        });
+        const d = await r.json();
+        if (d.ok) {
+          localStorage.setItem('aka_cms_token', d.token);
+          localStorage.setItem('aka_cms_role',  d.role);
+          localStorage.setItem('aka_cms_user',  d.display);
+          location.href = '/admin/dashboard';
+        } else {
+          err.textContent = d.error || 'Invalid credentials';
+          err.style.display = 'block';
+          btn.textContent = 'Sign In';
+          btn.disabled = false;
+        }
+      } catch {
+        err.textContent = 'Could not connect to server';
+        err.style.display = 'block';
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

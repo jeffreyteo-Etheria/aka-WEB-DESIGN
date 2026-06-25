@@ -1,0 +1,34 @@
+{
+  "main": [
+    { "label": "Home",          "href": "/",             "icon": "home" },
+    {
+      "label": "Solutions",
+      "href":  "/solutions",
+      "icon":  "bolt",
+      "children": [
+        { "label": "CRM & Marketing Automation",     "href": "/solutions/crm-automation" },
+        { "label": "Digital Marketing & Programmatic","href": "/solutions/digital-programmatic" },
+        { "label": "GEO / AI / SGO / AEO / SEO",    "href": "/solutions/geo-ai-seo" },
+        { "label": "Social Media Marketing",          "href": "/solutions/social-media" }
+      ]
+    },
+    { "label": "Tech Partners",  "href": "/tech-partners", "icon": "handshake" },
+    { "label": "Case Studies",   "href": "/case-studies",  "icon": "analytics" },
+    { "label": "Blog",          "href": "/blog",          "icon": "edit_note" },
+    { "label": "Insights",       "href": "/insights",      "icon": "article" },
+    { "label": "Careers",        "href": "/careers",       "icon": "work" },
+    { "label": "AKA Ads Platform", "href": "https://ads.akadigital.net", "icon": "open_in_new", "external": true, "platform": true }
+  ],
+  "mobile": [
+    { "label": "Home",      "href": "/",             "icon": "home" },
+    { "label": "Solutions", "href": "/solutions",    "icon": "bolt" },
+    { "label": "Cases",     "href": "/case-studies", "icon": "analytics" },
+    { "label": "Enquire",   "href": "/contact",      "icon": "mail" }
+  ],
+  "footer": [
+    { "label": "Privacy Policy",  "href": "/privacy" },
+    { "label": "Terms of Service","href": "/terms" },
+    { "label": "LinkedIn",  "href": "https://www.linkedin.com/company/akadigital", "external": true },
+    { "label": "YouTube",   "href": "https://www.youtube.com/@akadigital",         "external": true }
+  ]
+}

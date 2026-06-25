@@ -1,0 +1,61 @@
+---
+layout: layouts/base.njk
+title: Our Solutions | AKA Digital
+description: MarTech solutions for Southeast Asia — CRM & Automation, Digital Programmatic, GEO/AI/SEO, and Social Media Marketing.
+---
+
+<!-- Hero -->
+<section class="py-24 bg-surface-off-white">
+  <div class="section-container">
+    <p class="eyebrow mb-4">What We Do</p>
+    <h1 class="text-headline-lg font-display text-on-surface mb-6 max-w-2xl text-balance">
+      MarTech Solutions Built for Southeast Asia
+    </h1>
+    <p class="text-body-lg text-on-surface-variant max-w-xl">
+      Vietnam's exclusive representative for the world's leading MarTech platforms — combining deep regional expertise with enterprise-grade technology across Southeast Asia.
+    </p>
+  </div>
+</section>
+
+<!-- Solutions grid -->
+<section class="py-16 md:py-24">
+  <div class="section-container">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {% for sol in solutions %}
+        <a href="{{ sol.href }}" class="card group flex flex-col gap-6 no-underline">
+          <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-on-primary transition-all">
+              <span class="material-symbols-outlined text-3xl">{{ sol.icon }}</span>
+            </div>
+            <div>
+              <h2 class="text-headline-sm font-display text-on-surface group-hover:text-primary transition-colors mb-1">{{ sol.title }}</h2>
+              <p class="text-label-md text-primary font-bold">{{ sol.tagline }}</p>
+            </div>
+          </div>
+          <p class="text-body-md text-on-surface-variant leading-relaxed">{{ sol.description }}</p>
+          <ul class="space-y-2">
+            {% for benefit in sol.benefits %}
+              <li class="flex items-start gap-2 text-body-md text-on-surface-variant">
+                <span class="material-symbols-outlined text-base text-primary mt-0.5 shrink-0">check_small</span>
+                {{ benefit }}
+              </li>
+            {% endfor %}
+          </ul>
+          <div class="flex items-center gap-1 text-label-md font-bold text-primary mt-auto">
+            Explore solution
+            <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-20 bg-primary text-on-primary text-center">
+  <div class="section-container">
+    <h2 class="text-headline-md font-display mb-4">Not sure which solution fits?</h2>
+    <p class="text-body-lg text-on-primary/80 mb-8 max-w-md mx-auto">Talk to our team — we'll assess your stack and recommend the right path.</p>
+    <a href="/contact" class="btn-primary bg-action-yellow text-on-secondary-fixed">Book a Free Consultation</a>
+  </div>
+</section>

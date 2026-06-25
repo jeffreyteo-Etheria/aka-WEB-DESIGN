@@ -1,0 +1,177 @@
+{
+  "hero": {
+    "eyebrow": "Award-Winning MarTech Agency — Southeast Asia",
+    "headline": "MarTech That Actually Works.",
+    "headline_accent": "In Southeast Asia.",
+    "subheadline": "AKA Digital is the region's leading B2B marketing technology agency. Vietnam's exclusive representative for Mixpanel, Salesforce, Oracle, CleverTap, MoEngage, and more — licensed to operate across Southeast Asia.",
+    "cta_primary":        "Get a Free Consultation",
+    "cta_primary_href":   "/contact",
+    "cta_secondary":      "View Case Studies",
+    "cta_secondary_href": "/case-studies",
+    "background_image":   "/images/activities/Look-back-Martech-Summit-2024/Martech2024-0003.jpeg"
+  },
+  "value_proposition": {
+    "headline": "The MarTech Partner Southeast Asia Trusts",
+    "body": "AKA Digital bridges the gap between world-class marketing technology and real business outcomes. As Vietnam's exclusive representative for leading global MarTech platforms — and a licensed operator across Southeast Asia — we implement, manage, and optimise the tools that turn data into measurable revenue.",
+    "stats": [
+      { "value": "10+",  "label": "Years in MarTech" },
+      { "value": "150+", "label": "Enterprise Clients" },
+      { "value": "6+",   "label": "SEA Markets + S.Korea" },
+      { "value": "15+",  "label": "Platform Partners" }
+    ]
+  },
+  "media_mentions": [
+    {
+      "publication": "Brands Vietnam",
+      "logo": "/images/media/brandsvietnam.png",
+      "quote": "Data Solution Summit 2024: 80% of enterprises invest in software but only use 20% of functions — AKA Digital tackles this gap head-on.",
+      "href": "https://www.brandsvietnam.com",
+      "category": "Summit Coverage",
+      "year": 2024
+    },
+    {
+      "publication": "CafeBiz",
+      "logo": "/images/media/cafebiz.png",
+      "quote": "Growing demand for marketing automation solutions as e-commerce businesses in Vietnam seek scalable personalisation.",
+      "href": "https://cafebiz.vn",
+      "category": "Industry Report",
+      "year": 2024
+    },
+    {
+      "publication": "VnEconomy",
+      "logo": "/images/media/vneconomy.png",
+      "quote": "Improve customer experience: how brands in Vietnam are aligning technology with customer lifecycle strategy.",
+      "href": "https://vneconomy.vn",
+      "category": "Featured Article",
+      "year": 2024
+    },
+    {
+      "publication": "Bao Dau Tu",
+      "logo": "/images/media/baodautu.png",
+      "quote": "Vietnam's digital marketing sector sees surge in enterprise demand for first-party data strategies.",
+      "href": "https://baodautu.vn",
+      "category": "Investment News",
+      "year": 2023
+    },
+    {
+      "publication": "Nhip Cau Dau Tu",
+      "logo": "/images/media/nhipcaudautu.png",
+      "quote": "AKA Digital positions Vietnam as a regional hub for marketing technology adoption in Southeast Asia.",
+      "href": "https://nhipcaudautu.vn",
+      "category": "Business Feature",
+      "year": 2023
+    },
+    {
+      "publication": "Advertising Vietnam",
+      "logo": "/images/media/advertisingvietnam.png",
+      "quote": "MMA Smarties Silver 2022: AKA Digital's FE Credit campaign earns top honour for mobile marketing excellence.",
+      "href": "https://advertisingvietnam.com",
+      "category": "Awards Coverage",
+      "year": 2022
+    },
+    {
+      "publication": "CafeF",
+      "logo": "/images/media/cafef.png",
+      "quote": "Data-driven marketing is no longer optional — businesses that invest now will own the customer relationship.",
+      "href": "https://cafef.vn",
+      "category": "Finance & Tech",
+      "year": 2023
+    },
+    {
+      "publication": "VnEconomy.vn",
+      "logo": "/images/media/vneconomy.png",
+      "quote": "CDP adoption in Vietnam accelerates as brands seek to reduce reliance on third-party cookies.",
+      "href": "https://vneconomy.vn",
+      "category": "Digital Economy",
+      "year": 2024
+    }
+  ],
+  "activities": [
+    {
+      "title": "Martech Summit 2026 — Agentic AI & Intelligent Action",
+      "description": "AKA Digital's flagship annual summit returns in 2026. This year's theme: the Agentic AI ecosystem and how autonomous AI agents are transforming marketing operations across Southeast Asia.",
+      "date": "2026 — Ho Chi Minh City",
+      "type": "Summit",
+      "image": "/images/activities/2025 Martech Summit/Martech-summit-2025-from-data-chaos-to-performance-delivery.png",
+      "href": "/contact"
+    },
+    {
+      "title": "Hanoi Data Solution Summit 2024",
+      "description": "120 C-level executives gathered in Hanoi to explore AI-driven marketing, first-party data strategies, and the future of customer engagement across Southeast Asia.",
+      "date": "June 30, 2024 — Hanoi",
+      "type": "Summit",
+      "image": "/images/activities/DSS2024/bg_landingpage.jpg",
+      "href": "/insights/hanoi-data-summit-2024"
+    },
+    {
+      "title": "Martech Summit 2025",
+      "description": "AKA Digital hosted Vietnam's premier annual MarTech event — From Data Chaos to Performance Delivery. Leading brands discuss AI, automation, and zero-party data.",
+      "date": "March 2025 — Ho Chi Minh City",
+      "type": "Summit",
+      "image": "/images/activities/2025 Martech Summit/Martech-summit-2025-from-data-chaos-to-performance-delivery.png",
+      "href": "/insights/martech-summit-2025"
+    },
+    {
+      "title": "Martech Summit 2024 — Look Back",
+      "description": "Hundreds of marketing leaders joined AKA Digital for a deep dive into personalisation at scale, CDP architecture, and the evolving MarTech landscape.",
+      "date": "2024 — Ho Chi Minh City",
+      "type": "Summit",
+      "image": "/images/activities/Look-back-Martech-Summit-2024/Martech2024-0005.jpeg",
+      "href": "/insights/martech-summit-2024"
+    },
+    {
+      "title": "Martech Innovation Day 2023",
+      "description": "A landmark industry gathering showcasing the latest innovations in marketing automation, analytics, and customer data platforms in Vietnam.",
+      "date": "2023 — Ho Chi Minh City",
+      "type": "Conference",
+      "image": "/images/activities/2023 Martech Innovation/DSC01320_edited.jpg",
+      "href": "/insights/martech-innovation-2023"
+    },
+    {
+      "title": "MMA Smarties Awards 2022",
+      "description": "AKA Digital's campaign for FE Credit earned Silver at the MMA Smarties Awards — Southeast Asia's premier mobile marketing recognition.",
+      "date": "2022 — Ho Chi Minh City",
+      "type": "Awards",
+      "image": "/images/activities/Look-back-Martech-Summit-2024/Martech2024-0009.jpeg",
+      "href": "/case-studies/fe-credit-mma-smarties"
+    },
+    {
+      "title": "CDP Deepdive Workshop",
+      "description": "In collaboration with mParticle — an intensive workshop for heads of technology and marketing exploring Customer Data Platform architecture.",
+      "date": "Webinar / Workshop",
+      "type": "Workshop",
+      "image": "/images/activities/Look-back-Martech-Summit-2024/Martech2024-0003.jpeg",
+      "href": "/insights/cdp-deepdive"
+    },
+    {
+      "title": "Mixpanel vs. GA4 Roundtable",
+      "description": "Product, Data, and Marketing leaders debated the role of real-time insights in growth — and when to choose Mixpanel over Google Analytics.",
+      "date": "Webinar",
+      "type": "Webinar",
+      "image": "/images/activities/2023 Martech Innovation/DSC01320_edited.jpg",
+      "href": "/insights/mixpanel-vs-ga4"
+    },
+    {
+      "title": "DSS 2024 — Partner Workshop",
+      "description": "Exclusive breakout sessions with Mixpanel, mParticle, Netcore, and OneSignal — hands-on demos and architecture sessions for enterprise teams.",
+      "date": "June 30, 2024 — Hanoi",
+      "type": "Workshop",
+      "image": "/images/activities/DSS2024/Frame 50 (4).jpg",
+      "href": "/insights/hanoi-data-summit-2024"
+    }
+  ],
+  "clients": [
+    { "name": "FE Credit",     "logo": "/images/clients/fe-credit.png",    "industry": "Financial Services" },
+    { "name": "Vietjet Air",   "logo": "/images/clients/vietjet.png",      "industry": "Aviation" },
+    { "name": "CareerBuilder", "logo": "/images/clients/careerbuilder.png","industry": "HR Technology" },
+    { "name": "Prudential",    "logo": "/images/clients/prudential.png",   "industry": "Insurance" },
+    { "name": "Manulife",      "logo": "/images/clients/manulife.png",     "industry": "Insurance" },
+    { "name": "Sacombank",     "logo": "/images/clients/sacombank.png",    "industry": "Banking" },
+    { "name": "OCB Bank",      "logo": "/images/clients/ocb.png",          "industry": "Banking" },
+    { "name": "VIB Bank",      "logo": "/images/clients/vib.png",          "industry": "Banking" },
+    { "name": "MSB Bank",      "logo": "/images/clients/msb.png",          "industry": "Banking" },
+    { "name": "Sony",          "logo": "/images/clients/sony.png",         "industry": "Electronics" },
+    { "name": "Ajinomoto",     "logo": "/images/clients/ajinomoto.png",    "industry": "FMCG" },
+    { "name": "VTVcab",        "logo": "/images/clients/vtvCab.png",       "industry": "Media" }
+  ]
+}

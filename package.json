@@ -1,0 +1,27 @@
+{
+  "name": "akadigital-web",
+  "version": "1.0.0",
+  "description": "AKA Digital — B2B MarTech Agency Website for Southeast Asia",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run css:watch\" \"eleventy --serve --port=3000\"",
+    "editor": "node editor-server.js",
+    "editor:dev": "concurrently \"npm run css:watch\" \"eleventy --watch\" \"node editor-server.js\"",
+    "build": "npm run css:build && eleventy",
+    "css:build": "tailwindcss -i src/styles/main.css -o public/css/main.css --minify",
+    "css:watch": "tailwindcss -i src/styles/main.css -o public/css/main.css --watch",
+    "export:css": "node -e \"require('fs').mkdirSync('exports/css',{recursive:true})\" && cp public/css/main.css exports/css/main.css",
+    "export:json": "node -e \"const fs=require('fs');fs.mkdirSync('exports/json',{recursive:true});fs.readdirSync('src/_data').forEach(f=>fs.copyFileSync('src/_data/'+f,'exports/json/'+f))\"",
+    "export:assets": "node scripts/export-assets.js",
+    "export:build": "npm run build && node scripts/export-build.js",
+    "export:all": "npm run export:css && npm run export:json && npm run export:assets && npm run export:build"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0",
+    "@tailwindcss/forms": "^0.5.7",
+    "autoprefixer": "^10.4.19",
+    "concurrently": "^9.0.0",
+    "postcss": "^8.4.40",
+    "tailwindcss": "^3.4.10"
+  }
+}

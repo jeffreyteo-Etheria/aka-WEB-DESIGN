@@ -1,0 +1,164 @@
+---
+layout: layouts/base.njk
+---
+{% set post = insights | findBySlug(insightSlug) %}
+
+{% if not post %}
+  <div class="section-container py-32 text-center">
+    <h1 class="text-headline-md font-display text-on-surface">Article not found</h1>
+    <a href="/insights" class="btn-primary mt-8 inline-flex">Back to Insights</a>
+  </div>
+{% else %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ post.title }}",
+  "description": "{{ post.excerpt }}",
+  "author": { "@type": "Organization", "name": "AKA Digital" },
+  "publisher": { "@type": "Organization", "name": "AKA Digital" },
+  "datePublished": "{{ post.date }}",
+  "image": "{{ settings.siteUrl }}{{ post.cover_image }}"
+}
+</script>
+
+<!-- Breadcrumb -->
+<nav class="bg-surface-off-white border-b border-outline-variant/10" aria-label="Breadcrumb">
+  <div class="section-container py-3">
+    <ol class="flex items-center gap-2 text-label-md text-on-surface-variant flex-wrap">
+      <li><a href="/" class="hover:text-primary transition-colors">Home</a></li>
+      <li><span class="material-symbols-outlined text-sm opacity-50">chevron_right</span></li>
+      <li><a href="/insights" class="hover:text-primary transition-colors">Insights</a></li>
+      <li><span class="material-symbols-outlined text-sm opacity-50">chevron_right</span></li>
+      <li class="text-on-surface font-bold">{{ post.category }}</li>
+    </ol>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="relative min-h-[50vh] flex items-end py-20 bg-on-surface overflow-hidden">
+  <div class="absolute inset-0 z-0">
+    <img src="{{ post.cover_image }}" alt="{{ post.title }}"
+      class="w-full h-full object-cover opacity-20" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-r from-on-surface via-on-surface/80 to-on-surface/40"></div>
+  </div>
+  <div class="relative z-10 section-container">
+    <a href="/insights" class="inline-flex items-center gap-1 text-label-md text-inverse-on-surface/60 hover:text-inverse-on-surface transition-colors mb-8">
+      <span class="material-symbols-outlined text-base">arrow_back</span> All Insights
+    </a>
+    <div class="flex flex-wrap gap-3 mb-5">
+      <span class="bg-primary text-on-primary px-3 py-1 rounded-full text-label-md font-bold">{{ post.category }}</span>
+      {% for tag in post.tags %}
+        <span class="bg-white/10 text-inverse-on-surface px-3 py-1 rounded-full text-label-md">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    <h1 class="text-headline-lg-mobile md:text-headline-lg font-display font-bold text-inverse-on-surface mb-5 max-w-3xl text-balance leading-tight">
+      {{ post.title }}
+    </h1>
+    <p class="text-body-lg text-inverse-on-surface/70 max-w-2xl">{{ post.excerpt }}</p>
+    <p class="text-label-md text-inverse-on-surface/50 mt-4">{{ post.date | dateFormat }} · {{ post.author }}</p>
+  </div>
+</section>
+
+<!-- Body -->
+<section class="py-16 md:py-24">
+  <div class="section-container">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-body-lg text-on-surface-variant leading-loose mb-12">{{ post.body_intro }}</p>
+
+      {% if post.key_takeaways %}
+        <div class="card p-8 mb-12 border-l-4 border-primary">
+          <h2 class="text-headline-sm font-display text-on-surface mb-6">Key Takeaways</h2>
+          <ul class="flex flex-col gap-4">
+            {% for item in post.key_takeaways %}
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-primary text-xl mt-0.5 shrink-0" style="font-variation-settings:'FILL' 1">check_circle</span>
+                <span class="text-body-md text-on-surface-variant leading-relaxed">{{ item }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <div class="border-t border-outline-variant/10 pt-12">
+        <p class="text-body-md text-on-surface-variant mb-6">
+          Want to learn more about how these strategies apply to your business in Southeast Asia?
+        </p>
+        <a href="/contact" class="btn-primary">Talk to Our Team</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if post.gallery_images and post.gallery_images.length > 0 %}
+<!-- Photo gallery -->
+<section class="py-16 bg-surface-off-white">
+  <div class="section-container">
+    <p class="eyebrow mb-3 text-center">Event Gallery</p>
+    <h2 class="text-headline-sm font-display text-on-surface text-center mb-10">Photos from the Event</h2>
+    <div class="columns-2 md:columns-3 lg:columns-4 gap-3 space-y-3">
+      {% for img in post.gallery_images %}
+        <div class="break-inside-avoid overflow-hidden rounded-xl bg-surface-container group cursor-pointer"
+             onclick="openLightbox('{{ img }}')">
+          <img src="{{ img }}" alt="{{ post.title }} — photo {{ loop.index }}"
+            class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy" />
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div id="gallery-lightbox" class="fixed inset-0 z-[9999] bg-black/90 hidden items-center justify-center p-4"
+     onclick="closeLightbox()">
+  <button class="absolute top-4 right-4 text-white/70 hover:text-white"
+          onclick="closeLightbox(); event.stopPropagation()">
+    <span class="material-symbols-outlined text-3xl">close</span>
+  </button>
+  <img id="lightbox-img" src="" alt="" class="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl" />
+</div>
+<script>
+function openLightbox(src) {
+  var lb = document.getElementById('gallery-lightbox');
+  document.getElementById('lightbox-img').src = src;
+  lb.classList.remove('hidden');
+  lb.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  var lb = document.getElementById('gallery-lightbox');
+  lb.classList.add('hidden');
+  lb.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLightbox(); });
+</script>
+{% endif %}
+
+<!-- Related activities -->
+<section class="py-16 bg-surface-off-white">
+  <div class="section-container">
+    <p class="eyebrow mb-8">More from AKA Digital</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% for activity in sitedata.activities | first(3) %}
+        <article class="card group flex flex-col">
+          <div class="aspect-[16/9] overflow-hidden rounded-t-lg bg-surface-container">
+            <img src="{{ activity.image }}" alt="{{ activity.title }}"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+          </div>
+          <div class="p-6 flex flex-col flex-1 gap-2">
+            <span class="text-label-md text-primary font-bold uppercase tracking-wider">{{ activity.type }}</span>
+            <h3 class="text-headline-sm font-display text-on-surface group-hover:text-primary transition-colors">{{ activity.title }}</h3>
+            <a href="{{ activity.href }}" class="btn-ghost mt-auto">
+              Read more <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endif %}
