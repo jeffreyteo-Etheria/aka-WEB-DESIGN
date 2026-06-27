@@ -260,6 +260,12 @@
       el.setAttribute("translate", "no");
       el.classList.add("notranslate");
     });
+
+    // Any element already marked translate="no" in HTML — ensure notranslate class is present
+    // This covers partner names, brand names, and any future tagged elements
+    document.querySelectorAll("[translate='no']").forEach(function (el) {
+      el.classList.add("notranslate");
+    });
   }
 
   /* ----------------------------------------------------------
@@ -274,8 +280,10 @@
       "#google_translate_element { display:none!important }",
       /* Prevent translated <font> wrappers inside buttons from breaking layout */
       ".btn-primary font, .btn-secondary font, .btn-ghost font, .btn-outlined font { display:contents }",
-      /* Icons must never wrap or resize when GT injects font tags */
-      ".notranslate { display:inline-flex!important; align-items:center }"
+      /* Only icon spans need inline-flex — not block elements like p/h2 with notranslate */
+      "span.material-symbols-outlined.notranslate, span.material-symbols-rounded.notranslate,",
+      "span.material-icons.notranslate, span.material-icons-outlined.notranslate,",
+      "span.material-icons-round.notranslate { display:inline-flex!important; align-items:center }"
     ].join("\n");
     document.head.appendChild(style);
   }

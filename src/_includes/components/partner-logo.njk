@@ -14,18 +14,18 @@
       onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')"
     />
     <!-- Initials fallback -->
-    <span class="hidden font-display font-extrabold text-headline-sm text-primary">
+    <span class="hidden font-display font-extrabold text-headline-sm text-primary" translate="no">
       {{ partner.name | truncate(2, true, "") }}
     </span>
   </div>
 
   <!-- Name + category -->
   <div>
-    <p class="font-display font-bold text-body-md text-on-surface group-hover:text-primary transition-colors">
+    <p class="font-display font-bold text-body-md text-on-surface group-hover:text-primary transition-colors" translate="no">
       {{ partner.name }}
     </p>
     {% if partner.category %}
-      <span class="text-label-md text-on-surface-variant uppercase tracking-wider">{{ partner.category }}</span>
+      <span class="text-label-md text-on-surface-variant uppercase tracking-wider" translate="no">{{ partner.category }}</span>
     {% endif %}
   </div>
 

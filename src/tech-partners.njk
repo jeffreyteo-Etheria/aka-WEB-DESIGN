@@ -43,8 +43,8 @@ description: AKA Digital is a licensed integrator for world-class MarTech platfo
               />
             </div>
             <div>
-              <p class="font-display font-bold text-body-md text-on-surface">{{ partner.name }}</p>
-              <p class="text-label-md text-primary font-semibold">{{ partner.category }}</p>
+              <p class="font-display font-bold text-body-md text-on-surface" translate="no">{{ partner.name }}</p>
+              <p class="text-label-md text-primary font-semibold" translate="no">{{ partner.category }}</p>
             </div>
           </div>
         {% endfor %}
@@ -84,11 +84,11 @@ description: AKA Digital is a licensed integrator for world-class MarTech platfo
                 onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')"
                 loading="lazy"
               />
-              <span class="hidden font-display font-extrabold text-headline-sm text-primary">{{ partner.name | truncate(2, true, "") }}</span>
+              <span class="hidden font-display font-extrabold text-headline-sm text-primary" translate="no">{{ partner.name | truncate(2, true, "") }}</span>
             </div>
             <div class="flex-1">
-              <h2 class="text-headline-sm font-display text-on-surface">{{ partner.name }}</h2>
-              <span class="text-label-md font-bold text-primary uppercase tracking-wider">{{ partner.category }}</span>
+              <h2 class="text-headline-sm font-display text-on-surface" translate="no">{{ partner.name }}</h2>
+              <span class="text-label-md font-bold text-primary uppercase tracking-wider" translate="no">{{ partner.category }}</span>
             </div>
             {% if partner.exclusive_note %}
             <span class="hidden md:block text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-1 shrink-0 text-xs">

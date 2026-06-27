@@ -427,8 +427,8 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
       {% for partner in partners %}
         <a href="/tech-partners#{{ partner.slug }}"
            class="group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
-          <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug">{{ partner.name }}</span>
-          <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors">{{ partner.category }}</span>
+          <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">{{ partner.name }}</span>
+          <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors" translate="no">{{ partner.category }}</span>
         </a>
       {% endfor %}
     </div>
