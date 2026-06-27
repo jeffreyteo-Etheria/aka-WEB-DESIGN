@@ -85,12 +85,11 @@
   "popup": {
     "title": "Get Your Free Digital Growth Strategy Session",
     "subtitle": "30-minute video call with our team — no commitment, no pitch deck. Just a genuine conversation about your goals.",
-    "bullet_1_title": "Discover which MarTech & digital tools fit your stack",
-    "bullet_1_sub": "(CRM, automation, performance ads, social growth, AI GEO/AEO)",
-    "bullet_2_title": "Benchmark your data maturity against SEA leaders",
-    "bullet_2_sub": "(Understand where you stand in marketing technology adoption)",
-    "bullet_3_title": "Receive a priority roadmap for 90-day quick wins",
-    "bullet_3_sub": "(Actionable steps to accelerate campaigns and growth)",
+    "bullets": [
+      "Discover which MarTech & digital tools fit your stack (CRM, automation, performance ads, social growth, AI GEO/AEO)",
+      "Benchmark your data maturity against SEA leaders (Understand where you stand in marketing technology adoption)",
+      "Receive a priority roadmap for 90-day quick wins (Actionable steps to accelerate campaigns and growth)"
+    ],
     "button_text": "Book Free Session",
     "button_url": "/contact"
   }

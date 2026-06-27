@@ -163,28 +163,13 @@
           </h2>
           <p class="text-on-surface-variant text-body-md">{{ settings.popup.subtitle }}</p>
         </div>
-        <div class="space-y-4 mb-6">
+        <div class="space-y-3 mb-6">
+          {% for bullet in settings.popup.bullets %}
           <div class="flex items-start gap-3">
             <span class="material-symbols-outlined text-primary text-base mt-0.5 shrink-0" style="font-variation-settings:'FILL' 1">check_circle</span>
-            <div>
-              <span class="text-label-md font-bold text-on-surface">{{ settings.popup.bullet_1_title }}</span>
-              <p class="text-label-sm text-on-surface-variant mt-0.5">{{ settings.popup.bullet_1_sub }}</p>
-            </div>
+            <span class="text-label-md text-on-surface">{{ bullet }}</span>
           </div>
-          <div class="flex items-start gap-3">
-            <span class="material-symbols-outlined text-primary text-base mt-0.5 shrink-0" style="font-variation-settings:'FILL' 1">check_circle</span>
-            <div>
-              <span class="text-label-md font-bold text-on-surface">{{ settings.popup.bullet_2_title }}</span>
-              <p class="text-label-sm text-on-surface-variant mt-0.5">{{ settings.popup.bullet_2_sub }}</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="material-symbols-outlined text-primary text-base mt-0.5 shrink-0" style="font-variation-settings:'FILL' 1">check_circle</span>
-            <div>
-              <span class="text-label-md font-bold text-on-surface">{{ settings.popup.bullet_3_title }}</span>
-              <p class="text-label-sm text-on-surface-variant mt-0.5">{{ settings.popup.bullet_3_sub }}</p>
-            </div>
-          </div>
+          {% endfor %}
         </div>
         <a href="{{ settings.popup.button_url }}" data-close-exit onclick="document.getElementById('exit-intent-popup').classList.add('hidden'); document.body.style.overflow=''"
            class="btn-primary w-full justify-center mb-3">

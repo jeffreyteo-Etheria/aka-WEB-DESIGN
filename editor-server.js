@@ -524,7 +524,7 @@ http.createServer(async (req, res) => {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
       const b       = await readBody(req);
       const current = readData('settings');
-      const updated = { ...current, cta: { ...current.cta, ...b.cta }, popup: { ...current.popup, ...b.popup } };
+      const updated = { ...current, cta: { ...current.cta, ...b.cta }, popup: { ...current.popup, ...b.popup, bullets: b.popup.bullets || current.popup.bullets } };
       writeData('settings', updated);
       return j(res, 200, { ok: true });
     }
