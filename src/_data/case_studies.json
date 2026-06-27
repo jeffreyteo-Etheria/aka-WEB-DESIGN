@@ -53,7 +53,7 @@
     "outcome":         "Vietjet Air now operates a fully owned customer data ecosystem that personalises experiences across email, push, retargeting, and in-app — with a 400% revenue lift attributed to AMS-powered email automation and personalised engagement at scale.",
     "results": [
       { "metric": "Revenue Lift",       "value": "400%",  "context": "Email automation" },
-      { "metric": "Emails Delivered",   "value": "100M",  "context": "AMS services" },
+      { "metric": "Emails Delivered",   "value": "100Mil",  "context": "AMS services" },
       { "metric": "Email Open Rate",    "value": "37%",   "context": "vs. 21% industry avg" }
     ],
     "testimonial": "",
@@ -170,10 +170,9 @@
     "partners_used":   ["Meta"],
     "challenge":       "Ferrari Singapore needed a digital strategy to drive qualified traffic to their Ferrari Pre-Owned and Approved programmes among a genuinely ultra-high-net-worth audience in Singapore — without diluting brand prestige through mass-market digital advertising. The challenge was reaching a high net worth audience aged 28–60 at premium touchpoints rather than broad consumer channels.",
     "approach":        "AKA Digital designed a dual-channel campaign combining Facebook advertising with mobile geo-targeting. Facebook campaigns ran weekly creative rotations featuring Ferrari models (458 Speciale, 458 Italia, California T, F12 Berlinetta) with daily spend capping to maintain consistent audience reach throughout the 35-day flight. Mobile geo-targeting was activated on weekends within a 500m–2km radius of Singapore's 38 Good Class Bungalow areas and 25 luxury car showrooms — reaching prospects during their highest-intent moments near competitor dealerships.",
-    "outcome":         "The campaign over-delivered on its traffic KPI by 152% — driving 5,551 visits to Ferrari Singapore's websites at an average CPC of SGD $1.93, 25% below the projected benchmark. Facebook's main channel achieved a 1.78% CTR, significantly above the industry average for luxury automotive.",
+    "outcome":         "The campaign over-delivered on its traffic KPI by 152%, driving increased visits to Ferrari Singapore's website while achieving cost efficiency, below the projected benchmark. Facebook, as the main channel, delivered a 1.5× higher CTR, significantly above the luxury automotive industry average, and generated overall enquiries for test drives.",
     "results": [
       { "metric": "KPI Overdelivery",     "value": "152%",    "context": "vs. contracted target" },
-      { "metric": "Total Site Visits",    "value": "5,551",   "context": "35-day campaign" },
       { "metric": "Cost Savings",         "value": "25%",     "context": "vs. benchmark CPC" }
     ],
     "testimonial": "",
@@ -233,7 +232,7 @@
     "outcome":         "The campaign achieved full delivery against all contracted impression guarantees — demonstrating that programmatic DOOH is a highly efficient and measurable channel for event-driven financial services marketing in Singapore. The campaign established a repeatable DOOH framework for future conference and launch activations in the APAC market.",
     "results": [
       { "metric": "Delivery Rate",     "value": "100%+",  "context": "vs. contracted guarantee" },
-      { "metric": "Screen Formats",    "value": "3",      "context": "Office · Street · Billboard" },
+      { "metric": "GEO-Focused, Peak-Hours Impact", "value": "3 LED formats", "context": "Office · Street · Billboard" },
       { "metric": "Campaign Duration", "value": "17 Days","context": "CBD Singapore" }
     ],
     "testimonial": "",
@@ -351,12 +350,12 @@
     "solutions_used":  ["social-media", "digital-programmatic"],
     "partners_used":   ["SocialMind", "Meta"],
     "challenge":       "Alchemy Food Tech launched their Alchemy Fibre for Rice product into Singapore's competitive health food market as an unknown challenger brand. With limited distribution and a category-defining product, they needed social proof and mass awareness to drive trial among health-conscious Singaporeans aged 35+.",
-    "approach":        "AKA Digital designed a social content engine built on three pillars: (1) a SGAG collaboration leveraging Singapore's largest comedy platform; (2) a celebrity partnership with Michelle Chong delivering 380K impressions; and (3) sustained paid social across Facebook and Instagram with A/B-tested video creative and programmatic retargeting.",
-    "outcome":         "Across multiple campaign flights from 2021 to 2022, Alchemy Fibre grew from zero social presence to a recognised Singapore health brand. The SGAG campaign delivered a 62.79% video completion rate — more than 3× the FMCG industry average.",
+    "approach":        "AKA Digital designed a social content engine built on three pillars: (1) a SGAG collaboration leveraging Singapore's largest comedy platform; (2) a celebrity partnership with Michelle Chong delivering high intensity video impressions; and (3) sustained paid social across Facebook and Instagram with A/B-tested video creative and programmatic retargeting.",
+    "outcome":         "Across multiple campaign flights from 2021 to 2022, Alchemy Fibre successfully grew its social presence during the launch of the new healthy Alchemy Fibre Rice, establishing itself as a recognized Singapore health brand. The SGAG campaign delivered a strong video completion rate, achieving more than 3× higher reach through celebrity engagement and video ads compared to carousel formats.",
     "results": [
-      { "metric": "Video Completion Rate", "value": "62.8%", "context": "SGAG campaign — 3× avg" },
-      { "metric": "Celebrity Engagements", "value": "134K",  "context": "Michelle Chong collab" },
-      { "metric": "Total Video Views",     "value": "400K+", "context": "Across FB + IG flights" }
+      { "metric": "Cost Efficiency",      "value": "10x",   "context": "vs. industry avg" },
+      { "metric": "Reach",               "value": "3x",    "context": "Celebrity video ads" },
+      { "metric": "Conversions",         "value": "4x",    "context": "Landing page views" }
     ],
     "testimonial": "",
     "tags": ["Social Media", "Influencer Marketing", "Singapore", "F&B", "Health Tech", "Facebook", "Instagram"]
@@ -385,8 +384,7 @@
     "outcome":         "EU Holidays recorded their strongest digital-attributed booking quarter, with influencer content driving significant traffic to tour package landing pages and a measurable uplift in qualified enquiry calls.",
     "results": [
       { "metric": "Tour Page Traffic",   "value": "+124%", "context": "From influencer content" },
-      { "metric": "Booking Enquiries",   "value": "+56%",  "context": "vs. previous quarter" },
-      { "metric": "Content Views",       "value": "3.2M+", "context": "Across campaign period" }
+      { "metric": "Booking Enquiries",   "value": "+56%",  "context": "" }
     ],
     "testimonial": "",
     "tags": ["Influencer Marketing", "KOL", "Travel", "Singapore", "Instagram", "YouTube"]
