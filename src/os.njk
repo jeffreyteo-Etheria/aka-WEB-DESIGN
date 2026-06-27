@@ -1,0 +1,233 @@
+---
+layout: false
+permalink: /os/index.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AKADIGITAL OS</title>
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <link rel="icon" href="/images/logos/AKA%20Logo%20-%20New%20-%202025.10.png" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:    #060F24;
+      --navy:   #0B1F4B;
+      --yellow: #F5C400;
+      --white:  #ffffff;
+      --muted:  rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.08);
+      --card:   rgba(255,255,255,0.04);
+      --card-h: rgba(255,255,255,0.07);
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--ink);
+      color: var(--white);
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* Subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .portal {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+      text-align: center;
+    }
+
+    /* Logo / wordmark */
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    .logo-mark {
+      background: var(--yellow);
+      color: var(--ink);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: .06em;
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+    .logo-name {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Title */
+    .os-title {
+      font-size: clamp(28px, 6vw, 42px);
+      font-weight: 900;
+      letter-spacing: -.02em;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .os-title span { color: var(--yellow); }
+
+    .os-sub {
+      font-size: 14px;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 48px;
+    }
+
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 440px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 20px 28px;
+      text-decoration: none;
+      color: var(--white);
+      transition: background .2s, border-color .2s, transform .2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .card:hover {
+      background: var(--card-h);
+      border-color: rgba(245,196,0,0.35);
+      transform: translateY(-3px);
+    }
+    .card.disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .card-icon.admin  { background: rgba(245,196,0,0.15); border: 1px solid rgba(245,196,0,0.25); }
+    .card-icon.reach  { background: rgba(99,179,237,0.12); border: 1px solid rgba(99,179,237,0.2); }
+
+    .card-label {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+    .card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      text-align: center;
+    }
+    .card-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+    .badge-live   { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+    .badge-soon   { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
+
+    /* Footer */
+    .portal-footer {
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .portal-footer a {
+      color: rgba(255,255,255,0.25);
+      text-decoration: none;
+    }
+    .portal-footer a:hover { color: var(--muted); }
+  </style>
+</head>
+<body>
+
+  <div class="portal">
+
+    <!-- Wordmark -->
+    <div class="logo-wrap">
+      <div class="logo-mark">AKA</div>
+      <div class="logo-name">Internal Portal</div>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="os-title">AKADIGITAL <span>OS</span></h1>
+    <p class="os-sub">Select your workspace</p>
+
+    <!-- Two options -->
+    <div class="cards">
+
+      <!-- SUPER ADMIN -->
+      <a href="https://admin.akadigital.net" class="card">
+        <div class="card-icon admin">🛡️</div>
+        <div class="card-label">Super Admin</div>
+        <div class="card-desc">CMS Dashboard &amp; Content Management</div>
+        <span class="card-badge badge-live">Live</span>
+      </a>
+
+      <!-- AKADIGITAL REACH -->
+      <div class="card disabled">
+        <div class="card-icon reach">📡</div>
+        <div class="card-label">AKA Reach</div>
+        <div class="card-desc">Media Planning &amp; Campaign Dashboard</div>
+        <span class="card-badge badge-soon">Coming Soon</span>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <p class="portal-footer">
+      &copy; 2025 AKA Digital Pte. Ltd. &nbsp;·&nbsp;
+      <a href="/">Return to site</a>
+    </p>
+
+  </div>
+
+</body>
+</html>
