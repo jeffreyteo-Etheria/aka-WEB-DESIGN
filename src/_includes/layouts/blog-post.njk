@@ -132,8 +132,8 @@ layout: layouts/base.njk
         <div class="bg-primary text-on-primary rounded-2xl p-6 mb-8 sticky top-24">
           <h3 class="font-display font-bold text-on-primary text-headline-sm mb-3">Talk to a MarTech Expert</h3>
           <p class="text-on-primary/70 text-body-md mb-5 leading-relaxed">Get a free consultation and custom roadmap for your business from our SEA team.</p>
-          <a href="/contact" class="block w-full text-center bg-action-yellow text-on-secondary-fixed font-extrabold py-3 rounded-xl text-label-md uppercase tracking-wider hover:shadow-lg transition-all">
-            Book Free Session
+          <a href="{{ settings.cta.book_session_url }}" class="block w-full text-center bg-action-yellow text-on-secondary-fixed font-extrabold py-3 rounded-xl text-label-md uppercase tracking-wider hover:shadow-lg transition-all">
+            {{ settings.cta.book_session_text }}
           </a>
           <div class="mt-4 pt-4 border-t border-white/10 text-center">
             <span class="text-on-primary/40 text-label-md">150+ enterprise brands served</span>

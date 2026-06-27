@@ -17,7 +17,7 @@
     { "label": "Blog",          "href": "/blog",          "icon": "edit_note" },
     { "label": "Insights",       "href": "/insights",      "icon": "article" },
     { "label": "Careers",        "href": "/careers",       "icon": "work" },
-    { "label": "AKA Ads Platform", "href": "https://ads.akadigital.net", "icon": "open_in_new", "external": true, "platform": true }
+    { "label": "LOG IN", "href": "/os", "icon": "login", "external": false, "platform": true }
   ],
   "mobile": [
     { "label": "Home",      "href": "/",             "icon": "home" },

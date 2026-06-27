@@ -512,6 +512,24 @@ http.createServer(async (req, res) => {
     }
 
     /* ═══════════════════════════════════════════════════════════════
+       SITE SETTINGS — CTA links + popup content (super admin only)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/site-settings' && m === 'GET') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      return j(res, 200, readData('settings'));
+    }
+
+    if (p === '/api/site-settings' && m === 'PUT') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const b       = await readBody(req);
+      const current = readData('settings');
+      const updated = { ...current, cta: { ...current.cta, ...b.cta }, popup: { ...current.popup, ...b.popup } };
+      writeData('settings', updated);
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
        SUPER ADMIN ONLY — all other data files
        ═══════════════════════════════════════════════════════════════ */
 

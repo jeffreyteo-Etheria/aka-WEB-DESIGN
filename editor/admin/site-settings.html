@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CTA & Popup Settings — AKA Digital CMS</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+  <style>
+    .settings-section { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:28px; margin-bottom:28px; }
+    .settings-section h2 { font-size:15px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--aka-yellow); margin:0 0 6px; }
+    .settings-section p  { font-size:13px; color:var(--text-muted); margin:0 0 24px; line-height:1.5; }
+    .field-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:640px){ .field-grid { grid-template-columns:1fr; } }
+    .field-full { grid-column:1/-1; }
+    .save-bar { display:flex; align-items:center; gap:16px; margin-top:28px; padding-top:20px; border-top:1px solid var(--border); }
+    .save-msg { font-size:13px; color:#22c55e; display:none; }
+    .divider { border:none; border-top:1px solid var(--border); margin:8px 0 20px; }
+    .field-hint { font-size:11px; color:var(--text-muted); margin:4px 0 0; }
+  </style>
+</head>
+<body class="cms-body">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">AKA</div>
+      <div>
+        <div class="logo-name">AKA Digital</div>
+        <div class="logo-sub">Content Hub</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Content</div>
+      <a href="/admin/dashboard" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a>
+      <a href="/admin/blog-form" class="nav-item"><span class="nav-icon">✎</span> New Blog Post</a>
+      <a href="/admin/case-study-form" class="nav-item"><span class="nav-icon">◆</span> New Case Study</a>
+      <a href="/admin/events-form" class="nav-item"><span class="nav-icon">◷</span> New Event</a>
+      <a href="/admin/job-form" class="nav-item"><span class="nav-icon">◎</span> New Job / Career</a>
+      <div class="nav-section">CRM & Automation</div>
+      <a href="/admin/crm-hub" class="nav-item"><span class="nav-icon">⬡</span> CRM Hub</a>
+      <div class="nav-section super-only" style="display:none">Site Data</div>
+      <a href="/admin/site-settings" class="nav-item active super-only" style="display:none">
+        <span class="nav-icon">⚡</span> CTA &amp; Popup Settings
+      </a>
+      <div class="nav-section" style="margin-top:auto">Tools</div>
+      <a href="#" class="nav-item" id="buildBtn"><span class="nav-icon">⚙</span> Build Site</a>
+      <a href="#" class="nav-item" id="exportBtn"><span class="nav-icon">⬇</span> Export ZIP</a>
+      <a href="#" class="nav-item super-only" id="deployBtn" style="display:none;color:#22c55e">
+        <span class="nav-icon">🚀</span> Publish Live
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-badge" id="userBadge">—</div>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">CTA &amp; Popup Settings</h1>
+        <p class="page-sub">Edit button labels, redirect URLs, and lead-gen popup content. Save triggers a site rebuild.</p>
+      </div>
+    </div>
+
+    <!-- ── CTA Buttons ── -->
+    <div class="settings-section">
+      <h2>CTA Button Links</h2>
+      <p>Controls the label and destination URL for the three main call-to-action buttons across the site.</p>
+
+      <div class="field-grid">
+        <div>
+          <label class="form-label">Solution Plan — Button Text</label>
+          <input id="solution_plan_text" type="text" class="form-input" placeholder="Get My Custom Solution Plan" />
+        </div>
+        <div>
+          <label class="form-label">Solution Plan — URL</label>
+          <input id="solution_plan_url" type="text" class="form-input" placeholder="/contact" />
+          <p class="field-hint">Lead quiz submit button on homepage</p>
+        </div>
+        <div>
+          <label class="form-label">Book Session — Button Text</label>
+          <input id="book_session_text" type="text" class="form-input" placeholder="Book Free Session" />
+        </div>
+        <div>
+          <label class="form-label">Book Session — URL</label>
+          <input id="book_session_url" type="text" class="form-input" placeholder="/contact" />
+          <p class="field-hint">Blog sidebar CTA + popup button</p>
+        </div>
+        <div>
+          <label class="form-label">Get Started — Button Text</label>
+          <input id="get_started_text" type="text" class="form-input" placeholder="Get Started" />
+        </div>
+        <div>
+          <label class="form-label">Get Started — URL</label>
+          <input id="get_started_url" type="text" class="form-input" placeholder="/contact?market=sg" />
+          <p class="field-hint">Sticky bottom bar CTA</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Lead Gen Popup ── -->
+    <div class="settings-section">
+      <h2>Lead Gen Popup — Content</h2>
+      <p>The exit-intent popup shown to visitors. Changes here update the popup on every page of the site.</p>
+
+      <div class="field-grid">
+        <div class="field-full">
+          <label class="form-label">Popup Title</label>
+          <input id="popup_title" type="text" class="form-input" placeholder="Get Your Free Digital Growth Strategy Session" />
+        </div>
+        <div class="field-full">
+          <label class="form-label">Popup Subtitle</label>
+          <input id="popup_subtitle" type="text" class="form-input" placeholder="30-minute video call with our team..." />
+        </div>
+      </div>
+
+      <hr class="divider" />
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">BULLET POINTS (each has a bold title + lighter sub-text)</p>
+
+      <div class="field-grid">
+        <div>
+          <label class="form-label">Bullet 1 — Title</label>
+          <input id="popup_bullet_1_title" type="text" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Bullet 1 — Sub-text</label>
+          <input id="popup_bullet_1_sub" type="text" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Bullet 2 — Title</label>
+          <input id="popup_bullet_2_title" type="text" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Bullet 2 — Sub-text</label>
+          <input id="popup_bullet_2_sub" type="text" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Bullet 3 — Title</label>
+          <input id="popup_bullet_3_title" type="text" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Bullet 3 — Sub-text</label>
+          <input id="popup_bullet_3_sub" type="text" class="form-input" />
+        </div>
+      </div>
+
+      <hr class="divider" />
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">POPUP BUTTON</p>
+
+      <div class="field-grid">
+        <div>
+          <label class="form-label">Button Text</label>
+          <input id="popup_button_text" type="text" class="form-input" placeholder="Book Free Session" />
+        </div>
+        <div>
+          <label class="form-label">Button Redirect URL</label>
+          <input id="popup_button_url" type="text" class="form-input" placeholder="/contact" />
+          <p class="field-hint">Enter a full URL (https://...) or a site path (/contact)</p>
+        </div>
+      </div>
+
+      <div class="save-bar">
+        <button class="btn-primary" id="saveBtn">Save &amp; Rebuild Site</button>
+        <span class="save-msg" id="saveMsg">✓ Saved — site is rebuilding…</span>
+        <span class="error-msg" id="saveErr" style="display:none"></span>
+      </div>
+    </div>
+
+    <!-- Build log -->
+    <div id="buildLog" class="build-log" style="display:none">
+      <div class="build-log-header">Build Output</div>
+      <div id="buildLogText" class="build-log-text"></div>
+    </div>
+  </main>
+
+  <script src="/admin/admin.js"></script>
+  <script>
+    requireAuth();
+    const role = localStorage.getItem('aka_cms_role');
+    if (role !== 'super') { location.href = '/admin/dashboard'; }
+
+    document.getElementById('userBadge').textContent =
+      (localStorage.getItem('aka_cms_user') || '—') + ' (' + role + ')';
+    document.querySelectorAll('.super-only').forEach(el => el.style.display = '');
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // ── Load current settings ──
+    async function loadSettings() {
+      const data = await apiFetch('/api/site-settings');
+      if (!data) return;
+
+      const cta   = data.cta   || {};
+      const popup = data.popup || {};
+
+      setValue('solution_plan_text', cta.solution_plan_text);
+      setValue('solution_plan_url',  cta.solution_plan_url);
+      setValue('book_session_text',  cta.book_session_text);
+      setValue('book_session_url',   cta.book_session_url);
+      setValue('get_started_text',   cta.get_started_text);
+      setValue('get_started_url',    cta.get_started_url);
+
+      setValue('popup_title',          popup.title);
+      setValue('popup_subtitle',       popup.subtitle);
+      setValue('popup_bullet_1_title', popup.bullet_1_title);
+      setValue('popup_bullet_1_sub',   popup.bullet_1_sub);
+      setValue('popup_bullet_2_title', popup.bullet_2_title);
+      setValue('popup_bullet_2_sub',   popup.bullet_2_sub);
+      setValue('popup_bullet_3_title', popup.bullet_3_title);
+      setValue('popup_bullet_3_sub',   popup.bullet_3_sub);
+      setValue('popup_button_text',    popup.button_text);
+      setValue('popup_button_url',     popup.button_url);
+    }
+
+    function setValue(id, val) {
+      const el = document.getElementById(id);
+      if (el && val !== undefined) el.value = val;
+    }
+
+    function getVal(id) { return (document.getElementById(id) || {}).value || ''; }
+
+    // ── Save ──
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('saveBtn');
+      const msg = document.getElementById('saveMsg');
+      const err = document.getElementById('saveErr');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      msg.style.display = 'none';
+      err.style.display = 'none';
+
+      const payload = {
+        cta: {
+          solution_plan_text: getVal('solution_plan_text'),
+          solution_plan_url:  getVal('solution_plan_url'),
+          book_session_text:  getVal('book_session_text'),
+          book_session_url:   getVal('book_session_url'),
+          get_started_text:   getVal('get_started_text'),
+          get_started_url:    getVal('get_started_url')
+        },
+        popup: {
+          title:          getVal('popup_title'),
+          subtitle:       getVal('popup_subtitle'),
+          bullet_1_title: getVal('popup_bullet_1_title'),
+          bullet_1_sub:   getVal('popup_bullet_1_sub'),
+          bullet_2_title: getVal('popup_bullet_2_title'),
+          bullet_2_sub:   getVal('popup_bullet_2_sub'),
+          bullet_3_title: getVal('popup_bullet_3_title'),
+          bullet_3_sub:   getVal('popup_bullet_3_sub'),
+          button_text:    getVal('popup_button_text'),
+          button_url:     getVal('popup_button_url')
+        }
+      };
+
+      const res = await apiFetch('/api/site-settings', 'PUT', payload);
+      if (res && res.ok) {
+        msg.style.display = 'inline';
+        // Trigger rebuild via SSE
+        const log  = document.getElementById('buildLog');
+        const txt  = document.getElementById('buildLogText');
+        log.style.display = 'block';
+        txt.textContent = 'Building site…\n';
+        const es = new EventSource('/api/build');
+        es.onmessage = ev => {
+          try {
+            const d = JSON.parse(ev.data);
+            txt.textContent += (d.msg || '') + '\n';
+            if (d.status === 'done') { txt.textContent += '✓ Done — changes are live.\n'; es.close(); }
+            if (d.status === 'error') { txt.textContent += '✗ Build error.\n'; es.close(); }
+          } catch {}
+        };
+        await apiFetch('/api/build', 'POST');
+      } else {
+        err.textContent = 'Save failed. Try again.';
+        err.style.display = 'block';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save & Rebuild Site';
+    });
+
+    // ── Build / Export / Deploy buttons ──
+    document.getElementById('buildBtn').addEventListener('click', async e => {
+      e.preventDefault();
+      const log = document.getElementById('buildLog');
+      const txt = document.getElementById('buildLogText');
+      log.style.display = 'block'; txt.textContent = 'Building…\n';
+      const es = new EventSource('/api/build');
+      es.onmessage = ev => {
+        try { const d = JSON.parse(ev.data); txt.textContent += (d.msg||'') + '\n';
+          if (d.status==='done'||d.status==='error') es.close(); } catch {}
+      };
+      await apiFetch('/api/build', 'POST');
+    });
+
+    if (document.getElementById('exportBtn')) {
+      document.getElementById('exportBtn').addEventListener('click', async e => {
+        e.preventDefault();
+        const res = await apiFetch('/api/export', 'POST');
+        if (res && res.file) window.location = '/exports/' + res.file;
+      });
+    }
+
+    if (document.getElementById('deployBtn')) {
+      document.getElementById('deployBtn').addEventListener('click', async e => {
+        e.preventDefault();
+        if (!confirm('Publish to live site? This rebuilds and uploads everything.')) return;
+        const log = document.getElementById('buildLog');
+        const txt = document.getElementById('buildLogText');
+        log.style.display = 'block'; txt.textContent = 'Publishing…\n';
+        const es = new EventSource('/api/deploy');
+        es.onmessage = ev => {
+          try { const d = JSON.parse(ev.data); txt.textContent += (d.msg||'') + '\n';
+            if (d.status==='done'||d.status==='error') es.close(); } catch {}
+        };
+        await apiFetch('/api/deploy', 'POST');
+      });
+    }
+
+    loadSettings();
+  </script>
+</body>
+</html>

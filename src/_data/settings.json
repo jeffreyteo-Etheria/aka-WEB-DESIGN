@@ -73,5 +73,25 @@
     "legalName": "AKA Digital Pte. Ltd.",
     "type": "MarketingAgency",
     "areaServed": ["SG", "VN", "ID", "TH", "PH", "MY", "KR"]
+  },
+  "cta": {
+    "solution_plan_text": "Get My Custom Solution Plan",
+    "solution_plan_url": "/contact",
+    "book_session_text": "Book Free Session",
+    "book_session_url": "/contact",
+    "get_started_text": "Get Started",
+    "get_started_url": "/contact?market=sg"
+  },
+  "popup": {
+    "title": "Get Your Free Digital Growth Strategy Session",
+    "subtitle": "30-minute video call with our team — no commitment, no pitch deck. Just a genuine conversation about your goals.",
+    "bullet_1_title": "Discover which MarTech & digital tools fit your stack",
+    "bullet_1_sub": "(CRM, automation, performance ads, social growth, AI GEO/AEO)",
+    "bullet_2_title": "Benchmark your data maturity against SEA leaders",
+    "bullet_2_sub": "(Understand where you stand in marketing technology adoption)",
+    "bullet_3_title": "Receive a priority roadmap for 90-day quick wins",
+    "bullet_3_sub": "(Actionable steps to accelerate campaigns and growth)",
+    "button_text": "Book Free Session",
+    "button_url": "/contact"
   }
 }
