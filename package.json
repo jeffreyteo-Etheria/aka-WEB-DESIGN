@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "AKA Digital — B2B MarTech Agency Website for Southeast Asia",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node editor-server.js",
+    "postinstall": "npm run build",
     "dev": "concurrently \"npm run css:watch\" \"eleventy --serve --port=3000\"",
     "editor": "node editor-server.js",
     "editor:dev": "concurrently \"npm run css:watch\" \"eleventy --watch\" \"node editor-server.js\"",

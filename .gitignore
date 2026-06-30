@@ -23,12 +23,10 @@ src/_data/_edits.json
 *.bak
 ~$*
 
-public/images/uploads/
-public/images/case-studies/
-public/images/blog/
-public/images/partners/
-public/images/team/
-public/images/events/
+# Large media — upload manually to Hostinger via File Manager
 public/images/activities/
+public/images/team/
+public/images/blog/
+public/images/events/
 public/videos/
 public/fonts/
