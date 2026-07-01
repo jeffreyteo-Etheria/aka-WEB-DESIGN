@@ -852,4 +852,14 @@ http.createServer(async (req, res) => {
   console.log(`║  Super Admin  →  user: admin  /  pass: AKAadmin2025!    ║`);
   console.log(`║  Team Member  →  user: team   /  pass: AKAteam2025!     ║`);
   console.log('╚══════════════════════════════════════════════════════════╝\n');
+
+  // Auto-build on startup so dist/ is always fresh after a deployment
+  console.log('[startup] Running initial build...');
+  exec('npm run build', { cwd: ROOT }, (err, stdout, stderr) => {
+    if (err) {
+      console.error('[startup] Build failed:', stderr || err.message);
+    } else {
+      console.log('[startup] Build complete ✓');
+    }
+  });
 });
