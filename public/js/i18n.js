@@ -255,6 +255,13 @@
       el.classList.add("notranslate");
     });
 
+    // Stat/counter elements — protect "+" suffix and numeric values from translation.
+    // Google Translate can mangle "+" and tick/check characters inside animated counters.
+    document.querySelectorAll(".counter, [data-suffix], [data-target]").forEach(function (el) {
+      el.setAttribute("translate", "no");
+      el.classList.add("notranslate");
+    });
+
     // Logo fallback text spans
     document.querySelectorAll(".logo-text, [aria-label*='AKA Digital'] span").forEach(function (el) {
       el.setAttribute("translate", "no");
@@ -262,7 +269,7 @@
     });
 
     // Any element already marked translate="no" in HTML — ensure notranslate class is present
-    // This covers partner names, brand names, and any future tagged elements
+    // This covers partner names, brand names, stat numbers, and any future tagged elements
     document.querySelectorAll("[translate='no']").forEach(function (el) {
       el.classList.add("notranslate");
     });

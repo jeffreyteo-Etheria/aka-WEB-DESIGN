@@ -148,15 +148,15 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
             <!-- Mini stat grid -->
             <div class="grid grid-cols-3 gap-3 pt-5 border-t border-white/10">
               <div class="text-center">
-                <span class="block text-[28px] font-display font-extrabold text-action-yellow counter" data-target="150" data-suffix="+">0</span>
+                <span class="block text-[28px] font-display font-extrabold text-action-yellow counter notranslate" data-target="150" data-suffix="+" translate="no">0</span>
                 <span class="text-label-md text-white/40">Enterprise Clients</span>
               </div>
               <div class="text-center border-x border-white/10">
-                <span class="block text-[28px] font-display font-extrabold text-primary-fixed counter" data-target="15">0</span>
+                <span class="block text-[28px] font-display font-extrabold text-primary-fixed counter notranslate" data-target="15" translate="no">0</span>
                 <span class="text-label-md text-white/40">Global Tech Partners</span>
               </div>
               <div class="text-center">
-                <span class="block text-[28px] font-display font-extrabold text-green-400 counter" data-target="10">0</span>
+                <span class="block text-[28px] font-display font-extrabold text-green-400 counter notranslate" data-target="10" translate="no">0</span>
                 <span class="text-label-md text-white/40">Yrs Exp</span>
               </div>
             </div>
@@ -238,7 +238,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
       <div class="grid grid-cols-2 gap-4 reveal-up" style="animation-delay:0.1s">
         {% for stat in sitedata.value_proposition.stats %}
           <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-action-yellow/30 hover:bg-white/8 transition-all duration-300">
-            <span class="block text-[52px] font-display font-extrabold text-action-yellow leading-none mb-2 counter" data-target="{{ stat.value | replace('+','') | replace('x','') }}">{{ stat.value }}</span>
+            <span class="block text-[52px] font-display font-extrabold text-action-yellow leading-none mb-2 counter notranslate" data-target="{{ stat.value | replace('+','') | replace('x','') }}" translate="no">{{ stat.value }}</span>
             <span class="text-label-md text-white/50 uppercase tracking-wider">{{ stat.label }}</span>
           </div>
         {% endfor %}
