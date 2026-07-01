@@ -8,20 +8,33 @@
   class="fixed top-0 left-0 w-full z-50 bg-background/95 backdrop-blur-md border-b border-outline-variant/20 transition-shadow duration-300"
   id="site-header"
 >
-  <div class="section-container h-16 flex items-center justify-between">
-
-    <!-- Logo -->
+  <!-- Row 1: Logo bar -->
+  <div class="section-container h-16 flex items-center justify-between border-b border-outline-variant/10">
     <a href="/" class="inline-flex items-center shrink-0" aria-label="{{ settings.name }} — Home">
       <img
         src="/images/logos/aka-logo-rec.png"
         alt="{{ settings.name }}"
-        class="block h-10 w-auto"
+        class="block h-11 w-auto"
         style="mix-blend-mode:multiply"
       />
     </a>
+    <!-- Mobile hamburger (row 1) -->
+    <button
+      class="md:hidden p-2 text-primary transition-transform active:scale-90"
+      id="menu-toggle"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="drawer"
+    >
+      <span class="material-symbols-outlined text-2xl" id="menu-icon">menu</span>
+    </button>
+  </div>
 
+  <!-- Row 2: Desktop nav bar -->
+  <div class="hidden md:block bg-background/98">
+    <div class="section-container h-11 flex items-center justify-end">
     <!-- Desktop Nav -->
-    <nav class="hidden md:flex items-center gap-6 shrink-0" aria-label="Main navigation">
+    <nav class="flex items-center gap-6 shrink-0" aria-label="Main navigation">
       {% for item in navigation.main %}
         {% if item.children %}
           <div class="relative group">
@@ -81,19 +94,9 @@
         Get In Touch
       </a>
     </nav>
+    </div><!-- end section-container row 2 -->
+  </div><!-- end desktop nav bar -->
 
-    <!-- Mobile hamburger -->
-    <button
-      class="md:hidden p-2 text-primary transition-transform active:scale-90"
-      id="menu-toggle"
-      aria-label="Open menu"
-      aria-expanded="false"
-      aria-controls="drawer"
-    >
-      <span class="material-symbols-outlined text-2xl" id="menu-icon">menu</span>
-    </button>
-
-  </div>
 </header>
 
 <!-- Mobile Drawer Backdrop -->
