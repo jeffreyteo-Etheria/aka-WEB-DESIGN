@@ -5,28 +5,40 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
 ---
 
 <!-- ============================================================
-     HERO — Light / white design
+     HERO — Dark cinematic with event photo
      ============================================================ -->
-<section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-white" id="hero">
+<section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#060F24]" id="hero">
 
-  <!-- Decorative soft orbs -->
-  <div class="absolute top-0 right-0 w-[700px] h-[700px] rounded-full bg-primary/6 blur-[140px] pointer-events-none -translate-y-1/3 translate-x-1/4"></div>
-  <div class="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-action-yellow/10 blur-[120px] pointer-events-none translate-y-1/3 -translate-x-1/4"></div>
-
-  <!-- Subtle grid -->
-  <div class="absolute inset-0 z-0 opacity-[0.03]"
-       style="background-image: linear-gradient(rgba(11,31,75,1) 1px, transparent 1px), linear-gradient(90deg, rgba(11,31,75,1) 1px, transparent 1px); background-size: 80px 80px;">
+  <!-- Background: real event photo -->
+  <div class="absolute inset-0 z-0">
+    <img
+      src="/images/hero/home-summit.jpeg"
+      alt="AKA Digital Martech Summit"
+      class="w-full h-full object-cover opacity-45"
+      loading="eager"
+    />
+    <div class="absolute inset-0" style="background:rgba(8,12,24,0.55)"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[#060F24] via-transparent to-transparent"></div>
   </div>
 
+  <!-- Subtle grid -->
+  <div class="absolute inset-0 z-0 opacity-[0.04]"
+       style="background-image: linear-gradient(rgba(188,195,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(188,195,255,1) 1px, transparent 1px); background-size: 80px 80px;">
+  </div>
+
+  <!-- Glowing orbs -->
+  <div class="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-primary/20 blur-[120px] opacity-50 pointer-events-none"></div>
+  <div class="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full bg-action-yellow/10 blur-[100px] opacity-40 pointer-events-none"></div>
+
   <!-- Language switcher -->
-  <div class="absolute top-24 right-4 md:right-8 z-20 flex items-center gap-1 bg-on-surface/5 border border-on-surface/10 rounded-full px-3 py-2">
-    <button class="lang-btn text-label-md font-bold text-primary px-2 py-0.5 rounded-full" data-lang="en">EN</button>
-    <span class="text-on-surface/20 text-xs">|</span>
-    <button class="lang-btn text-label-md text-on-surface-variant hover:text-on-surface px-2 py-0.5 rounded-full transition-colors" data-lang="vi">VI</button>
-    <span class="text-on-surface/20 text-xs">|</span>
-    <button class="lang-btn text-label-md text-on-surface-variant hover:text-on-surface px-2 py-0.5 rounded-full transition-colors" data-lang="ko">한국어</button>
-    <span class="text-on-surface/20 text-xs">|</span>
-    <button class="lang-btn text-label-md text-on-surface-variant hover:text-on-surface px-2 py-0.5 rounded-full transition-colors" data-lang="zh">中文</button>
+  <div class="absolute top-24 right-4 md:right-8 z-20 flex items-center gap-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-3 py-2">
+    <button class="lang-btn text-label-md font-bold text-action-yellow px-2 py-0.5 rounded-full" data-lang="en">EN</button>
+    <span class="text-white/20 text-xs">|</span>
+    <button class="lang-btn text-label-md text-white/60 hover:text-white px-2 py-0.5 rounded-full transition-colors" data-lang="vi">VI</button>
+    <span class="text-white/20 text-xs">|</span>
+    <button class="lang-btn text-label-md text-white/60 hover:text-white px-2 py-0.5 rounded-full transition-colors" data-lang="ko">한국어</button>
+    <span class="text-white/20 text-xs">|</span>
+    <button class="lang-btn text-label-md text-white/60 hover:text-white px-2 py-0.5 rounded-full transition-colors" data-lang="zh">中文</button>
   </div>
 
   <div class="relative z-10 section-container py-32">
@@ -36,50 +48,50 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
       <div class="lg:col-span-7 reveal-up">
 
         <!-- Award badge -->
-        <div class="inline-flex items-center gap-2 bg-action-yellow text-on-secondary-fixed px-4 py-2 rounded-full text-label-md font-extrabold uppercase tracking-widest mb-8 shadow-[0_0_30px_rgba(245,196,0,0.35)]">
+        <div class="inline-flex items-center gap-2 bg-action-yellow text-on-secondary-fixed px-4 py-2 rounded-full text-label-md font-extrabold uppercase tracking-widest mb-8 shadow-[0_0_30px_rgba(245,209,0,0.3)]">
           <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">emoji_events</span>
           MMA Smarties Silver Winner 2022
         </div>
 
         <!-- Headline -->
-        <h1 class="text-[48px] md:text-[64px] lg:text-[72px] font-display font-extrabold leading-[1.05] tracking-[-0.02em] text-on-surface mb-6 text-balance">
+        <h1 class="text-[48px] md:text-[64px] lg:text-[72px] font-display font-extrabold leading-[1.05] tracking-[-0.02em] text-white mb-6 text-balance">
           MarTech That<br/>
-          <span class="text-action-yellow">Actually Works.</span><br/>
-          <span class="text-on-surface/60">In Southeast Asia.</span>
+          <span class="bg-gradient-to-r from-action-yellow via-[#FFE566] to-action-yellow bg-clip-text text-transparent">Actually Works.</span><br/>
+          <span class="text-white/80">In Southeast Asia.</span>
         </h1>
 
         <!-- Subheadline -->
-        <p class="text-[18px] md:text-[20px] text-on-surface-variant mb-10 leading-relaxed max-w-2xl">
+        <p class="text-[18px] md:text-[20px] text-white/65 mb-10 leading-relaxed max-w-2xl">
           We operate across Southeast Asia as a licensed MarTech partner and Vietnam's exclusive representative for global platforms — powering 150+ enterprise brands to turn data into revenue.
         </p>
 
         <!-- CTA row -->
         <div class="flex flex-col sm:flex-row gap-4 mb-12">
-          <a href="/contact" class="inline-flex items-center justify-center gap-2 bg-action-yellow text-on-secondary-fixed px-8 py-4 rounded-xl text-label-md font-extrabold uppercase tracking-wider shadow-[0_8px_32px_rgba(245,196,0,0.40)] hover:shadow-[0_12px_48px_rgba(245,196,0,0.60)] hover:translate-y-[-2px] transition-all duration-300">
+          <a href="/contact" class="inline-flex items-center justify-center gap-2 bg-action-yellow text-on-secondary-fixed px-8 py-4 rounded-xl text-label-md font-extrabold uppercase tracking-wider shadow-[0_8px_32px_rgba(245,209,0,0.35)] hover:shadow-[0_12px_40px_rgba(245,209,0,0.5)] hover:translate-y-[-2px] transition-all duration-300">
             <span data-i18n="cta.getInTouch">Get a Free Consultation</span>
             <span class="material-symbols-outlined text-base">arrow_forward</span>
           </a>
-          <a href="/case-studies" class="inline-flex items-center justify-center gap-2 bg-on-surface/5 border border-on-surface/15 text-on-surface px-8 py-4 rounded-xl text-label-md font-bold hover:bg-on-surface/10 transition-all duration-300">
+          <a href="/case-studies" class="inline-flex items-center justify-center gap-2 bg-white/8 backdrop-blur-sm border border-white/20 text-white px-8 py-4 rounded-xl text-label-md font-bold hover:bg-white/15 transition-all duration-300">
             <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">play_circle</span>
             View Case Studies
           </a>
         </div>
 
         <!-- Social proof -->
-        <div class="flex items-center gap-6 pt-8 border-t border-on-surface/10">
+        <div class="flex items-center gap-6 pt-8 border-t border-white/10">
           <div class="flex -space-x-2">
             {% for person in team %}
-              <div class="w-10 h-10 rounded-full bg-primary/20 border-2 border-white flex items-center justify-center text-primary font-bold text-label-md overflow-hidden">
+              <div class="w-10 h-10 rounded-full bg-primary/30 border-2 border-[#060F24] flex items-center justify-center text-white font-bold text-label-md overflow-hidden">
                 <img src="{{ person.photo }}" alt="{{ person.name }}"
                   class="w-full h-full object-cover"
-                  onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'text-sm font-bold text-primary flex items-center justify-center h-full\'>{{ person.name | truncate(1, true, '') }}</span>'" />
+                  onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'text-sm font-bold text-white\'>{{ person.name | truncate(1, true, \'\') }}</span>'" />
               </div>
             {% endfor %}
-            <div class="w-10 h-10 rounded-full bg-action-yellow/20 border-2 border-white flex items-center justify-center text-on-surface font-bold text-label-md">+47</div>
+            <div class="w-10 h-10 rounded-full bg-action-yellow/20 border-2 border-[#060F24] flex items-center justify-center text-action-yellow font-bold text-label-md">+47</div>
           </div>
           <div>
-            <p class="text-on-surface font-bold text-body-md">150+ Enterprise Brands Trust Us</p>
-            <p class="text-on-surface-variant text-label-md">Across Singapore · Vietnam · Indonesia · Korea</p>
+            <p class="text-white font-bold text-body-md">150+ Enterprise Brands Trust Us</p>
+            <p class="text-white/50 text-label-md">Across Singapore · Vietnam · Indonesia · Korea</p>
           </div>
         </div>
       </div>
@@ -89,20 +101,20 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
         <div class="relative">
 
           <!-- Main card -->
-          <div class="bg-white border border-outline-variant/30 rounded-3xl p-6 shadow-[0_16px_60px_rgba(11,31,75,0.10)]">
+          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-[0_32px_80px_rgba(0,0,0,0.4)]">
 
             <!-- Card header -->
-            <div class="flex items-center gap-3 mb-6 pb-5 border-b border-outline-variant/20">
+            <div class="flex items-center gap-3 mb-6 pb-5 border-b border-white/10">
               <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <span class="material-symbols-outlined text-white text-xl">insights</span>
               </div>
               <div>
-                <p class="text-label-md text-on-surface-variant uppercase tracking-wider">Live Campaign Analytics</p>
-                <p class="font-display font-bold text-on-surface">Real-Time Performance</p>
+                <p class="text-label-md text-white/50 uppercase tracking-wider">Live Campaign Analytics</p>
+                <p class="font-display font-bold text-white">Real-Time Performance</p>
               </div>
               <div class="ml-auto flex items-center gap-1.5">
-                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span class="text-label-md text-on-surface-variant">Live</span>
+                <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                <span class="text-label-md text-white/50">Live</span>
               </div>
             </div>
 
@@ -110,40 +122,40 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
             <div class="space-y-4 mb-6">
               <div>
                 <div class="flex justify-between mb-2">
-                  <span class="text-label-md text-on-surface-variant">Conversion Rate</span>
+                  <span class="text-label-md text-white/60">Conversion Rate</span>
                   <span class="text-label-md font-bold text-action-yellow notranslate" translate="no">+34%</span>
                 </div>
-                <div class="h-1.5 bg-on-surface/8 rounded-full"><div class="h-1.5 bg-action-yellow rounded-full animate-[grow_1.5s_ease-out_0.5s_both]" style="width:76%"></div></div>
+                <div class="h-1.5 bg-white/10 rounded-full"><div class="h-1.5 bg-action-yellow rounded-full animate-[grow_1.5s_ease-out_0.5s_both]" style="width:76%"></div></div>
               </div>
               <div>
                 <div class="flex justify-between mb-2">
-                  <span class="text-label-md text-on-surface-variant">User Retention</span>
-                  <span class="text-label-md font-bold text-primary notranslate" translate="no">+52%</span>
+                  <span class="text-label-md text-white/60">User Retention</span>
+                  <span class="text-label-md font-bold text-primary-fixed notranslate" translate="no">+52%</span>
                 </div>
-                <div class="h-1.5 bg-on-surface/8 rounded-full"><div class="h-1.5 bg-primary rounded-full animate-[grow_1.5s_ease-out_0.7s_both]" style="width:88%"></div></div>
+                <div class="h-1.5 bg-white/10 rounded-full"><div class="h-1.5 bg-primary rounded-full animate-[grow_1.5s_ease-out_0.7s_both]" style="width:88%"></div></div>
               </div>
               <div>
                 <div class="flex justify-between mb-2">
-                  <span class="text-label-md text-on-surface-variant">Revenue Growth</span>
-                  <span class="text-label-md font-bold text-green-600 notranslate" translate="no">+127%</span>
+                  <span class="text-label-md text-white/60">Revenue Growth</span>
+                  <span class="text-label-md font-bold text-green-400 notranslate" translate="no">+127%</span>
                 </div>
-                <div class="h-1.5 bg-on-surface/8 rounded-full"><div class="h-1.5 bg-green-500 rounded-full animate-[grow_1.5s_ease-out_0.9s_both]" style="width:93%"></div></div>
+                <div class="h-1.5 bg-white/10 rounded-full"><div class="h-1.5 bg-green-400 rounded-full animate-[grow_1.5s_ease-out_0.9s_both]" style="width:93%"></div></div>
               </div>
             </div>
 
             <!-- Mini stat grid -->
-            <div class="grid grid-cols-3 gap-3 pt-5 border-t border-outline-variant/20">
+            <div class="grid grid-cols-3 gap-3 pt-5 border-t border-white/10">
               <div class="text-center">
                 <span class="block text-[28px] font-display font-extrabold text-action-yellow counter notranslate" data-target="150" data-suffix="+" translate="no">0</span>
-                <span class="text-label-md text-on-surface-variant/60">Enterprise Clients</span>
+                <span class="text-label-md text-white/40">Enterprise Clients</span>
               </div>
-              <div class="text-center border-x border-outline-variant/20">
-                <span class="block text-[28px] font-display font-extrabold text-primary counter notranslate" data-target="15" translate="no">0</span>
-                <span class="text-label-md text-on-surface-variant/60">Tech Partners</span>
+              <div class="text-center border-x border-white/10">
+                <span class="block text-[28px] font-display font-extrabold text-primary-fixed counter notranslate" data-target="15" translate="no">0</span>
+                <span class="text-label-md text-white/40">Tech Partners</span>
               </div>
               <div class="text-center">
-                <span class="block text-[28px] font-display font-extrabold text-green-600 counter notranslate" data-target="10" translate="no">0</span>
-                <span class="text-label-md text-on-surface-variant/60">Yrs Exp</span>
+                <span class="block text-[28px] font-display font-extrabold text-green-400 counter notranslate" data-target="10" translate="no">0</span>
+                <span class="text-label-md text-white/40">Yrs Exp</span>
               </div>
             </div>
           </div>
@@ -160,9 +172,9 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
   </div>
 
   <!-- Scroll indicator -->
-  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-30">
-    <span class="text-on-surface-variant text-label-md uppercase tracking-widest">Scroll</span>
-    <div class="w-px h-10 bg-gradient-to-b from-on-surface/40 to-transparent animate-[scrollLine_2s_ease-in-out_infinite]"></div>
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-40">
+    <span class="text-white text-label-md uppercase tracking-widest">Scroll</span>
+    <div class="w-px h-10 bg-gradient-to-b from-white/60 to-transparent animate-[scrollLine_2s_ease-in-out_infinite]"></div>
   </div>
 </section>
 
@@ -429,6 +441,30 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
 
 
 <!-- ============================================================
+     MEDIA MENTIONS — Scrolling dark band
+     ============================================================ -->
+<section class="py-16 bg-inverse-surface overflow-hidden">
+  <div class="section-container mb-8">
+    <div class="w-10 h-1 bg-primary-fixed mb-4"></div>
+    <h2 class="text-headline-sm md:text-headline-md font-display text-inverse-on-surface">Global Recognition</h2>
+    <p class="text-body-md text-inverse-on-surface/50 mt-2">Featured by leading industry publications across Southeast Asia.</p>
+  </div>
+  <div class="flex overflow-x-auto gap-4 px-4 hide-scrollbar snap-x pb-2">
+    {% for mention in sitedata.media_mentions %}
+      <div class="min-w-[300px] max-w-[320px] snap-center bg-white/5 border border-white/8 rounded-2xl p-6 space-y-3 shrink-0 hover:border-primary/30 transition-colors duration-300">
+        <span class="text-label-md font-bold text-primary-fixed uppercase tracking-wider">{{ mention.publication }}</span>
+        <p class="text-body-md text-inverse-on-surface/70 leading-relaxed italic">"{{ mention.quote }}"</p>
+        <div class="flex items-center justify-between pt-2 border-t border-white/5">
+          <span class="text-label-md text-inverse-on-surface/30">{{ mention.year }}</span>
+          <span class="text-label-md text-primary-fixed/60 uppercase tracking-wider">{{ mention.category }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+
+<!-- ============================================================
      CASE STUDY VIDEO SPOTLIGHT — grouped by category, 4 columns
      ============================================================ -->
 <section class="py-20 md:py-32 bg-background">
@@ -518,30 +554,6 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
 
 
 <!-- ============================================================
-     MEDIA MENTIONS — Scrolling dark band
-     ============================================================ -->
-<section class="py-16 bg-inverse-surface overflow-hidden">
-  <div class="section-container mb-8">
-    <div class="w-10 h-1 bg-primary-fixed mb-4"></div>
-    <h2 class="text-headline-sm md:text-headline-md font-display text-inverse-on-surface">Global Recognition</h2>
-    <p class="text-body-md text-inverse-on-surface/50 mt-2">Featured by leading industry publications across Southeast Asia.</p>
-  </div>
-  <div class="flex overflow-x-auto gap-4 px-4 hide-scrollbar snap-x pb-2">
-    {% for mention in sitedata.media_mentions %}
-      <div class="min-w-[300px] max-w-[320px] snap-center bg-white/5 border border-white/8 rounded-2xl p-6 space-y-3 shrink-0 hover:border-primary/30 transition-colors duration-300">
-        <span class="text-label-md font-bold text-primary-fixed uppercase tracking-wider">{{ mention.publication }}</span>
-        <p class="text-body-md text-inverse-on-surface/70 leading-relaxed italic">"{{ mention.quote }}"</p>
-        <div class="flex items-center justify-between pt-2 border-t border-white/5">
-          <span class="text-label-md text-inverse-on-surface/30">{{ mention.year }}</span>
-          <span class="text-label-md text-primary-fixed/60 uppercase tracking-wider">{{ mention.category }}</span>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-</section>
-
-
-<!-- ============================================================
      ACTIVITIES — Horizontal scroll
      ============================================================ -->
 <section class="py-20 md:py-32 bg-surface-off-white">
@@ -594,84 +606,79 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
   <div class="relative section-container">
     <!-- Header -->
     <div class="text-center mb-14 reveal-up">
-      <p class="eyebrow text-primary mb-3">AKA Ads Management Platform</p>
+      <p class="eyebrow text-primary mb-3">AKA MARTECH Management Platform</p>
       <h2 class="text-headline-md md:text-display-sm font-display text-white mb-4 text-balance">
         One Platform. Four Intelligence Engines.
       </h2>
       <p class="text-body-lg text-white/60 max-w-2xl mx-auto">
-        Our proprietary MarTech platform gives you centralised access to AI-powered social, geo-targeting, ads, and CRM intelligence — built for SEA's fastest-growing brands.
+        Our proprietary MarTech platform gives you centralised access to AI-powered social, search, ads, and CRM intelligence — built for SEA's fastest-growing brands.
       </p>
     </div>
 
-    <!-- 4 platform cards -->
+    <!-- 4 platform cards (coming soon — not yet live) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
 
       <!-- SocialMind -->
-      <a href="{{ cms_settings.socialmind_url or '#' }}" target="_blank" rel="noopener"
-         class="group relative bg-white/5 border border-white/10 rounded-2xl p-7 hover:border-primary/50 hover:bg-white/8 transition-all duration-300 reveal-up" style="animation-delay:0s">
+      <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0s">
+        <div class="absolute top-3 right-3">
+          <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
+        </div>
         <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
              style="background: linear-gradient(135deg, #F5C400 0%, #e6b800 100%);">
           <span class="material-symbols-outlined text-[#060F24] text-xl">people</span>
         </div>
-        <h3 class="text-headline-sm font-display text-white mb-2 group-hover:text-primary transition-colors">SocialMind</h3>
+        <h3 class="text-headline-sm font-display text-white mb-2">SocialMind</h3>
         <p class="text-body-sm text-white/50 leading-relaxed">AI-powered social media intelligence. Plan, publish, and measure campaigns across all channels from a single dashboard.</p>
-        <div class="mt-5 flex items-center gap-1 text-label-md text-primary/70 group-hover:text-primary transition-colors">
-          Access platform <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-        </div>
-      </a>
+      </div>
 
       <!-- GeoMind -->
-      <a href="{{ cms_settings.geomind_url or '#' }}" target="_blank" rel="noopener"
-         class="group relative bg-white/5 border border-white/10 rounded-2xl p-7 hover:border-primary/50 hover:bg-white/8 transition-all duration-300 reveal-up" style="animation-delay:0.1s">
+      <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0.1s">
+        <div class="absolute top-3 right-3">
+          <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
+        </div>
         <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
              style="background: linear-gradient(135deg, #0B1F4B 0%, #1a3a7a 100%); border: 1px solid rgba(245,196,0,0.3);">
-          <span class="material-symbols-outlined text-primary text-xl">location_on</span>
+          <span class="material-symbols-outlined text-primary text-xl">travel_explore</span>
         </div>
-        <h3 class="text-headline-sm font-display text-white mb-2 group-hover:text-primary transition-colors">GeoMind</h3>
-        <p class="text-body-sm text-white/50 leading-relaxed">Precision geo-targeting and location intelligence. Reach audiences at the right place and time with programmatic DOOH and mobile targeting.</p>
-        <div class="mt-5 flex items-center gap-1 text-label-md text-primary/70 group-hover:text-primary transition-colors">
-          Access platform <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-        </div>
-      </a>
+        <h3 class="text-headline-sm font-display text-white mb-2">GeoMind</h3>
+        <p class="text-body-sm text-white/50 leading-relaxed">AI-driven SEO, AEO, and GEO strategy engine. Optimise your brand's visibility across traditional search and AI-generated answers — from Google to ChatGPT and Perplexity.</p>
+      </div>
 
       <!-- AdsMind -->
-      <a href="{{ cms_settings.adsmind_url or '#' }}" target="_blank" rel="noopener"
-         class="group relative bg-white/5 border border-white/10 rounded-2xl p-7 hover:border-primary/50 hover:bg-white/8 transition-all duration-300 reveal-up" style="animation-delay:0.2s">
+      <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0.2s">
+        <div class="absolute top-3 right-3">
+          <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
+        </div>
         <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
              style="background: linear-gradient(135deg, #F5C400 0%, #e6b800 100%);">
           <span class="material-symbols-outlined text-[#060F24] text-xl">ads_click</span>
         </div>
-        <h3 class="text-headline-sm font-display text-white mb-2 group-hover:text-primary transition-colors">AdsMind</h3>
+        <h3 class="text-headline-sm font-display text-white mb-2">AdsMind</h3>
         <p class="text-body-sm text-white/50 leading-relaxed">Unified ads management across Meta, Google, TikTok, and programmatic networks. AI-optimised bidding and creative performance tracking.</p>
-        <div class="mt-5 flex items-center gap-1 text-label-md text-primary/70 group-hover:text-primary transition-colors">
-          Access platform <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-        </div>
-      </a>
+      </div>
 
       <!-- CRMMind -->
-      <a href="{{ cms_settings.crmmind_url or '#' }}" target="_blank" rel="noopener"
-         class="group relative bg-white/5 border border-white/10 rounded-2xl p-7 hover:border-primary/50 hover:bg-white/8 transition-all duration-300 reveal-up" style="animation-delay:0.3s">
+      <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0.3s">
+        <div class="absolute top-3 right-3">
+          <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
+        </div>
         <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
              style="background: linear-gradient(135deg, #0B1F4B 0%, #1a3a7a 100%); border: 1px solid rgba(245,196,0,0.3);">
           <span class="material-symbols-outlined text-primary text-xl">hub</span>
         </div>
-        <h3 class="text-headline-sm font-display text-white mb-2 group-hover:text-primary transition-colors">CRMMind</h3>
+        <h3 class="text-headline-sm font-display text-white mb-2">CRMMind</h3>
         <p class="text-body-sm text-white/50 leading-relaxed">Intelligent CRM and customer lifecycle automation. Unify customer data, trigger smart sequences, and drive retention at scale.</p>
-        <div class="mt-5 flex items-center gap-1 text-label-md text-primary/70 group-hover:text-primary transition-colors">
-          Access platform <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-        </div>
-      </a>
+      </div>
 
     </div>
 
-    <!-- Platform CTA -->
+    <!-- Platform CTA — non-clickable (platform not yet built) -->
     <div class="text-center reveal-up" style="animation-delay:0.4s">
-      <a href="{{ cms_settings.ads_platform_url or '#' }}" target="_blank" rel="noopener"
-         class="inline-flex items-center gap-2 bg-action-yellow text-on-secondary-fixed px-8 py-4 rounded-xl text-label-md font-extrabold uppercase tracking-wider shadow-[0_8px_32px_rgba(245,209,0,0.35)] hover:shadow-[0_12px_40px_rgba(245,209,0,0.5)] hover:translate-y-[-2px] transition-all duration-300">
-        <span class="material-symbols-outlined text-base">open_in_new</span>
-        Access AKA Ads Platform
-      </a>
-      <p class="text-body-sm text-white/30 mt-4">Client credentials required · Separate hosted environment</p>
+      <span class="inline-flex items-center gap-2 bg-action-yellow/60 text-on-secondary-fixed/70 px-8 py-4 rounded-xl text-label-md font-extrabold uppercase tracking-wider cursor-not-allowed select-none">
+        <span class="material-symbols-outlined text-base">construction</span>
+        Access AKA Martech Service Platform
+      </span>
+      <p class="text-body-sm text-white/30 mt-4">Platform in development · Available to clients soon</p>
     </div>
   </div>
 </section>
