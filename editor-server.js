@@ -43,16 +43,27 @@ const USERS = [
    PATHS
    ───────────────────────────────────────────────────────────────────────── */
 
-const ROOT    = __dirname;
-const DIST    = path.join(ROOT, 'dist');
-const DATA    = path.join(ROOT, 'src', '_data');
-const PUBLIC  = path.join(ROOT, 'public');
-const EDITOR  = path.join(ROOT, 'editor');
-const ADMIN   = path.join(ROOT, 'editor', 'admin');
-const EDITS   = path.join(DATA,   '_edits.json');
-const UPLOADS = path.join(PUBLIC, 'images', 'uploads');
+const ROOT       = __dirname;
+const DIST       = path.join(ROOT, 'dist');
+const DATA       = path.join(ROOT, 'src', '_data');
+const PUBLIC     = path.join(ROOT, 'public');
+const EDITOR     = path.join(ROOT, 'editor');
+const ADMIN      = path.join(ROOT, 'editor', 'admin');
+const EDITS      = path.join(DATA,   '_edits.json');
+const UPLOADS    = path.join(PUBLIC, 'images', 'uploads');
+const BLOG_PAGES = path.join(ROOT, 'src', 'blog');
 
-[UPLOADS, ADMIN].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
+[UPLOADS, ADMIN, BLOG_PAGES].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
+
+/* Write / delete the Eleventy .njk wrapper that gives a blog post its URL */
+function writeBlogNjk(slug) {
+  const content = `---\nlayout: layouts/blog-post.njk\npermalink: /blog/${slug}/index.html\npostSlug: ${slug}\n---\n`;
+  fs.writeFileSync(path.join(BLOG_PAGES, `${slug}.njk`), content);
+}
+function deleteBlogNjk(slug) {
+  const fp = path.join(BLOG_PAGES, `${slug}.njk`);
+  if (fs.existsSync(fp)) fs.unlinkSync(fp);
+}
 
 /* ─────────────────────────────────────────────────────────────────────────
    SESSION STORE  { token → { username, role, display } }
@@ -300,6 +311,7 @@ http.createServer(async (req, res) => {
 
       blogs.unshift(post); // newest first
       writeData('blogs', blogs);
+      writeBlogNjk(post.slug);
       return j(res, 200, { ok: true, slug: post.slug });
     }
 
@@ -321,6 +333,7 @@ http.createServer(async (req, res) => {
       const slug  = p.replace('/api/blogs/', '');
       const blogs = readData('blogs').filter(x => x.slug !== slug);
       writeData('blogs', blogs);
+      deleteBlogNjk(slug);
       return j(res, 200, { ok: true });
     }
 
