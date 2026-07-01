@@ -110,10 +110,56 @@
     init();
   }
 
+  /* ----------------------------------------------------------
+     Mouse-follow glow blob
+     ---------------------------------------------------------- */
+  function initMouseGlow() {
+    var blob = document.createElement("div");
+    blob.id = "mouse-glow";
+    blob.style.cssText = [
+      "position:fixed",
+      "top:0",
+      "left:0",
+      "width:480px",
+      "height:480px",
+      "border-radius:50%",
+      "pointer-events:none",
+      "z-index:9999",
+      "transform:translate(-50%,-50%)",
+      "background:radial-gradient(circle, rgba(245,196,0,0.10) 0%, rgba(27,58,122,0.06) 40%, transparent 70%)",
+      "transition:opacity 0.3s ease",
+      "opacity:0"
+    ].join(";");
+    document.body.appendChild(blob);
+
+    var px = window.innerWidth / 2, py = window.innerHeight / 2;
+    var tx = px, ty = py;
+    var raf;
+
+    document.addEventListener("mousemove", function (e) {
+      tx = e.clientX;
+      ty = e.clientY;
+      blob.style.opacity = "1";
+    });
+    document.addEventListener("mouseleave", function () {
+      blob.style.opacity = "0";
+    });
+
+    function loop() {
+      px += (tx - px) * 0.08;
+      py += (ty - py) * 0.08;
+      blob.style.left = px + "px";
+      blob.style.top  = py + "px";
+      raf = requestAnimationFrame(loop);
+    }
+    raf = requestAnimationFrame(loop);
+  }
+
   function init() {
     initScrollReveal();
     initCounters();
     initHeroBarAnimations();
     initSmoothScroll();
+    initMouseGlow();
   }
 })();
