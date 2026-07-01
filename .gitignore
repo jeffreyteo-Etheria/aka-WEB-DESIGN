@@ -26,7 +26,7 @@ src/_data/_edits.json
 # Large media — upload manually to Hostinger via File Manager
 public/images/activities/
 public/images/team/
-public/images/blog/
 public/images/events/
+# blog cover images are small .avif files (~300KB total) — tracked in git
 public/videos/
 public/fonts/
