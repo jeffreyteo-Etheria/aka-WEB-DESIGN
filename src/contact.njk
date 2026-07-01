@@ -462,34 +462,32 @@ description: Get in touch with AKA Digital's team in Singapore, Vietnam, and Kor
     submitText.classList.add("hidden");
     spinner.classList.remove("hidden");
 
-    // Build mailto as primary fallback (since Google Forms ID not yet configured)
     var contact = CONTACTS[selectedMarket || "sg"];
-    var body = [
-      "Name: " + document.getElementById("fc-name").value,
-      "Company: " + document.getElementById("fc-company").value,
-      "Email: " + document.getElementById("fc-email").value,
-      "Phone: " + document.getElementById("fc-phone").value,
-      "Market: " + selectedMarket,
-      "Enquiry Type: " + document.getElementById("fc-type").value,
-      "Message: " + document.getElementById("fc-message").value
-    ].join("\n");
+    var payload = {
+      form_type:    'lead',
+      source_page:  window.location.pathname,
+      market:       selectedMarket || 'sg',
+      assigned_to:  contact.email,
+      name:         document.getElementById("fc-name").value,
+      company:      document.getElementById("fc-company").value,
+      email:        document.getElementById("fc-email").value,
+      phone:        document.getElementById("fc-phone").value,
+      inquiry_type: document.getElementById("fc-type").value,
+      message:      document.getElementById("fc-message").value
+    };
 
-    // Try Google Forms first if configured, fallback to mailto
-    var gFormId = "{{ settings.google_form_id }}";
-    if (gFormId && gFormId !== "YOUR_GOOGLE_FORM_ID") {
-      fetch("https://docs.google.com/forms/d/e/" + gFormId + "/formResponse", {
+    var webhookUrl = "{{ settings.google_sheets_webhook }}";
+    if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {
+      fetch(webhookUrl, {
         method: "POST",
-        mode: "no-cors",
-        body: new FormData(form)
-      }).then(function () {
-        showSuccess();
-      }).catch(function () {
-        window.location.href = "mailto:" + contact.email + "?subject=Enquiry from Website&body=" + encodeURIComponent(body);
-        showSuccess();
-      });
+        mode:   "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body:   JSON.stringify(payload)
+      }).catch(function(){}).finally(function() { showSuccess(); });
     } else {
-      // Direct mailto routing
-      window.location.href = "mailto:" + contact.email + "?subject=Website Enquiry — " + (document.getElementById("fc-type").value || "General") + "&body=" + encodeURIComponent(body);
+      // Fallback mailto if webhook not yet configured
+      var mailBody = Object.entries(payload).map(function(p){return p[0]+': '+p[1];}).join('\n');
+      window.location.href = "mailto:" + contact.email + "?subject=Website Enquiry — " + encodeURIComponent(payload.inquiry_type || "General") + "&body=" + encodeURIComponent(mailBody);
       showSuccess();
     }
   });

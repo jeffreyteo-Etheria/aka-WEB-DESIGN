@@ -168,24 +168,38 @@ function closeApplyModal() {
   document.body.style.overflow = '';
 }
 function submitApplication() {
-  const name    = document.getElementById('apply-name').value.trim();
-  const email   = document.getElementById('apply-email').value.trim();
-  const phone   = document.getElementById('apply-phone').value.trim();
-  const linkedin= document.getElementById('apply-linkedin').value.trim();
-  const cover   = document.getElementById('apply-cover').value.trim();
-  const role    = document.getElementById('apply-role').value;
+  const name     = document.getElementById('apply-name').value.trim();
+  const email    = document.getElementById('apply-email').value.trim();
+  const phone    = document.getElementById('apply-phone').value.trim();
+  const linkedin = document.getElementById('apply-linkedin').value.trim();
+  const cover    = document.getElementById('apply-cover').value.trim();
+  const role     = document.getElementById('apply-role').value;
   if (!name || !email) { alert('Please enter your name and email.'); return; }
-  const subject = encodeURIComponent('Application: ' + role + ' — ' + name);
-  const body    = encodeURIComponent(
-    'Role: ' + role + '\n\n' +
-    'Name: ' + name + '\n' +
-    'Email: ' + email + '\n' +
-    'Phone: ' + (phone || 'Not provided') + '\n' +
-    'LinkedIn: ' + (linkedin || 'Not provided') + '\n\n' +
-    'Cover Note:\n' + (cover || 'No cover note provided.')
-  );
-  window.location.href = 'mailto:Hello@akadigital.net?subject=' + subject + '&body=' + body;
+
+  const payload = { form_type:'career', role, name, email, phone, linkedin, cover };
+  const webhookUrl = '{{ settings.google_sheets_webhook }}';
+
+  if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {
+    fetch(webhookUrl, {
+      method: 'POST',
+      mode:   'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body:   JSON.stringify(payload)
+    }).catch(function(){});
+  } else {
+    // Fallback mailto if webhook not configured
+    const subject = encodeURIComponent('Application: ' + role + ' — ' + name);
+    const body    = encodeURIComponent('Role: '+role+'\nName: '+name+'\nEmail: '+email+'\nPhone: '+(phone||'—')+'\nLinkedIn: '+(linkedin||'—')+'\n\nCover Note:\n'+(cover||'—'));
+    window.location.href = 'mailto:jeffrey.teo@akadigital.net?subject=' + subject + '&body=' + body;
+  }
+
   closeApplyModal();
+  // Show toast confirmation
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0B1F4B;color:#fff;padding:14px 24px;border-radius:12px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+  toast.textContent = '✓ Application submitted! We\'ll be in touch within 3 business days.';
+  document.body.appendChild(toast);
+  setTimeout(function(){ toast.remove(); }, 5000);
 }
 document.getElementById('apply-modal').addEventListener('click', function(e) {
   if (e.target === this) closeApplyModal();

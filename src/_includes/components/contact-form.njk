@@ -131,17 +131,18 @@
      ─────────────────────────────────────────────────────────────────── -->
 <script>
 (function() {
-  var WEBHOOK_URL = 'REPLACE_WITH_YOUR_APPS_SCRIPT_URL';
+  var WEBHOOK_URL = '{{ settings.google_sheets_webhook }}';
 
   var form = document.getElementById('contact-form');
-  if (!form || WEBHOOK_URL.indexOf('REPLACE') !== -1) return;
+  if (!form || !WEBHOOK_URL || WEBHOOK_URL.indexOf('REPLACE') !== -1) return;
 
   form.addEventListener('submit', function(e) {
     /* Phase 3: CRM payload structure for Make.com automation sequences */
     var payload = {
-      timestamp:   new Date().toISOString(),
+      form_type:   'lead',
       source_page: window.location.pathname,
-      lead_status: 'New Lead',          /* Make.com watches this column */
+      market:      'SG/SEA',
+      assigned_to: 'jeffrey.teo@akadigital.net',
       name:        (document.getElementById('form-name')    || {}).value || '',
       company:     (document.getElementById('form-company') || {}).value || '',
       email:       (document.getElementById('form-email')   || {}).value || '',
