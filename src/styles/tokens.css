@@ -42,8 +42,8 @@
   --color-outline-variant: #C4CCDC;  /* Mist */
 
   /* --- Typography (Brand 2025) --- */
-  --font-display: "Playfair Display", Georgia, serif;  /* Cambria equivalent */
-  --font-body:    "Inter", system-ui, sans-serif;       /* Calibri equivalent */
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-body:    "Inter", system-ui, sans-serif;
   --font-mono:    "JetBrains Mono", "Courier New", monospace; /* Data labels */
 
   /* --- Scale --- */

@@ -83,8 +83,8 @@ module.exports = {
       },
 
       fontFamily: {
-        display: ["Playfair Display", "Georgia", "serif"],       // Brand: Cambria-equivalent serif
-        body:    ["Inter", "system-ui", "sans-serif"],            // Brand: Calibri-equivalent sans
+        display: ["Inter", "system-ui", "sans-serif"],            // Headings: Inter
+        body:    ["Inter", "system-ui", "sans-serif"],            // Body: Inter
         mono:    ["JetBrains Mono", "Courier New", "monospace"], // Brand: labels / data / platform names
       },
 
