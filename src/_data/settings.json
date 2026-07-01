@@ -65,9 +65,11 @@
     }
   ],
   "social": {
-    "linkedin": "https://www.linkedin.com/company/akadigital",
-    "youtube":  "https://www.youtube.com/@akadigital",
-    "whatsapp": "https://wa.me/6586999719"
+    "linkedin":    "https://www.linkedin.com/company/akadigital",
+    "youtube":     "https://www.youtube.com/@AKADIGITALVIETNAM",
+    "facebook_sg": "https://www.facebook.com/akadigitalsg/",
+    "facebook_vn": "https://www.facebook.com/akadigital.net/",
+    "whatsapp":    "https://wa.me/6586999719"
   },
   "schema": {
     "legalName": "AKA Digital Pte. Ltd.",
