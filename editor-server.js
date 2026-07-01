@@ -52,8 +52,17 @@ const ADMIN      = path.join(ROOT, 'editor', 'admin');
 const EDITS      = path.join(DATA,   '_edits.json');
 const UPLOADS    = path.join(PUBLIC, 'images', 'uploads');
 const BLOG_PAGES = path.join(ROOT, 'src', 'blog');
+const CMS_USERS  = path.join(ROOT, 'cms_users.json');
 
 [UPLOADS, ADMIN, BLOG_PAGES].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
+
+/* ── Google-authorized CMS users (stored outside Eleventy data dir) ──────── */
+function readUsers() {
+  try { return JSON.parse(fs.readFileSync(CMS_USERS, 'utf8')); } catch { return []; }
+}
+function writeUsers(data) {
+  fs.writeFileSync(CMS_USERS, JSON.stringify(data, null, 2));
+}
 
 /* Write / delete the Eleventy .njk wrapper that gives a blog post its URL */
 function writeBlogNjk(slug) {
@@ -73,7 +82,10 @@ const SESSIONS = new Map();
 const mkToken  = () => crypto.randomBytes(32).toString('hex');
 
 function getSession(req) {
-  const t = req.headers['x-editor-token'] || '';
+  /* Accept token from header (API calls) OR query string (EventSource, which can't set headers) */
+  const t = req.headers['x-editor-token']
+    || new URL(req.url, 'http://localhost').searchParams.get('token')
+    || '';
   return SESSIONS.get(t) || null;
 }
 function isSuper(req) { const s = getSession(req); return s && s.role === 'super'; }
@@ -268,6 +280,32 @@ http.createServer(async (req, res) => {
     if (p === '/api/status') {
       const s = getSession(req);
       return j(res, 200, { ok: true, authed: !!s, role: s?.role || null, display: s?.display || null });
+    }
+
+    /* ── PUBLIC CONFIG (Google Client ID — safe to expose, it's a public value) ── */
+    if (p === '/api/config') {
+      return j(res, 200, { google_client_id: process.env.GOOGLE_CLIENT_ID || '' });
+    }
+
+    /* ── GOOGLE OAUTH LOGIN ── */
+    if (p === '/api/login/google' && m === 'POST') {
+      const b = await readBody(req);
+      if (!b.credential) return j(res, 400, { error: 'No credential provided' });
+      try {
+        const gRes  = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${b.credential}`);
+        const info  = await gRes.json();
+        if (info.error || !info.email) return j(res, 401, { error: 'Invalid Google token' });
+        if (info.email_verified !== 'true' && info.email_verified !== true)
+          return j(res, 401, { error: 'Google email not verified' });
+        const users = readUsers();
+        const user  = users.find(u => u.email === info.email && u.active !== false);
+        if (!user) return j(res, 403, { error: 'Access not granted. Ask your administrator to add your Gmail address.' });
+        const t = mkToken();
+        SESSIONS.set(t, { username: info.email, role: user.role || 'team', display: user.name || info.name || info.email });
+        return j(res, 200, { ok: true, token: t, role: user.role || 'team', display: user.name || info.name || info.email });
+      } catch (e) {
+        return j(res, 500, { error: 'Could not verify with Google: ' + e.message });
+      }
     }
 
     /* Auth gate for all remaining API routes */
@@ -543,6 +581,46 @@ http.createServer(async (req, res) => {
     }
 
     /* ═══════════════════════════════════════════════════════════════
+       GOOGLE USER MANAGEMENT  (super admin only)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/users' && m === 'GET') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      return j(res, 200, readUsers());
+    }
+
+    if (p === '/api/users/new' && m === 'POST') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const b     = await readBody(req);
+      const email = (b.email || '').toLowerCase().trim();
+      if (!email || !email.includes('@')) return j(res, 400, { error: 'Valid email required' });
+      const users = readUsers();
+      if (users.find(u => u.email === email)) return j(res, 409, { error: 'Email already exists' });
+      users.push({ email, name: b.name || '', role: b.role || 'team', active: true });
+      writeUsers(users);
+      return j(res, 200, { ok: true });
+    }
+
+    if (p.startsWith('/api/users/') && m === 'PUT') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const email = decodeURIComponent(p.replace('/api/users/', ''));
+      const users = readUsers();
+      const idx   = users.findIndex(u => u.email === email);
+      if (idx === -1) return j(res, 404, { error: 'User not found' });
+      const b = await readBody(req);
+      users[idx] = { ...users[idx], ...b, email };
+      writeUsers(users);
+      return j(res, 200, { ok: true });
+    }
+
+    if (p.startsWith('/api/users/') && m === 'DELETE') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const email = decodeURIComponent(p.replace('/api/users/', ''));
+      writeUsers(readUsers().filter(u => u.email !== email));
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
        SUPER ADMIN ONLY — all other data files
        ═══════════════════════════════════════════════════════════════ */
 
@@ -641,19 +719,19 @@ http.createServer(async (req, res) => {
        BUILD + EXPORT  (both roles)
        ═══════════════════════════════════════════════════════════════ */
 
-    if (p === '/api/build' && m === 'POST') {
+    if (p === '/api/build' && (m === 'POST' || m === 'GET')) {
       res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*' });
       res.write(`data: ${JSON.stringify({ status: 'building', msg: 'Running npm run build...' })}\n\n`);
       exec('npm run build', { cwd: ROOT }, (err, stdout, stderr) => {
         if (err) res.write(`data: ${JSON.stringify({ status: 'error', msg: (stderr || err.message).slice(0, 800) })}\n\n`);
-        else     res.write(`data: ${JSON.stringify({ status: 'done',  msg: 'Build complete!' })}\n\n`);
+        else     res.write(`data: ${JSON.stringify({ status: 'done',  msg: 'Build complete! Site is live.' })}\n\n`);
         res.end();
       });
       return;
     }
 
     /* Export ZIP for Hostinger */
-    if (p === '/api/export' && m === 'POST') {
+    if (p === '/api/export' && (m === 'POST' || m === 'GET')) {
       if (!fs.existsSync(path.join(ROOT, 'dist', 'index.html'))) {
         return j(res, 400, { error: 'Run build first' });
       }
@@ -679,7 +757,7 @@ http.createServer(async (req, res) => {
        Optional:          FTP_DIR (default: /public_html)
        ═══════════════════════════════════════════════════════════════ */
 
-    if (p === '/api/deploy' && m === 'POST') {
+    if (p === '/api/deploy' && (m === 'POST' || m === 'GET')) {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
 
       const FTP_HOST = process.env.FTP_HOST || '';

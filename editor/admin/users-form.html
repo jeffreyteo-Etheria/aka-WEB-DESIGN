@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Users — AKA Digital CMS</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+  <style>
+    .users-table { width:100%;border-collapse:collapse;margin-top:8px; }
+    .users-table th { text-align:left;padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--slate);border-bottom:2px solid var(--mist); }
+    .users-table td { padding:12px;border-bottom:1px solid var(--mist);font-size:13px;vertical-align:middle; }
+    .users-table tr:last-child td { border-bottom:none; }
+    .users-table tr:hover td { background:#f8fafc; }
+    .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em; }
+    .badge-super { background:#1B3A7A;color:#fff; }
+    .badge-team  { background:#f1f5f9;color:#475569; }
+    .badge-on    { background:#dcfce7;color:#16a34a; }
+    .badge-off   { background:#fef2f2;color:#dc2626; }
+    .add-section { background:#fff;border:1.5px solid var(--mist);border-radius:12px;padding:24px;margin-bottom:28px; }
+    .add-section h3 { font-size:15px;font-weight:700;color:var(--ink);margin-bottom:16px; }
+    .form-row { display:grid;grid-template-columns:1fr 1fr auto auto;gap:12px;align-items:end; }
+    .form-row .field { display:flex;flex-direction:column;gap:4px; }
+    .form-row label { font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--slate); }
+    .form-row input,.form-row select { padding:9px 12px;border:1.5px solid var(--mist);border-radius:8px;font-size:13px;outline:none;transition:border-color .15s; }
+    .form-row input:focus,.form-row select:focus { border-color:var(--primary); }
+    .info-box { background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 18px;margin-bottom:24px;font-size:13px;color:#1e40af;line-height:1.6; }
+    .info-box strong { display:block;margin-bottom:4px;font-size:14px; }
+    .empty-state { text-align:center;padding:40px;color:var(--slate);font-size:13px; }
+  </style>
+</head>
+<body class="cms-body">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/logos/aka-logo-rec.png" alt="AKA Digital" style="height:34px;width:auto;border-radius:8px;background:#fff;padding:3px 7px;" />
+      <div><div class="logo-name">AKA Digital</div><div class="logo-sub">CMS</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Navigation</div>
+      <a href="/admin/dashboard" class="nav-item">← Dashboard</a>
+      <a href="/admin/users-form" class="nav-item active">👥 Manage Users</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-badge" id="userBadge">—</div>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Manage Users</h1>
+        <p class="page-sub">Control who can access the CMS via Google Sign-In.</p>
+      </div>
+    </header>
+
+    <div id="statusBanner" class="status-banner" style="display:none"></div>
+
+    <!-- Setup instructions -->
+    <div class="info-box">
+      <strong>Google Sign-In Setup</strong>
+      To enable Google login, set the <code>GOOGLE_CLIENT_ID</code> environment variable in Hostinger's Node.js settings.
+      Get your Client ID from <strong>Google Cloud Console → APIs &amp; Services → Credentials → Create OAuth 2.0 Client ID</strong>
+      (Web application). Add <code>https://akadigital.net</code> as an Authorised JavaScript Origin.
+      The master admin account (username/password) always works regardless.
+    </div>
+
+    <!-- Add user form -->
+    <div class="add-section">
+      <h3>Add Google User</h3>
+      <div class="form-row">
+        <div class="field">
+          <label>Gmail Address *</label>
+          <input id="newEmail" type="email" placeholder="user@gmail.com" />
+        </div>
+        <div class="field">
+          <label>Display Name</label>
+          <input id="newName" type="text" placeholder="Jane Smith" />
+        </div>
+        <div class="field">
+          <label>Role</label>
+          <select id="newRole">
+            <option value="team">Team — edit content</option>
+            <option value="super">Super — full access</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn-primary" id="addUserBtn" onclick="addUser()">Add User</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- User list -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2>Authorised Users</h2>
+        <span id="userCount" style="font-size:12px;color:var(--slate)"></span>
+      </div>
+      <div id="userList">
+        <div class="loading">Loading…</div>
+      </div>
+    </section>
+
+    <!-- Built-in accounts note -->
+    <section class="content-section" style="margin-top:24px">
+      <div class="section-header"><h2>Built-in Accounts (username / password)</h2></div>
+      <div class="content-list">
+        <div class="list-item">
+          <div class="list-item-info">
+            <span class="list-item-title">admin</span>
+            <span class="list-item-meta">Password login · <span class="badge badge-super">Super Admin</span> · Full access — change password in editor-server.js → ADMIN_PASS env var</span>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="list-item-info">
+            <span class="list-item-title">team</span>
+            <span class="list-item-meta">Password login · <span class="badge badge-team">Team</span> · Blogs &amp; events only — change via TEAM_PASS env var</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/admin/admin.js"></script>
+  <script>
+    requireAuth();
+    const role = localStorage.getItem('aka_cms_role');
+    if (role !== 'super') { alert('Super admin access required.'); location.href = '/admin/dashboard'; }
+
+    document.getElementById('userBadge').textContent = localStorage.getItem('aka_cms_user') + ' (super)';
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    function showBanner(msg, isError) {
+      const el = document.getElementById('statusBanner');
+      el.textContent = msg;
+      el.className = 'status-banner ' + (isError ? 'error' : 'success');
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 4000);
+    }
+
+    function renderUsers(users) {
+      const el = document.getElementById('userList');
+      document.getElementById('userCount').textContent = users.length + ' user' + (users.length !== 1 ? 's' : '');
+      if (!users.length) {
+        el.innerHTML = '<div class="empty-state">No Google users added yet. Add a Gmail address above to get started.</div>';
+        return;
+      }
+      el.innerHTML = `<table class="users-table">
+        <thead><tr>
+          <th>Gmail Address</th><th>Name</th><th>Role</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+        ${users.map(u => `
+          <tr>
+            <td>${u.email}</td>
+            <td>${u.name || '—'}</td>
+            <td><span class="badge ${u.role === 'super' ? 'badge-super' : 'badge-team'}">${u.role || 'team'}</span></td>
+            <td><span class="badge ${u.active !== false ? 'badge-on' : 'badge-off'}">${u.active !== false ? 'Active' : 'Disabled'}</span></td>
+            <td style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="btn-xs" onclick="toggleRole('${u.email}','${u.role === 'super' ? 'team' : 'super'}')">${u.role === 'super' ? '→ Team' : '→ Super'}</button>
+              <button class="btn-xs" onclick="toggleActive('${u.email}',${u.active !== false})">${u.active !== false ? 'Disable' : 'Enable'}</button>
+              <button class="btn-xs danger" onclick="removeUser('${u.email}')">Remove</button>
+            </td>
+          </tr>`).join('')}
+        </tbody></table>`;
+    }
+
+    function loadUsers() {
+      apiFetch('/api/users').then(users => renderUsers(users || []));
+    }
+    loadUsers();
+
+    async function addUser() {
+      const email = document.getElementById('newEmail').value.trim().toLowerCase();
+      const name  = document.getElementById('newName').value.trim();
+      const role  = document.getElementById('newRole').value;
+      if (!email) { showBanner('Please enter a Gmail address', true); return; }
+      const r = await apiFetch('/api/users/new', 'POST', { email, name, role });
+      if (r.ok) { showBanner('User added: ' + email); loadUsers(); document.getElementById('newEmail').value = ''; document.getElementById('newName').value = ''; }
+      else       showBanner(r.error || 'Could not add user', true);
+    }
+
+    async function toggleRole(email, newRole) {
+      const r = await apiFetch('/api/users/' + encodeURIComponent(email), 'PUT', { role: newRole });
+      if (r.ok) loadUsers();
+      else showBanner(r.error || 'Could not update', true);
+    }
+
+    async function toggleActive(email, currentlyActive) {
+      const r = await apiFetch('/api/users/' + encodeURIComponent(email), 'PUT', { active: !currentlyActive });
+      if (r.ok) loadUsers();
+      else showBanner(r.error || 'Could not update', true);
+    }
+
+    async function removeUser(email) {
+      if (!confirm('Remove ' + email + ' from CMS access?')) return;
+      const r = await apiFetch('/api/users/' + encodeURIComponent(email), 'DELETE');
+      if (r.ok) { showBanner('User removed'); loadUsers(); }
+      else showBanner(r.error || 'Could not remove', true);
+    }
+
+    // Allow Enter key in add form
+    document.getElementById('newEmail').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addUser(); } });
+  </script>
+</body>
+</html>

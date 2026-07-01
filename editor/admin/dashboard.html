@@ -41,12 +41,15 @@
         <span class="nav-icon">⬡</span> CRM Hub
       </a>
 
-      <div class="nav-section super-only" style="display:none">Site Data</div>
-      <a href="http://localhost:3001" target="_blank" class="nav-item super-only" style="display:none">
-        <span class="nav-icon">◉</span> Visual Editor
+      <div class="nav-section super-only" style="display:none">Site Admin</div>
+      <a href="/" target="_blank" class="nav-item super-only" style="display:none">
+        <span class="nav-icon">◉</span> View Live Site
       </a>
       <a href="/admin/site-settings" class="nav-item super-only" style="display:none">
         <span class="nav-icon">⚡</span> CTA &amp; Popup Settings
+      </a>
+      <a href="/admin/users-form" class="nav-item super-only" style="display:none">
+        <span class="nav-icon">👥</span> Manage Users
       </a>
 
       <div class="nav-section" style="margin-top:auto">Tools</div>
@@ -111,7 +114,7 @@
 
     <!-- Build log -->
     <div id="buildLog" class="build-log" style="display:none">
-      <div class="build-log-header">Build Output</div>
+      <div class="build-log-header">Build Output <button onclick="document.getElementById('buildLog').style.display='none'" style="float:right;background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:14px">✕ close</button></div>
       <div id="buildLogText" class="build-log-text"></div>
     </div>
 
@@ -175,56 +178,49 @@
 
     document.getElementById('logoutBtn').addEventListener('click', logout);
 
-    // Build
-    document.getElementById('buildBtn').addEventListener('click', async (e) => {
-      e.preventDefault();
-      const log = document.getElementById('buildLog');
-      const txt = document.getElementById('buildLogText');
-      log.style.display = 'block';
-      txt.textContent = 'Starting build…\n';
-      const es = new EventSource('/api/build');
+    /* ── SSE stream helper — works with EventSource (GET + token in query) ── */
+    function startSSE(endpoint, logEl) {
+      const token = getToken();
+      const url   = `/api/${endpoint}?token=${encodeURIComponent(token)}`;
+      document.getElementById('buildLog').style.display = 'block';
+      logEl.textContent = '';
+
+      const es = new EventSource(url);
       es.onmessage = ev => {
-        const d = JSON.parse(ev.data);
-        txt.textContent += d.msg + '\n';
-        if (d.status === 'done' || d.status === 'error') es.close();
+        try {
+          const d = JSON.parse(ev.data);
+          logEl.textContent += d.msg + '\n';
+          logEl.scrollTop = logEl.scrollHeight;
+          if (d.status === 'done' || d.status === 'error') es.close();
+        } catch {}
       };
-      await apiFetch('/api/build', 'POST');
+      es.onerror = () => {
+        logEl.textContent += '\n⚠ Connection lost — check server logs.\n';
+        es.close();
+      };
+    }
+
+    const logEl = document.getElementById('buildLogText');
+
+    // Build
+    document.getElementById('buildBtn').addEventListener('click', e => {
+      e.preventDefault();
+      startSSE('build', logEl);
     });
 
     // Export ZIP
-    document.getElementById('exportBtn').addEventListener('click', async (e) => {
+    document.getElementById('exportBtn').addEventListener('click', e => {
       e.preventDefault();
-      const log = document.getElementById('buildLog');
-      const txt = document.getElementById('buildLogText');
-      log.style.display = 'block';
-      txt.textContent = 'Building + packaging…\n';
-      const es = new EventSource('/api/export');
-      es.onmessage = ev => {
-        const d = JSON.parse(ev.data);
-        txt.textContent += d.msg + '\n';
-        if (d.status === 'done' || d.status === 'error') es.close();
-      };
-      await apiFetch('/api/export', 'POST');
+      startSSE('export', logEl);
     });
 
-    // Publish Live (super admin — FTP deploy to Hostinger)
+    // Publish Live (super admin)
     const deployBtn = document.getElementById('deployBtn');
     if (deployBtn) {
-      deployBtn.addEventListener('click', async (e) => {
+      deployBtn.addEventListener('click', e => {
         e.preventDefault();
         if (!confirm('This will rebuild the site and publish it LIVE to akadigital.net. Continue?')) return;
-        const log = document.getElementById('buildLog');
-        const txt = document.getElementById('buildLogText');
-        log.style.display = 'block';
-        txt.textContent = 'Publishing to akadigital.net…\n';
-        const es = new EventSource('/api/deploy');
-        es.onmessage = ev => {
-          const d = JSON.parse(ev.data);
-          txt.textContent += d.msg + '\n';
-          if (d.status === 'done') { txt.textContent += '\n✓ Site is now live!\n'; es.close(); }
-          if (d.status === 'error') { txt.textContent += '\n✗ ' + d.msg + '\n'; es.close(); }
-        };
-        await apiFetch('/api/deploy', 'POST');
+        startSSE('deploy', logEl);
       });
     }
 
@@ -232,13 +228,14 @@
     apiFetch('/api/blogs').then(blogs => {
       const el = document.getElementById('blogList');
       if (!blogs || !blogs.length) { el.innerHTML = '<p class="empty">No blog posts yet.</p>'; return; }
-      el.innerHTML = blogs.slice(0, 8).map(b => `
+      el.innerHTML = blogs.slice(0, 10).map(b => `
         <div class="list-item">
           <div class="list-item-info">
             <span class="list-item-title">${b.title}</span>
             <span class="list-item-meta">${b.category} · ${b.date} · ${b.read_time} min read</span>
           </div>
           <div class="list-item-actions">
+            <a href="/blog/${b.slug}" target="_blank" class="btn-xs">View</a>
             <a href="/admin/blog-form?edit=${b.slug}" class="btn-xs">Edit</a>
             ${role === 'super' ? `<button class="btn-xs danger" onclick="delBlog('${b.slug}')">Delete</button>` : ''}
           </div>

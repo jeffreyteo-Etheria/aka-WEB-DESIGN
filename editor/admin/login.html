@@ -5,13 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AKA Digital — CMS Login</title>
   <link rel="stylesheet" href="/admin/admin.css" />
+  <style>
+    .divider { display:flex;align-items:center;gap:12px;margin:20px 0;color:#8C9BB8;font-size:12px; }
+    .divider::before,.divider::after { content:'';flex:1;border-top:1px solid #e2e8f0; }
+    #googleSignIn { width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fff;font-size:14px;font-weight:600;color:#060F24;cursor:pointer;transition:border-color .15s,box-shadow .15s; }
+    #googleSignIn:hover { border-color:#0B1F4B;box-shadow:0 2px 8px rgba(0,0,0,.08); }
+    #googleSignIn img { width:20px;height:20px; }
+    #googleSection { display:none; }
+  </style>
 </head>
 <body class="login-body">
   <div class="login-card">
     <div class="login-logo">
-      <img src="/images/logo/aka-logo.png" alt="AKA Digital" onerror="this.style.display='none'" />
-      <h1>AKA Digital</h1>
+      <img src="/images/logos/aka-logo-rec.png" alt="AKA Digital"
+           style="height:48px;width:auto;border-radius:6px;background:#fff;padding:4px 8px;"
+           onerror="this.style.display='none'" />
+      <h1 style="margin-top:12px">AKA Digital</h1>
       <p>Content Management</p>
+    </div>
+
+    <!-- Google Sign-In (shown only when GOOGLE_CLIENT_ID is configured) -->
+    <div id="googleSection">
+      <button id="googleSignIn" type="button">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%234285F4' d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'/%3E%3Cpath fill='%2334A853' d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'/%3E%3Cpath fill='%23FBBC05' d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z'/%3E%3Cpath fill='%23EA4335' d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'/%3E%3C/svg%3E" alt="Google" />
+        Sign in with Google
+      </button>
+      <div class="divider">or sign in with username</div>
     </div>
 
     <form id="loginForm" class="login-form">
@@ -30,14 +49,29 @@
     </form>
   </div>
 
+  <!-- Google Identity Services — loaded only when client ID is available -->
+  <script id="gsiScript"></script>
   <script>
-    // Redirect if already logged in
     const tok = localStorage.getItem('aka_cms_token');
     if (tok) {
       fetch('/api/status', { headers: { 'X-Editor-Token': tok } })
         .then(r => r.json()).then(d => { if (d.authed) location.href = '/admin/dashboard'; });
     }
 
+    function storeSession(d) {
+      localStorage.setItem('aka_cms_token', d.token);
+      localStorage.setItem('aka_cms_role',  d.role);
+      localStorage.setItem('aka_cms_user',  d.display);
+      location.href = '/admin/dashboard';
+    }
+
+    function showError(msg) {
+      const err = document.getElementById('loginError');
+      err.textContent = msg;
+      err.style.display = 'block';
+    }
+
+    /* ── Username/password login ── */
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('loginBtn');
@@ -45,7 +79,6 @@
       btn.textContent = 'Signing in…';
       btn.disabled = true;
       err.style.display = 'none';
-
       try {
         const r = await fetch('/api/login', {
           method: 'POST',
@@ -56,24 +89,47 @@
           }),
         });
         const d = await r.json();
-        if (d.ok) {
-          localStorage.setItem('aka_cms_token', d.token);
-          localStorage.setItem('aka_cms_role',  d.role);
-          localStorage.setItem('aka_cms_user',  d.display);
-          location.href = '/admin/dashboard';
-        } else {
-          err.textContent = d.error || 'Invalid credentials';
-          err.style.display = 'block';
-          btn.textContent = 'Sign In';
-          btn.disabled = false;
-        }
+        if (d.ok) { storeSession(d); }
+        else { showError(d.error || 'Invalid credentials'); btn.textContent = 'Sign In'; btn.disabled = false; }
       } catch {
-        err.textContent = 'Could not connect to server';
-        err.style.display = 'block';
-        btn.textContent = 'Sign In';
-        btn.disabled = false;
+        showError('Could not connect to server');
+        btn.textContent = 'Sign In'; btn.disabled = false;
       }
     });
+
+    /* ── Google Sign-In ── */
+    fetch('/api/config').then(r => r.json()).then(cfg => {
+      if (!cfg.google_client_id) return; // Google not configured — hide button
+
+      document.getElementById('googleSection').style.display = 'block';
+
+      // Load GSI library dynamically
+      const script = document.getElementById('gsiScript');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.onload = () => {
+        google.accounts.id.initialize({
+          client_id: cfg.google_client_id,
+          callback: async (response) => {
+            try {
+              const r = await fetch('/api/login/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: response.credential }),
+              });
+              const d = await r.json();
+              if (d.ok) { storeSession(d); }
+              else { showError(d.error || 'Google sign-in failed'); }
+            } catch { showError('Could not connect to server'); }
+          },
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+      };
+
+      document.getElementById('googleSignIn').addEventListener('click', () => {
+        google.accounts.id.prompt();
+      });
+    }).catch(() => {});
   </script>
 </body>
 </html>

@@ -255,25 +255,34 @@
           status.textContent = '✓ Saved! Triggering build…';
           status.className   = 'form-status success';
 
-          // Auto-build
-          const es = new EventSource('/api/build');
+          // Auto-build via SSE (token in query string — EventSource can't send headers)
+          const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
           es.onmessage = ev => {
-            const d = JSON.parse(ev.data);
-            status.textContent = '⚙ ' + d.msg;
-            if (d.status === 'done') {
-              status.textContent = '✓ Published and built! ';
-              const a = document.createElement('a');
-              a.href = '/admin/dashboard';
-              a.textContent = '← Back to dashboard';
-              status.appendChild(a);
-              es.close();
-            }
-            if (d.status === 'error') {
-              status.textContent = '⚠ Build error — check terminal';
-              status.className   = 'form-status error';
-              es.close();
-            }
+            try {
+              const d = JSON.parse(ev.data);
+              status.textContent = '⚙ ' + d.msg;
+              if (d.status === 'done') {
+                status.textContent = '✓ Published! ';
+                const a = document.createElement('a');
+                a.href = '/blog/' + (result.slug || editSlug || '');
+                a.target = '_blank';
+                a.textContent = 'View post ↗';
+                status.appendChild(a);
+                status.appendChild(document.createTextNode(' · '));
+                const b2 = document.createElement('a');
+                b2.href = '/admin/dashboard';
+                b2.textContent = '← Dashboard';
+                status.appendChild(b2);
+                es.close();
+              }
+              if (d.status === 'error') {
+                status.textContent = '⚠ Build error — check server logs';
+                status.className   = 'form-status error';
+                es.close();
+              }
+            } catch {}
           };
+          es.onerror = () => { status.textContent = '⚠ Build stream lost'; es.close(); };
         } else {
           status.textContent = '⚠ ' + (result.error || 'Error saving');
           status.className   = 'form-status error';
