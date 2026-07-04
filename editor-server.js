@@ -17,6 +17,15 @@ const fs     = require('fs');
 const path   = require('path');
 const crypto = require('crypto');
 const { exec } = require('child_process');
+const {
+  validatePayload,
+  getClientIp,
+  createRateLimiter,
+  appendAuditLog,
+  appendSecurityLog,
+  getSecurityHeaders,
+} = require('./scripts/security-helpers');
+const securityConfig = require('./config/security.config');
 
 /* ─────────────────────────────────────────────────────────────────────────
    CONFIG — change passwords before sharing
@@ -27,17 +36,19 @@ const PORT = process.env.PORT || 3001;
 const USERS = [
   {
     username: process.env.ADMIN_USER || 'admin',
-    password: process.env.ADMIN_PASS || 'AKAadmin2025!',
+    password: process.env.ADMIN_PASS || 'change-me',
     role:     'super',
     display:  'Super Admin',
   },
   {
     username: process.env.TEAM_USER || 'team',
-    password: process.env.TEAM_PASS || 'AKAteam2025!',
+    password: process.env.TEAM_PASS || 'change-me',
     role:     'team',
     display:  'Team Member',
   },
 ];
+const loginLimiter = createRateLimiter(securityConfig.rateLimits.login);
+const apiLimiter = createRateLimiter(securityConfig.rateLimits.api);
 
 /* ─────────────────────────────────────────────────────────────────────────
    PATHS
@@ -86,7 +97,14 @@ function getSession(req) {
   const t = req.headers['x-editor-token']
     || new URL(req.url, 'http://localhost').searchParams.get('token')
     || '';
-  return SESSIONS.get(t) || null;
+  const session = SESSIONS.get(t);
+  if (!session) return null;
+  if (session.expiresAt && Date.now() > session.expiresAt) {
+    SESSIONS.delete(t);
+    return null;
+  }
+  session.lastSeen = Date.now();
+  return session;
 }
 function isSuper(req) { const s = getSession(req); return s && s.role === 'super'; }
 function isAuthed(req) { return !!getSession(req); }
@@ -113,7 +131,9 @@ function reply(res, status, data, ct) {
   res.writeHead(status, {
     'Content-Type': ct || 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Editor-Token',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Editor-Token, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    ...getSecurityHeaders(),
   });
   if (Buffer.isBuffer(data)) {
     res.end(data);
@@ -125,12 +145,31 @@ const j   = (res, st, d) => reply(res, st, d, 'application/json');
 const h   = (res, st, d) => reply(res, st, d, 'text/html');
 
 function readBody(req) {
-  return new Promise((res, rej) => {
+  return new Promise((res) => {
     let b = '';
-    req.on('data', c => b += c);
-    req.on('end', () => { try { res(JSON.parse(b)); } catch { res({}); } });
-    req.on('error', rej);
+    let size = 0;
+    req.on('data', c => {
+      size += Buffer.byteLength(c);
+      if (size > securityConfig.maxPayloadSizeBytes) {
+        req.destroy();
+        return;
+      }
+      b += c;
+    });
+    req.on('end', () => { try { res(JSON.parse(b || '{}')); } catch { res({}); } });
+    req.on('error', () => res({}));
   });
+}
+
+async function readValidatedBody(req, res, context) {
+  const payload = await readBody(req);
+  const validation = validatePayload(payload);
+  if (!validation.valid) {
+    appendSecurityLog('invalid_payload', { context, path: req.url, error: validation.error, clientIp: getClientIp(req) });
+    j(res, 400, { error: validation.error });
+    return null;
+  }
+  return validation.value;
 }
 
 function readMultipart(req, boundary) {
@@ -236,6 +275,7 @@ http.createServer(async (req, res) => {
   const u = new URL(req.url, `http://localhost`);
   const p = u.pathname;
   const m = req.method;
+  const clientIp = getClientIp(req);
 
   if (m === 'OPTIONS') return reply(res, 200, '', 'text/plain');
 
@@ -266,14 +306,22 @@ http.createServer(async (req, res) => {
 
   /* ── 3. API ──────────────────────────────────────────────────────────── */
   if (p.startsWith('/api/')) {
-
-    /* ── LOGIN ── */
     if (p === '/api/login' && m === 'POST') {
-      const b = await readBody(req);
+      const limit = loginLimiter(clientIp);
+      if (!limit.allowed) {
+        appendSecurityLog('login_rate_limited', { clientIp });
+        return j(res, 429, { error: 'Too many login attempts' });
+      }
+      const b = await readValidatedBody(req, res, 'login');
+      if (b === null) return;
       const user = USERS.find(u => u.username === b.username && u.password === b.password);
-      if (!user) return j(res, 401, { error: 'Invalid credentials' });
+      if (!user) {
+        appendSecurityLog('failed_login', { clientIp, username: b.username || '' });
+        return j(res, 401, { error: 'Invalid credentials' });
+      }
       const t = mkToken();
-      SESSIONS.set(t, { username: user.username, role: user.role, display: user.display });
+      SESSIONS.set(t, { username: user.username, role: user.role, display: user.display, createdAt: Date.now(), expiresAt: Date.now() + securityConfig.sessionTtlMs });
+      appendAuditLog('login_succeeded', { username: user.username, role: user.role, clientIp });
       return j(res, 200, { ok: true, token: t, role: user.role, display: user.display });
     }
 
@@ -281,6 +329,7 @@ http.createServer(async (req, res) => {
     if (p === '/api/logout' && m === 'POST') {
       const t = req.headers['x-editor-token'] || '';
       SESSIONS.delete(t);
+      appendAuditLog('logout', { clientIp, token: t ? '[redacted]' : '' });
       return j(res, 200, { ok: true });
     }
 
@@ -288,6 +337,10 @@ http.createServer(async (req, res) => {
     if (p === '/api/status') {
       const s = getSession(req);
       return j(res, 200, { ok: true, authed: !!s, role: s?.role || null, display: s?.display || null });
+    }
+
+    if (p === '/api/health') {
+      return j(res, 200, { ok: true, uptime: process.uptime().toFixed(2) });
     }
 
     /* ── PUBLIC CONFIG (Google Client ID — safe to expose, it's a public value) ── */
@@ -319,6 +372,12 @@ http.createServer(async (req, res) => {
     /* Auth gate for all remaining API routes */
     if (!isAuthed(req)) return j(res, 401, { error: 'Unauthorized' });
 
+    const rateLimit = apiLimiter(clientIp);
+    if (!rateLimit.allowed) {
+      appendSecurityLog('api_rate_limited', { clientIp, path: p });
+      return j(res, 429, { error: 'Too many requests' });
+    }
+
     const session = getSession(req);
 
     /* ═══════════════════════════════════════════════════════════════
@@ -332,7 +391,8 @@ http.createServer(async (req, res) => {
 
     /* CREATE blog post */
     if (p === '/api/blogs/new' && m === 'POST') {
-      const b  = await readBody(req);
+      const b  = await readValidatedBody(req, res, 'blogs.create');
+      if (b === null) return;
       const blogs = readData('blogs');
       const slug = b.slug || slugify(b.title || 'untitled-' + Date.now());
 
@@ -367,7 +427,8 @@ http.createServer(async (req, res) => {
       const blogs = readData('blogs');
       const idx   = blogs.findIndex(x => x.slug === slug);
       if (idx === -1) return j(res, 404, { error: 'Post not found' });
-      const b = await readBody(req);
+      const b = await readValidatedBody(req, res, 'blogs.update');
+      if (b === null) return;
       blogs[idx] = { ...blogs[idx], ...b, slug }; // preserve slug
       writeData('blogs', blogs);
       return j(res, 200, { ok: true });
@@ -394,7 +455,8 @@ http.createServer(async (req, res) => {
 
     /* CREATE event */
     if (p === '/api/events/new' && m === 'POST') {
-      const b      = await readBody(req);
+      const b      = await readValidatedBody(req, res, 'events.create');
+      if (b === null) return;
       const events = readData('events');
       const slug   = b.slug || slugify(b.title || 'event-' + Date.now());
 
@@ -425,7 +487,8 @@ http.createServer(async (req, res) => {
       const events = readData('events');
       const idx    = events.findIndex(x => x.slug === slug);
       if (idx === -1) return j(res, 404, { error: 'Event not found' });
-      const b = await readBody(req);
+      const b = await readValidatedBody(req, res, 'events.update');
+      if (b === null) return;
       events[idx] = { ...events[idx], ...b, slug };
       writeData('events', events);
       return j(res, 200, { ok: true });
@@ -449,7 +512,8 @@ http.createServer(async (req, res) => {
     }
 
     if (p === '/api/case-studies/new' && m === 'POST') {
-      const b  = await readBody(req);
+      const b  = await readValidatedBody(req, res, 'case_studies.create');
+      if (b === null) return;
       const cs = readData('case_studies');
       const slug = b.slug || slugify(b.title || 'case-' + Date.now());
       if (cs.find(x => x.slug === slug)) return j(res, 409, { error: 'Slug already exists' });
@@ -488,7 +552,8 @@ http.createServer(async (req, res) => {
       const cs   = readData('case_studies');
       const idx  = cs.findIndex(x => x.slug === slug);
       if (idx === -1) return j(res, 404, { error: 'Case study not found' });
-      const b = await readBody(req);
+      const b = await readValidatedBody(req, res, 'case_studies.update');
+      if (b === null) return;
       cs[idx] = { ...cs[idx], ...b, slug };
       writeData('case_studies', cs);
       return j(res, 200, { ok: true });
@@ -510,7 +575,8 @@ http.createServer(async (req, res) => {
     }
 
     if (p === '/api/jobs/new' && m === 'POST') {
-      const b    = await readBody(req);
+      const b    = await readValidatedBody(req, res, 'jobs.create');
+      if (b === null) return;
       const jobs = readData('jobs');
       const slug = b.slug || slugify(b.title || 'job-' + Date.now());
       if (jobs.find(x => x.slug === slug)) return j(res, 409, { error: 'Slug already exists' });
@@ -536,7 +602,8 @@ http.createServer(async (req, res) => {
       const jobs = readData('jobs');
       const idx  = jobs.findIndex(x => x.slug === slug);
       if (idx === -1) return j(res, 404, { error: 'Job not found' });
-      const b = await readBody(req);
+      const b = await readValidatedBody(req, res, 'jobs.update');
+      if (b === null) return;
       if (b.requirements && !Array.isArray(b.requirements)) {
         b.requirements = b.requirements.split('\n').map(r => r.trim()).filter(Boolean);
       }
@@ -563,7 +630,8 @@ http.createServer(async (req, res) => {
 
     if (p === '/api/settings' && m === 'PUT') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
-      const b       = await readBody(req);
+      const b       = await readValidatedBody(req, res, 'settings.update');
+      if (b === null) return;
       const current = readData('cms_settings');
       const updated = { ...current, ...b };
       writeData('cms_settings', updated);
@@ -581,7 +649,8 @@ http.createServer(async (req, res) => {
 
     if (p === '/api/site-settings' && m === 'PUT') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
-      const b       = await readBody(req);
+      const b       = await readValidatedBody(req, res, 'site_settings.update');
+      if (b === null) return;
       const current = readData('settings');
       const updated = { ...current, cta: { ...current.cta, ...b.cta }, popup: { ...current.popup, ...b.popup, bullets: b.popup.bullets || current.popup.bullets } };
       writeData('settings', updated);
@@ -599,7 +668,8 @@ http.createServer(async (req, res) => {
 
     if (p === '/api/users/new' && m === 'POST') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
-      const b     = await readBody(req);
+      const b     = await readValidatedBody(req, res, 'users.create');
+      if (b === null) return;
       const email = (b.email || '').toLowerCase().trim();
       if (!email || !email.includes('@')) return j(res, 400, { error: 'Valid email required' });
       const users = readUsers();
@@ -615,7 +685,8 @@ http.createServer(async (req, res) => {
       const users = readUsers();
       const idx   = users.findIndex(u => u.email === email);
       if (idx === -1) return j(res, 404, { error: 'User not found' });
-      const b = await readBody(req);
+      const b = await readValidatedBody(req, res, 'users.update');
+      if (b === null) return;
       users[idx] = { ...users[idx], ...b, email };
       writeUsers(users);
       return j(res, 200, { ok: true });
@@ -647,7 +718,8 @@ http.createServer(async (req, res) => {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
       const file = path.join(DATA, p.replace('/api/data/', '') + '.json');
       if (!fs.existsSync(file)) return j(res, 404, { error: 'File not found' });
-      const b = await readBody(req);
+      const b = await readValidatedBody(req, res, 'data.update');
+      if (b === null) return;
       try {
         const obj  = JSON.parse(fs.readFileSync(file, 'utf8'));
         const keys = (b.path || '').split('.').filter(Boolean);
@@ -666,7 +738,8 @@ http.createServer(async (req, res) => {
     if (p === '/api/edits' && m === 'GET')  return j(res, 200, loadEdits());
 
     if (p === '/api/edits' && m === 'POST') {
-      const b = await readBody(req);
+      const b = await readValidatedBody(req, res, 'edits.save');
+      if (b === null) return;
       const e = loadEdits();
       e.pending = b.changes || [];
       e.lastSaved = new Date().toISOString();
@@ -691,7 +764,8 @@ http.createServer(async (req, res) => {
 
     if (p === '/api/approve/revert' && m === 'POST') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
-      const b = await readBody(req);
+      const b = await readValidatedBody(req, res, 'edits.revert');
+      if (b === null) return;
       const e = loadEdits();
       e.approved = (e.approved || []).filter(x => x.id !== b.id);
       saveEdits(e);
@@ -705,7 +779,8 @@ http.createServer(async (req, res) => {
     if (p === '/api/upload' && m === 'POST') {
       const ct = (req.headers['content-type'] || '').split(';')[0].trim();
       if (ct === 'application/json') {
-        const b = await readBody(req);
+        const b = await readValidatedBody(req, res, 'upload.json');
+        if (b === null) return;
         if (!b.base64 || !b.filename) return j(res, 400, { error: 'Missing base64/filename' });
         const ext  = path.extname(b.filename) || '.jpg';
         const name = `upload-${Date.now()}${ext}`;
@@ -849,8 +924,7 @@ http.createServer(async (req, res) => {
   console.log(`║  🌐  Site:    http://localhost:${PORT}                      ║`);
   console.log(`║  🔑  Admin:   http://localhost:${PORT}/admin                ║`);
   console.log('╠══════════════════════════════════════════════════════════╣');
-  console.log(`║  Super Admin  →  user: admin  /  pass: AKAadmin2025!    ║`);
-  console.log(`║  Team Member  →  user: team   /  pass: AKAteam2025!     ║`);
+  console.log('║  Set ADMIN_USER/ADMIN_PASS and TEAM_USER/TEAM_PASS in the environment to customize credentials. ║');
   console.log('╚══════════════════════════════════════════════════════════╝\n');
 
   // Auto-build on startup so dist/ is always fresh after a deployment
