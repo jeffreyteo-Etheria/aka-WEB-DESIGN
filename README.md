@@ -2,6 +2,35 @@
 
 Static marketing website for [akadigital.net](https://akadigital.net).
 
+## Enterprise Hardening Baseline
+
+This repository now includes:
+- Runtime CMS hardening with request validation, rate limiting, audit logging, and secure session handling.
+- Security documentation under docs/.
+- GitHub workflow scaffolding for CI, CodeQL, dependency review, release automation, and Dependabot.
+- Backup and deployment notes for Hostinger and Cloudflare.
+
+## Next Steps
+1. Set environment variables for admin and team credentials.
+2. Configure Cloudflare SSL, WAF, and bot protections in staging first.
+3. Apply Hostinger HTTPS and header settings.
+4. Review logs in monitoring/.
+
+## GitHub to Hostinger FTP Deployment
+
+A GitHub Actions workflow is included at [.github/workflows/deploy-hostinger.yml](.github/workflows/deploy-hostinger.yml). To enable it:
+
+1. In GitHub, open your repository Settings > Secrets and variables > Actions.
+2. Add these repository secrets:
+   - `FTP_HOST`
+   - `FTP_USERNAME`
+   - `FTP_PASSWORD`
+   - `FTP_PORT` (optional, default `21`)
+   - `FTP_REMOTE_ROOT` (optional, default `/public_html/`)
+3. Push to `main` or `master` to trigger the deployment.
+4. Use the workflow_dispatch option to run it manually.
+
+
 **Stack:** Eleventy (11ty) · Tailwind CSS v3 · Nunjucks · Vanilla JS · Formspree
 
 ---

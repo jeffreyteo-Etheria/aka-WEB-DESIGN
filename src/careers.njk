@@ -190,18 +190,51 @@ function submitApplication() {
     // Fallback mailto if webhook not configured
     const subject = encodeURIComponent('Application: ' + role + ' — ' + name);
     const body    = encodeURIComponent('Role: '+role+'\nName: '+name+'\nEmail: '+email+'\nPhone: '+(phone||'—')+'\nLinkedIn: '+(linkedin||'—')+'\n\nCover Note:\n'+(cover||'—'));
-    window.location.href = 'mailto:jeffrey.teo@akadigital.net?subject=' + subject + '&body=' + body;
+    window.location.href = 'mailto:Hello@akadigital.net?subject=' + subject + '&body=' + body;
   }
 
   closeApplyModal();
-  // Show toast confirmation
-  const toast = document.createElement('div');
-  toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0B1F4B;color:#fff;padding:14px 24px;border-radius:12px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)';
-  toast.textContent = '✓ Application submitted! We\'ll be in touch within 3 business days.';
-  document.body.appendChild(toast);
-  setTimeout(function(){ toast.remove(); }, 5000);
+  openCareerThankYou();
 }
 document.getElementById('apply-modal').addEventListener('click', function(e) {
   if (e.target === this) closeApplyModal();
 });
+function closeCareerThankYou() {
+  const modal = document.getElementById('career-thankyou-modal');
+  const inner = document.getElementById('career-thankyou-inner');
+  inner.classList.remove('scale-100', 'opacity-100');
+  inner.classList.add('scale-95', 'opacity-0');
+  document.body.style.overflow = '';
+  setTimeout(function () { modal.classList.add('hidden'); }, 200);
+}
+function openCareerThankYou() {
+  const modal = document.getElementById('career-thankyou-modal');
+  const inner = document.getElementById('career-thankyou-inner');
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(function () {
+    inner.classList.remove('scale-95', 'opacity-0');
+    inner.classList.add('scale-100', 'opacity-100');
+  });
+}
 </script>
+
+<!-- ── Application Thank-You Popup ── -->
+<div id="career-thankyou-modal"
+     class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+     role="dialog" aria-modal="true" aria-label="Thank you for your application">
+  <div id="career-thankyou-inner"
+       class="relative scale-95 opacity-0 transition-all duration-300 bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden text-center">
+    <div class="h-1.5 bg-gradient-to-r from-primary to-action-yellow"></div>
+    <div class="p-8">
+      <button onclick="closeCareerThankYou()"
+              class="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface transition-colors" aria-label="Close">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <span class="material-symbols-outlined text-primary text-5xl block mb-4" style="font-variation-settings:'FILL' 1">check_circle</span>
+      <h2 class="font-display font-extrabold text-on-surface text-2xl mb-2">Thank you!</h2>
+      <p class="text-on-surface-variant text-body-md mb-6">Your application has been submitted. We'll be in touch within 3 business days.</p>
+      <button onclick="closeCareerThankYou()" class="btn-primary w-full justify-center">Got it</button>
+    </div>
+  </div>
+</div>

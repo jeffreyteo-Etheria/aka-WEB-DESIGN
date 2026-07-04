@@ -8,7 +8,7 @@
       "children": [
         { "label": "CRM & Marketing Automation",     "href": "/solutions/crm-automation" },
         { "label": "Digital Marketing & Programmatic","href": "/solutions/digital-programmatic" },
-        { "label": "GEO / AI / SGO / AEO / SEO",    "href": "/solutions/geo-ai-seo" },
+        { "label": "AI Search — GEO / AEO / SEO",    "href": "/solutions/geo-ai-seo" },
         { "label": "Social Media Marketing",          "href": "/solutions/social-media" }
       ]
     },

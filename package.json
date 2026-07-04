@@ -13,6 +13,8 @@
     "editor": "node editor-server.js",
     "editor:dev": "concurrently \"npm run css:watch\" \"eleventy --watch\" \"node editor-server.js\"",
     "build": "npm run css:build && eleventy",
+    "test:security": "node --test tests/security.test.js",
+    "backup": "node scripts/backup-site.js",
     "css:build": "tailwindcss -i src/styles/main.css -o public/css/main.css --minify",
     "css:watch": "tailwindcss -i src/styles/main.css -o public/css/main.css --watch",
     "export:css": "node -e \"require('fs').mkdirSync('exports/css',{recursive:true})\" && cp public/css/main.css exports/css/main.css",
