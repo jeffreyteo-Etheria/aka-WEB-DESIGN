@@ -29,7 +29,7 @@ This skill guides building and extending the AKA Digital CMS pattern:
 ## Architecture Summary
 
 ```
-User edits in browser (admin.akadigital.net/admin)
+User edits in browser (akadigital.net/admin)
   ↓
 editor-server.js receives API call
   ↓
@@ -320,5 +320,5 @@ npm run dev     # local dev with CSS watch + eleventy watch
    - URL: `akadigital.net`
 3. Node.js console: `npm install` then `npm run build`
 4. Upload images via FTP to `/akadigital-cms/public/images/` (252 MB, one-time)
-5. `admin.akadigital.net` → redirect to `akadigital.net/admin`
+5. Admin dashboard is accessed directly at `akadigital.net/admin` (no separate subdomain — a Hostinger `admin.akadigital.net` subdomain was tried and abandoned because it required a subfolder inside the main site's shared `public_html`, which collided with the live `/admin` path)
 6. FTP deploy env vars (for Publish Live button): `FTP_HOST`, `FTP_USER`, `FTP_PASS`, `FTP_DIR=/public_html`

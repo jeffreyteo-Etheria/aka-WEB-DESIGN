@@ -279,14 +279,6 @@ http.createServer(async (req, res) => {
 
   if (m === 'OPTIONS') return reply(res, 200, '', 'text/plain');
 
-  /* admin.akadigital.net → redirect to main site /admin */
-  const host = (req.headers.host || '').split(':')[0];
-  if (host === 'admin.akadigital.net') {
-    const dest = p.startsWith('/admin') ? p : '/admin';
-    res.writeHead(302, { 'Location': 'https://akadigital.net' + dest });
-    return res.end();
-  }
-
   /* ── 1. Admin UI pages (/admin and /admin/*) ─────────────────────────── */
   if (p === '/admin' || p === '/admin/' || p.startsWith('/admin/')) {
     const subpath = p === '/admin' || p === '/admin/' ? '/login.html' : p.replace('/admin', '');
