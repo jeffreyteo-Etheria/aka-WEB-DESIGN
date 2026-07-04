@@ -283,7 +283,7 @@ http.createServer(async (req, res) => {
   const host = (req.headers.host || '').split(':')[0];
   if (host === 'admin.akadigital.net') {
     const dest = p.startsWith('/admin') ? p : '/admin';
-    res.writeHead(302, { 'Location': 'https://www.akadigital.net' + dest });
+    res.writeHead(302, { 'Location': 'https://akadigital.net' + dest });
     return res.end();
   }
 
