@@ -429,20 +429,49 @@
     spinner.classList.remove('hidden');
 
     var sol = SOLUTIONS[state.solution] || SOLUTIONS['crm-automation'];
-    var body = [
-      'Solution: ' + sol.title,
-      'Challenge: ' + (document.getElementById('quiz-h-pain').value || '—'),
-      'Budget: ' + (document.getElementById('quiz-h-budget').value || '—'),
-      '',
-      'Name: ' + name.value,
-      'Brand: ' + document.getElementById('quiz-brand').value,
-      'Company: ' + company.value,
-      'Email: ' + email.value,
-      'Phone: ' + document.getElementById('quiz-phone').value
-    ].join('\n');
+    var brand = document.getElementById('quiz-brand').value;
+    var phone = document.getElementById('quiz-phone').value;
+    var pain = document.getElementById('quiz-h-pain').value || '—';
+    var budget = document.getElementById('quiz-h-budget').value || '—';
 
-    var subject = 'Solution Match: ' + sol.title + ' — ' + name.value;
-    window.location.href = 'mailto:jeffrey.teo@akadigital.net?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    /* CRM bridge: Google Sheets webhook (same pattern as contact-form.njk / careers.njk) */
+    var payload = {
+      form_type:   'lead',
+      source_page: window.location.pathname,
+      market:      'SG/SEA',
+      assigned_to: 'jeffrey.teo@akadigital.net',
+      solution:    sol.title,
+      pain_point:  pain,
+      budget:      budget,
+      name:        name.value,
+      brand:       brand,
+      company:     company.value,
+      email:       email.value,
+      phone:       phone
+    };
+    var webhookUrl = '{{ settings.google_sheets_webhook }}';
+    if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {
+      fetch(webhookUrl, {
+        method: 'POST',
+        mode:   'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body:   JSON.stringify(payload)
+      }).catch(function () {});
+    } else {
+      var body = [
+        'Solution: ' + sol.title,
+        'Challenge: ' + pain,
+        'Budget: ' + budget,
+        '',
+        'Name: ' + name.value,
+        'Brand: ' + brand,
+        'Company: ' + company.value,
+        'Email: ' + email.value,
+        'Phone: ' + phone
+      ].join('\n');
+      var subject = 'Solution Match: ' + sol.title + ' — ' + name.value;
+      window.location.href = 'mailto:jeffrey.teo@akadigital.net?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    }
 
     /* Show result screen */
     setTimeout(function () {
