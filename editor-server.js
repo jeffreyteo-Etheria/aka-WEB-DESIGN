@@ -27,6 +27,16 @@ const {
 } = require('./scripts/security-helpers');
 const securityConfig = require('./config/security.config');
 
+/* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
+   with a PATH that doesn't include the directory npm actually lives in, even
+   though node itself starts fine — causing "npm: command not found" when we
+   shell out to run the site build. Force the running node's own bin
+   directory onto PATH for any child process we spawn. */
+const EXEC_ENV = {
+  ...process.env,
+  PATH: path.dirname(process.execPath) + path.delimiter + (process.env.PATH || ''),
+};
+
 /* ─────────────────────────────────────────────────────────────────────────
    CONFIG — change passwords before sharing
    ───────────────────────────────────────────────────────────────────────── */
@@ -797,7 +807,7 @@ http.createServer(async (req, res) => {
     if (p === '/api/build' && (m === 'POST' || m === 'GET')) {
       res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*' });
       res.write(`data: ${JSON.stringify({ status: 'building', msg: 'Running npm run build...' })}\n\n`);
-      exec('npm run build', { cwd: ROOT }, (err, stdout, stderr) => {
+      exec('npm run build', { cwd: ROOT, env: EXEC_ENV }, (err, stdout, stderr) => {
         if (err) res.write(`data: ${JSON.stringify({ status: 'error', msg: (stderr || err.message).slice(0, 800) })}\n\n`);
         else     res.write(`data: ${JSON.stringify({ status: 'done',  msg: 'Build complete! Site is live.' })}\n\n`);
         res.end();
@@ -851,7 +861,7 @@ http.createServer(async (req, res) => {
 
       send('building', 'Building site...');
 
-      exec('npm run build', { cwd: ROOT }, async (err, stdout, stderr) => {
+      exec('npm run build', { cwd: ROOT, env: EXEC_ENV }, async (err, stdout, stderr) => {
         if (err) {
           send('error', 'Build failed: ' + (stderr || err.message).slice(0, 500));
           return res.end();
@@ -921,7 +931,7 @@ http.createServer(async (req, res) => {
 
   // Auto-build on startup so dist/ is always fresh after a deployment
   console.log('[startup] Running initial build...');
-  exec('npm run build', { cwd: ROOT }, (err, stdout, stderr) => {
+  exec('npm run build', { cwd: ROOT, env: EXEC_ENV }, (err, stdout, stderr) => {
     if (err) {
       console.error('[startup] Build failed:', stderr || err.message);
     } else {
