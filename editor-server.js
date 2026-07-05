@@ -386,7 +386,7 @@ http.createServer(async (req, res) => {
       const b  = await readValidatedBody(req, res, 'blogs.create');
       if (b === null) return;
       const blogs = readData('blogs');
-      const slug = b.slug || slugify(b.title || 'untitled-' + Date.now());
+      const slug = slugify(b.slug || b.title || 'untitled-' + Date.now());
 
       if (blogs.find(x => x.slug === slug)) {
         return j(res, 409, { error: 'A post with this slug already exists' });
@@ -450,7 +450,7 @@ http.createServer(async (req, res) => {
       const b      = await readValidatedBody(req, res, 'events.create');
       if (b === null) return;
       const events = readData('events');
-      const slug   = b.slug || slugify(b.title || 'event-' + Date.now());
+      const slug   = slugify(b.slug || b.title || 'event-' + Date.now());
 
       if (events.find(x => x.slug === slug)) {
         return j(res, 409, { error: 'An event with this slug already exists' });
@@ -507,7 +507,7 @@ http.createServer(async (req, res) => {
       const b  = await readValidatedBody(req, res, 'case_studies.create');
       if (b === null) return;
       const cs = readData('case_studies');
-      const slug = b.slug || slugify(b.title || 'case-' + Date.now());
+      const slug = slugify(b.slug || b.title || 'case-' + Date.now());
       if (cs.find(x => x.slug === slug)) return j(res, 409, { error: 'Slug already exists' });
       const entry = {
         slug,
@@ -570,7 +570,7 @@ http.createServer(async (req, res) => {
       const b    = await readValidatedBody(req, res, 'jobs.create');
       if (b === null) return;
       const jobs = readData('jobs');
-      const slug = b.slug || slugify(b.title || 'job-' + Date.now());
+      const slug = slugify(b.slug || b.title || 'job-' + Date.now());
       if (jobs.find(x => x.slug === slug)) return j(res, 409, { error: 'Slug already exists' });
       const entry = {
         slug,

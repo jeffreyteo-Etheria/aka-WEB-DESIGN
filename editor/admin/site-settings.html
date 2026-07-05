@@ -279,7 +279,7 @@
         const log = document.getElementById('buildLog');
         const txt = document.getElementById('buildLogText');
         log.style.display = 'block'; txt.textContent = 'Building site…\n';
-        const es = new EventSource('/api/build');
+        const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
         es.onmessage = ev => {
           try {
             const d = JSON.parse(ev.data);
@@ -288,7 +288,10 @@
             if (d.status === 'error') { txt.textContent += '✗ Build error.\n'; es.close(); }
           } catch {}
         };
-        await apiFetch('/api/build', 'POST');
+        es.onerror = () => {
+          txt.textContent += '⚠ Build connection lost — check server logs.\n';
+          es.close();
+        };
       } else {
         err.textContent = 'Save failed. Try again.'; err.style.display = 'block';
       }
@@ -301,18 +304,33 @@
       const log = document.getElementById('buildLog');
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block'; txt.textContent = 'Building…\n';
-      const es = new EventSource('/api/build');
+      const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         try { const d = JSON.parse(ev.data); txt.textContent += (d.msg||'') + '\n';
           if (d.status==='done'||d.status==='error') es.close(); } catch {}
       };
-      await apiFetch('/api/build', 'POST');
+      es.onerror = () => {
+        txt.textContent += '⚠ Build connection lost — check server logs.\n';
+        es.close();
+      };
     });
 
     document.getElementById('exportBtn')?.addEventListener('click', async e => {
       e.preventDefault();
-      const res = await apiFetch('/api/export', 'POST');
-      if (res && res.file) window.location = '/exports/' + res.file;
+      const log = document.getElementById('buildLog');
+      const txt = document.getElementById('buildLogText');
+      log.style.display = 'block'; txt.textContent = 'Packaging…\n';
+      const es = new EventSource('/api/export?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
+      es.onmessage = ev => {
+        try {
+          const d = JSON.parse(ev.data); txt.textContent += (d.msg||'') + '\n';
+          if (d.status === 'done' || d.status === 'error') es.close();
+        } catch {}
+      };
+      es.onerror = () => {
+        txt.textContent += '⚠ Export connection lost — check server logs.\n';
+        es.close();
+      };
     });
 
     document.getElementById('deployBtn')?.addEventListener('click', async e => {
@@ -321,12 +339,15 @@
       const log = document.getElementById('buildLog');
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block'; txt.textContent = 'Publishing…\n';
-      const es = new EventSource('/api/deploy');
+      const es = new EventSource('/api/deploy?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         try { const d = JSON.parse(ev.data); txt.textContent += (d.msg||'') + '\n';
           if (d.status==='done'||d.status==='error') es.close(); } catch {}
       };
-      await apiFetch('/api/deploy', 'POST');
+      es.onerror = () => {
+        txt.textContent += '⚠ Deploy connection lost — check server logs.\n';
+        es.close();
+      };
     });
 
     loadSettings();

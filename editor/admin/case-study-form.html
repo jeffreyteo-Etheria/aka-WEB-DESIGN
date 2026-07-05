@@ -367,7 +367,7 @@
           const txt = document.getElementById('buildLogText');
           log.style.display = 'block';
           txt.textContent = 'Building site…\n';
-          const es = new EventSource('/api/build');
+          const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
           es.onmessage = ev => {
             const d = JSON.parse(ev.data);
             txt.textContent += d.msg + '\n';
@@ -375,9 +375,15 @@
               es.close();
               setTimeout(() => { location.href = '/admin/dashboard'; }, 1200);
             }
-            if (d.status === 'error') es.close();
+            if (d.status === 'error') {
+              txt.textContent += '⚠ Build failed — post was saved, but the site was not rebuilt.\n';
+              es.close();
+            }
           };
-          await apiFetch('/api/build', 'POST');
+          es.onerror = () => {
+            txt.textContent += '⚠ Build connection lost — check server logs.\n';
+            es.close();
+          };
         } else {
           status.textContent = '✗ ' + (r.error || 'Save failed');
           status.style.color = '#ef4444';
@@ -396,13 +402,16 @@
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block';
       txt.textContent = 'Building…\n';
-      const es = new EventSource('/api/build');
+      const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         const d = JSON.parse(ev.data);
         txt.textContent += d.msg + '\n';
         if (d.status === 'done' || d.status === 'error') es.close();
       };
-      await apiFetch('/api/build', 'POST');
+      es.onerror = () => {
+        txt.textContent += '⚠ Build connection lost — check server logs.\n';
+        es.close();
+      };
     });
   </script>
 </body>

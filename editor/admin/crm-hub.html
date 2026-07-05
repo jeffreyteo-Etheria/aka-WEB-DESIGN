@@ -480,12 +480,15 @@
       const log = document.getElementById('buildLog');
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block'; txt.textContent = 'Building…\n';
-      const es = new EventSource('/api/build');
+      const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         const d = JSON.parse(ev.data); txt.textContent += d.msg + '\n';
         if (d.status === 'done' || d.status === 'error') es.close();
       };
-      await apiFetch('/api/build', 'POST');
+      es.onerror = () => {
+        txt.textContent += '⚠ Build connection lost — check server logs.\n';
+        es.close();
+      };
     });
 
     document.getElementById('exportBtn').addEventListener('click', async e => {
@@ -493,12 +496,15 @@
       const log = document.getElementById('buildLog');
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block'; txt.textContent = 'Packaging…\n';
-      const es = new EventSource('/api/export');
+      const es = new EventSource('/api/export?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         const d = JSON.parse(ev.data); txt.textContent += d.msg + '\n';
         if (d.status === 'done' || d.status === 'error') es.close();
       };
-      await apiFetch('/api/export', 'POST');
+      es.onerror = () => {
+        txt.textContent += '⚠ Export connection lost — check server logs.\n';
+        es.close();
+      };
     });
   </script>
 </body>
