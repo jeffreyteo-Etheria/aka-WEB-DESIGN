@@ -327,7 +327,7 @@
                 es.close();
               }
               if (d.status === 'error') {
-                status.textContent = '⚠ Build error — check server logs';
+                status.textContent = '⚠ Build error: ' + (d.msg || 'unknown error — check server logs');
                 status.className   = 'form-status error';
                 es.close();
               }

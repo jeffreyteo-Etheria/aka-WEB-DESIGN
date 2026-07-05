@@ -204,7 +204,7 @@
         if (result.ok) {
           status.textContent = '✓ Saved! Building site…';
           status.className   = 'form-status success';
-          const es = new EventSource('/api/build');
+          const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
           es.onmessage = ev => {
             const d = JSON.parse(ev.data);
             status.textContent = '⚙ ' + d.msg;
@@ -217,10 +217,15 @@
               es.close();
             }
             if (d.status === 'error') {
-              status.textContent = '⚠ Build error — check terminal';
+              status.textContent = '⚠ Build error: ' + (d.msg || 'unknown error — check server logs');
               status.className   = 'form-status error';
               es.close();
             }
+          };
+          es.onerror = () => {
+            status.textContent = '⚠ Build connection lost — check server logs';
+            status.className   = 'form-status error';
+            es.close();
           };
         } else {
           status.textContent = '⚠ ' + (result.error || 'Error');
