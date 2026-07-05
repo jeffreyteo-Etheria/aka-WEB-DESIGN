@@ -26,6 +26,7 @@ const {
   getSecurityHeaders,
 } = require('./scripts/security-helpers');
 const securityConfig = require('./config/security.config');
+const { renderCaseStudyPreview } = require('./scripts/preview-renderer');
 
 /* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
    with a PATH that doesn't include the directory npm actually lives in, even
@@ -73,6 +74,7 @@ const ADMIN      = path.join(ROOT, 'editor', 'admin');
 const EDITS      = path.join(DATA,   '_edits.json');
 const UPLOADS    = path.join(PUBLIC, 'images', 'uploads');
 const BLOG_PAGES = path.join(ROOT, 'src', 'blog');
+const CASE_STUDY_PAGES = path.join(ROOT, 'src', 'case-studies');
 const CMS_USERS  = path.join(ROOT, 'cms_users.json');
 const SESSIONS_FILE = path.join(ROOT, '.sessions.json');
 
@@ -93,6 +95,28 @@ function writeBlogNjk(slug) {
 }
 function deleteBlogNjk(slug) {
   const fp = path.join(BLOG_PAGES, `${slug}.njk`);
+  if (fs.existsSync(fp)) fs.unlinkSync(fp);
+}
+
+/* Quote a string for safe use as a YAML frontmatter scalar — user-entered
+   text can contain ":", quotes, or newlines that would otherwise corrupt
+   the frontmatter block. */
+function yamlQuote(str) {
+  return '"' + String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, ' ') + '"';
+}
+
+/* Write / delete the Eleventy .njk wrapper that gives a case study its URL.
+   Without this file, a case study only exists in case_studies.json — it shows
+   up in listings but /case-studies/<slug>/ 404s because Eleventy never
+   builds a page for it. */
+function writeCaseStudyNjk(slug, entry) {
+  const title = `${entry.client ? entry.client + ' — ' : ''}${entry.title || slug} | AKA Digital Case Study`;
+  const description = (entry.summary || '').replace(/\s+/g, ' ').trim().slice(0, 300);
+  const content = `---\nlayout: layouts/base.njk\ntitle: ${yamlQuote(title)}\ndescription: ${yamlQuote(description)}\npermalink: /case-studies/${slug}/index.html\nstudySlug: ${slug}\n---\n{% include "case-studies/template.njk" %}\n`;
+  fs.writeFileSync(path.join(CASE_STUDY_PAGES, `${slug}.njk`), content);
+}
+function deleteCaseStudyNjk(slug) {
+  const fp = path.join(CASE_STUDY_PAGES, `${slug}.njk`);
   if (fs.existsSync(fp)) fs.unlinkSync(fp);
 }
 
@@ -171,25 +195,36 @@ function reply(res, status, data, ct) {
 const j   = (res, st, d) => reply(res, st, d, 'application/json');
 const h   = (res, st, d) => reply(res, st, d, 'text/html');
 
+const TOO_LARGE = Symbol('tooLarge');
+
 function readBody(req) {
   return new Promise((res) => {
     let b = '';
     let size = 0;
+    let tooLarge = false;
     req.on('data', c => {
+      if (tooLarge) return;
       size += Buffer.byteLength(c);
       if (size > securityConfig.maxPayloadSizeBytes) {
+        tooLarge = true;
         req.destroy();
+        res(TOO_LARGE); // resolve now — destroy() never fires 'end', so without
+                         // this the caller would hang waiting forever
         return;
       }
       b += c;
     });
-    req.on('end', () => { try { res(JSON.parse(b || '{}')); } catch { res({}); } });
+    req.on('end', () => { if (tooLarge) return; try { res(JSON.parse(b || '{}')); } catch { res({}); } });
     req.on('error', () => res({}));
   });
 }
 
 async function readValidatedBody(req, res, context) {
   const payload = await readBody(req);
+  if (payload === TOO_LARGE) {
+    j(res, 413, { error: 'Payload too large' });
+    return null;
+  }
   const validation = validatePayload(payload);
   if (!validation.valid) {
     appendSecurityLog('invalid_payload', { context, path: req.url, error: validation.error, clientIp: getClientIp(req) });
@@ -199,11 +234,24 @@ async function readValidatedBody(req, res, context) {
   return validation.value;
 }
 
-function readMultipart(req, boundary) {
+function readMultipart(req, boundary, maxBytes = 15 * 1024 * 1024) {
   return new Promise((res) => {
     const chunks = [];
-    req.on('data', c => chunks.push(c));
+    let size = 0;
+    let tooLarge = false;
+    req.on('data', c => {
+      if (tooLarge) return;
+      size += c.length;
+      if (size > maxBytes) {
+        tooLarge = true;
+        req.destroy();
+        res(TOO_LARGE);
+        return;
+      }
+      chunks.push(c);
+    });
     req.on('end', () => {
+      if (tooLarge) return;
       const buf = Buffer.concat(chunks);
       const sep = Buffer.from('--' + boundary);
       const files = {}, fields = {};
@@ -226,6 +274,7 @@ function readMultipart(req, boundary) {
       }
       res({ files, fields });
     });
+    req.on('error', () => res({ files: {}, fields: {} }));
   });
 }
 
@@ -566,6 +615,7 @@ http.createServer(async (req, res) => {
       };
       cs.unshift(entry);
       writeData('case_studies', cs);
+      writeCaseStudyNjk(entry.slug, entry);
       return j(res, 200, { ok: true, slug: entry.slug });
     }
 
@@ -578,6 +628,7 @@ http.createServer(async (req, res) => {
       if (b === null) return;
       cs[idx] = { ...cs[idx], ...b, slug };
       writeData('case_studies', cs);
+      writeCaseStudyNjk(slug, cs[idx]);
       return j(res, 200, { ok: true });
     }
 
@@ -585,7 +636,23 @@ http.createServer(async (req, res) => {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
       const slug = p.replace('/api/case-studies/', '');
       writeData('case_studies', readData('case_studies').filter(x => x.slug !== slug));
+      deleteCaseStudyNjk(slug);
       return j(res, 200, { ok: true });
+    }
+
+    /* Live "as-is" preview — renders the draft (unsaved) case study through
+       the real template, so it looks exactly like the published page will,
+       without writing any file or running a build. */
+    if (p === '/api/preview/case-study' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.case-study');
+      if (b === null) return;
+      try {
+        let html = renderCaseStudyPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -811,8 +878,9 @@ http.createServer(async (req, res) => {
       }
       const boundary = (req.headers['content-type'] || '').split('boundary=')[1];
       if (!boundary) return j(res, 400, { error: 'No boundary' });
-      const { files } = await readMultipart(req, boundary);
-      const file = files.image;
+      const parsed = await readMultipart(req, boundary);
+      if (parsed === TOO_LARGE) return j(res, 413, { error: 'Image too large (max 15MB)' });
+      const file = parsed.files.image;
       if (!file) return j(res, 400, { error: 'No image field' });
       const ext  = path.extname(file.filename) || '.jpg';
       const name = `upload-${Date.now()}${ext}`;

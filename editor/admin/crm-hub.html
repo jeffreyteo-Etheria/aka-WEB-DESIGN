@@ -480,13 +480,14 @@
       const log = document.getElementById('buildLog');
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block'; txt.textContent = 'Building…\n';
+      let finished = false;
       const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         const d = JSON.parse(ev.data); txt.textContent += d.msg + '\n';
-        if (d.status === 'done' || d.status === 'error') es.close();
+        if (d.status === 'done' || d.status === 'error') { finished = true; es.close(); }
       };
       es.onerror = () => {
-        txt.textContent += '⚠ Build connection lost — check server logs.\n';
+        if (!finished) txt.textContent += '⚠ Build connection lost — check server logs.\n';
         es.close();
       };
     });
@@ -496,13 +497,14 @@
       const log = document.getElementById('buildLog');
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block'; txt.textContent = 'Packaging…\n';
+      let exportFinished = false;
       const es = new EventSource('/api/export?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         const d = JSON.parse(ev.data); txt.textContent += d.msg + '\n';
-        if (d.status === 'done' || d.status === 'error') es.close();
+        if (d.status === 'done' || d.status === 'error') { exportFinished = true; es.close(); }
       };
       es.onerror = () => {
-        txt.textContent += '⚠ Export connection lost — check server logs.\n';
+        if (!exportFinished) txt.textContent += '⚠ Export connection lost — check server logs.\n';
         es.close();
       };
     });

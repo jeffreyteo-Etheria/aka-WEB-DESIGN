@@ -135,13 +135,15 @@
     coverFile.addEventListener('change', async () => {
       const file = coverFile.files[0];
       if (!file) return;
-      const base64 = await toBase64(file);
-      const r = await apiFetch('/api/upload', 'POST', { base64, filename: file.name });
-      if (r.url) {
+      prompt.textContent = 'Uploading…';
+      const r = await uploadImage(file);
+      if (r.ok) {
         imageUrl.value = r.url;
         preview.src = r.url;
         preview.style.display = 'block';
         prompt.style.display  = 'none';
+      } else {
+        prompt.textContent = '✗ ' + r.error;
       }
     });
 

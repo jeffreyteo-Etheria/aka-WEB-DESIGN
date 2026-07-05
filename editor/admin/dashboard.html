@@ -118,6 +118,11 @@
       <div id="buildLogText" class="build-log-text"></div>
     </div>
 
+    <p style="font-size:13px;color:var(--slate);margin:4px 0 16px;">
+      "View" on any post below shows the <strong>currently published</strong> site. After saving edits, click
+      <strong>Build Site</strong> (or <strong>Publish Live</strong>) in the sidebar to make them visible there.
+    </p>
+
     <!-- Blog post list -->
     <section class="content-section">
       <div class="section-header">
@@ -185,17 +190,22 @@
       document.getElementById('buildLog').style.display = 'block';
       logEl.textContent = '';
 
+      let finished = false;
       const es = new EventSource(url);
       es.onmessage = ev => {
         try {
           const d = JSON.parse(ev.data);
           logEl.textContent += d.msg + '\n';
           logEl.scrollTop = logEl.scrollHeight;
-          if (d.status === 'done' || d.status === 'error') es.close();
+          if (d.status === 'done' || d.status === 'error') { finished = true; es.close(); }
         } catch {}
       };
       es.onerror = () => {
-        logEl.textContent += '\n⚠ Connection lost — check server logs.\n';
+        /* The server closes the connection right after its final message —
+           the browser can race this as a network error even though the
+           build already finished cleanly. Only report it if we never got
+           a done/error status. */
+        if (!finished) logEl.textContent += '\n⚠ Connection lost — check server logs.\n';
         es.close();
       };
     }

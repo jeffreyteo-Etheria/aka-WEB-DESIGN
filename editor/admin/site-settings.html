@@ -279,17 +279,18 @@
         const log = document.getElementById('buildLog');
         const txt = document.getElementById('buildLogText');
         log.style.display = 'block'; txt.textContent = 'Building site…\n';
+        let saveFinished = false;
         const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
         es.onmessage = ev => {
           try {
             const d = JSON.parse(ev.data);
             txt.textContent += (d.msg || '') + '\n';
-            if (d.status === 'done')  { txt.textContent += '✓ Done — changes are live.\n'; es.close(); }
-            if (d.status === 'error') { txt.textContent += '✗ Build error.\n'; es.close(); }
+            if (d.status === 'done')  { txt.textContent += '✓ Done — changes are live.\n'; saveFinished = true; es.close(); }
+            if (d.status === 'error') { txt.textContent += '✗ Build error.\n'; saveFinished = true; es.close(); }
           } catch {}
         };
         es.onerror = () => {
-          txt.textContent += '⚠ Build connection lost — check server logs.\n';
+          if (!saveFinished) txt.textContent += '⚠ Build connection lost — check server logs.\n';
           es.close();
         };
       } else {
@@ -304,13 +305,14 @@
       const log = document.getElementById('buildLog');
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block'; txt.textContent = 'Building…\n';
+      let buildFinished = false;
       const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         try { const d = JSON.parse(ev.data); txt.textContent += (d.msg||'') + '\n';
-          if (d.status==='done'||d.status==='error') es.close(); } catch {}
+          if (d.status==='done'||d.status==='error') { buildFinished = true; es.close(); } } catch {}
       };
       es.onerror = () => {
-        txt.textContent += '⚠ Build connection lost — check server logs.\n';
+        if (!buildFinished) txt.textContent += '⚠ Build connection lost — check server logs.\n';
         es.close();
       };
     });
@@ -320,15 +322,16 @@
       const log = document.getElementById('buildLog');
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block'; txt.textContent = 'Packaging…\n';
+      let exportFinished = false;
       const es = new EventSource('/api/export?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         try {
           const d = JSON.parse(ev.data); txt.textContent += (d.msg||'') + '\n';
-          if (d.status === 'done' || d.status === 'error') es.close();
+          if (d.status === 'done' || d.status === 'error') { exportFinished = true; es.close(); }
         } catch {}
       };
       es.onerror = () => {
-        txt.textContent += '⚠ Export connection lost — check server logs.\n';
+        if (!exportFinished) txt.textContent += '⚠ Export connection lost — check server logs.\n';
         es.close();
       };
     });
@@ -339,13 +342,14 @@
       const log = document.getElementById('buildLog');
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block'; txt.textContent = 'Publishing…\n';
+      let deployFinished = false;
       const es = new EventSource('/api/deploy?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         try { const d = JSON.parse(ev.data); txt.textContent += (d.msg||'') + '\n';
-          if (d.status==='done'||d.status==='error') es.close(); } catch {}
+          if (d.status==='done'||d.status==='error') { deployFinished = true; es.close(); } } catch {}
       };
       es.onerror = () => {
-        txt.textContent += '⚠ Deploy connection lost — check server logs.\n';
+        if (!deployFinished) txt.textContent += '⚠ Deploy connection lost — check server logs.\n';
         es.close();
       };
     });

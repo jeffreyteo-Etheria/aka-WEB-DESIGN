@@ -5,6 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Case Study — AKA Digital CMS</title>
   <link rel="stylesheet" href="/admin/admin.css" />
+  <style>
+    /* This page needs more room than the standard form pages — form on the
+       left, live "as-is" preview of the actual published page on the right. */
+    .main-content { max-width: none; }
+    .editor-layout { display: flex; gap: 24px; align-items: flex-start; }
+    .editor-col { flex: 1 1 480px; min-width: 0; }
+    .preview-col { flex: 1 1 480px; min-width: 0; position: sticky; top: 20px; }
+    .preview-frame-wrap {
+      background: var(--white); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; display: flex; flex-direction: column;
+      height: calc(100vh - 140px);
+    }
+    .preview-frame-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid var(--border); background: #fafafa;
+    }
+    .preview-frame-header .btn-xs { cursor: pointer; border: 1px solid var(--border); background: #fff; }
+    #previewStatus { font-size: 12px; color: var(--slate, #64748b); }
+    #previewFrame { flex: 1; width: 100%; border: 0; background: #fff; }
+    @media (max-width: 1200px) {
+      .editor-layout { flex-direction: column; }
+      .preview-col { position: static; width: 100%; }
+      .preview-frame-wrap { height: 700px; }
+    }
+  </style>
 </head>
 <body class="cms-body">
 
@@ -47,6 +72,8 @@
       <div id="buildLogText" class="build-log-text"></div>
     </div>
 
+    <div class="editor-layout">
+    <div class="editor-col">
     <form id="csForm" class="form-card" autocomplete="off">
 
       <!-- ─── Basic Info ──────────────────────────────────────────── -->
@@ -229,6 +256,21 @@
       </div>
 
     </form>
+    </div>
+
+    <div class="preview-col">
+      <div class="preview-frame-wrap">
+        <div class="preview-frame-header">
+          <strong style="font-size:13px">Live Preview — as it will publish</strong>
+          <span style="display:flex;align-items:center;gap:10px">
+            <span id="previewStatus">—</span>
+            <button type="button" class="btn-xs" id="refreshPreviewBtn">↻ Refresh</button>
+          </span>
+        </div>
+        <iframe id="previewFrame" title="Case study preview"></iframe>
+      </div>
+    </div>
+    </div>
   </main>
 
   <script src="/admin/admin.js"></script>
@@ -267,6 +309,7 @@
           rows[i].querySelector('.result-value').value  = r.value  || '';
           rows[i].querySelector('.result-context').value = r.context || '';
         });
+        refreshPreview();
       });
     }
 
@@ -302,24 +345,19 @@
     });
     async function handleUpload(file) {
       document.getElementById('uploadStatus').textContent = 'Uploading…';
-      const b64 = await toBase64(file);
-      const r = await apiFetch('/api/upload', 'POST', { base64: b64, filename: file.name });
-      if (r.url) {
+      const r = await uploadImage(file);
+      if (r.ok) {
         document.getElementById('cover_image').value = r.url;
         document.getElementById('video_thumbnail').value = r.url;
         document.getElementById('uploadStatus').textContent = '✓ Uploaded: ' + r.url;
+        schedulePreview();
       } else {
-        document.getElementById('uploadStatus').textContent = '✗ Upload failed';
+        document.getElementById('uploadStatus').textContent = '✗ ' + r.error;
       }
     }
 
-    // Submit
-    document.getElementById('csForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      const status = document.getElementById('saveStatus');
-      btn.disabled = true; btn.textContent = 'Saving…';
-
+    // Shared by Save and the live preview, so they can never drift apart.
+    function getFormPayload() {
       const results = [];
       document.querySelectorAll('.result-row').forEach(row => {
         const metric  = row.querySelector('.result-metric').value.trim();
@@ -328,7 +366,7 @@
         if (metric && value) results.push({ metric, value, context });
       });
 
-      const payload = {
+      return {
         client:         document.getElementById('client').value.trim(),
         title:          document.getElementById('title').value.trim(),
         slug:           document.getElementById('slug').value.trim() || slugify(document.getElementById('title').value),
@@ -351,6 +389,16 @@
         featured:       document.getElementById('featured').checked,
         featured_home:  document.getElementById('featured_home').checked,
       };
+    }
+
+    // Submit
+    document.getElementById('csForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const status = document.getElementById('saveStatus');
+      btn.disabled = true; btn.textContent = 'Saving…';
+
+      const payload = getFormPayload();
 
       try {
         let r;
@@ -381,17 +429,55 @@
       const txt = document.getElementById('buildLogText');
       log.style.display = 'block';
       txt.textContent = 'Building…\n';
+      let finished = false;
       const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
       es.onmessage = ev => {
         const d = JSON.parse(ev.data);
         txt.textContent += d.msg + '\n';
-        if (d.status === 'done' || d.status === 'error') es.close();
+        if (d.status === 'done' || d.status === 'error') { finished = true; es.close(); }
       };
       es.onerror = () => {
-        txt.textContent += '⚠ Build connection lost — check server logs.\n';
+        if (!finished) txt.textContent += '⚠ Build connection lost — check server logs.\n';
         es.close();
       };
     });
+
+    // ── Live preview — renders the draft through the real template, so it
+    // looks exactly like the published page will, without saving anything.
+    const previewFrame  = document.getElementById('previewFrame');
+    const previewStatus = document.getElementById('previewStatus');
+    let previewTimer = null;
+    let previewSeq = 0;
+
+    async function refreshPreview() {
+      const seq = ++previewSeq;
+      previewStatus.textContent = 'Rendering…';
+      try {
+        const r = await apiFetch('/api/preview/case-study', 'POST', getFormPayload());
+        if (seq !== previewSeq) return; // a newer keystroke superseded this request
+        if (r.ok && r.html) {
+          previewFrame.srcdoc = r.html;
+          previewStatus.textContent = 'Updated ' + new Date().toLocaleTimeString();
+        } else {
+          previewStatus.textContent = '✗ ' + (r.error || 'Preview failed');
+        }
+      } catch (err) {
+        if (seq === previewSeq) previewStatus.textContent = '✗ ' + err.message;
+      }
+    }
+
+    function schedulePreview() {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(refreshPreview, 600);
+    }
+
+    document.getElementById('csForm').addEventListener('input', schedulePreview);
+    document.getElementById('csForm').addEventListener('change', schedulePreview);
+    document.getElementById('refreshPreviewBtn').addEventListener('click', refreshPreview);
+
+    // Initial render for a brand-new (mostly-empty) draft. In edit mode the
+    // first render is triggered once existing data has finished loading above.
+    if (!editSlug) refreshPreview();
   </script>
 </body>
 </html>
