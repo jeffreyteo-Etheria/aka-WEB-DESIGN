@@ -196,6 +196,42 @@ body { font-family: Inter, system-ui, sans-serif; font-size: 14px; color: var(--
 .body-preview th { background: var(--surface); padding: 8px 12px; text-align: left; font-weight: 700; font-size: 13px; }
 .body-preview td { padding: 8px 12px; border-bottom: 1px solid var(--mist); }
 
+/* Rich text editor toolbar */
+.editor-toolbar {
+  display: flex; flex-wrap: wrap; gap: 4px; padding: 8px;
+  border: 1.5px solid var(--mist); border-bottom: none;
+  border-radius: 0 var(--radius) 0 0; background: var(--surface);
+}
+.editor-toolbar button {
+  min-width: 32px; height: 32px; padding: 0 8px;
+  border: 1px solid transparent; border-radius: 6px;
+  background: transparent; color: var(--ink);
+  font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+.editor-toolbar button:hover { background: var(--white); border-color: var(--mist); }
+.editor-toolbar button.active { background: var(--primary); color: var(--white); }
+.editor-toolbar .toolbar-sep { width: 1px; background: var(--mist); margin: 4px 4px; }
+.body-editable {
+  border: 1.5px solid var(--mist); border-radius: 0 0 var(--radius) var(--radius);
+  padding: 16px; min-height: 300px; background: var(--white);
+  line-height: 1.7; outline: none; overflow-y: auto;
+}
+.body-editable:focus { border-color: var(--primary); }
+.body-editable h2 { font-size: 18px; font-weight: 700; margin: 16px 0 8px; }
+.body-editable h3 { font-size: 15px; font-weight: 700; margin: 14px 0 6px; }
+.body-editable p  { margin-bottom: 12px; }
+.body-editable ul, .body-editable ol { padding-left: 20px; margin-bottom: 12px; }
+.body-editable li { margin-bottom: 4px; }
+.body-editable blockquote { border-left: 3px solid var(--primary); padding-left: 12px; color: var(--slate); margin-bottom: 12px; }
+.body-editable a { color: var(--primary); text-decoration: underline; }
+.body-editable:empty::before { content: attr(data-placeholder); color: var(--slate); }
+
+/* Word/character count */
+.word-count { font-size: 12px; color: var(--slate); margin-top: 6px; }
+.word-count.warn { color: #b45309; font-weight: 600; }
+.word-count.over { color: var(--error); font-weight: 600; }
+
 /* ── BUTTONS ── */
 .btn-primary {
   display: inline-flex; align-items: center; gap: 6px;
