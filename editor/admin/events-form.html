@@ -202,31 +202,12 @@
         const result = await apiFetch(url, method, payload);
 
         if (result.ok) {
-          status.textContent = '✓ Saved! Building site…';
+          status.textContent = '✓ Saved. ';
           status.className   = 'form-status success';
-          const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
-          es.onmessage = ev => {
-            const d = JSON.parse(ev.data);
-            status.textContent = '⚙ ' + d.msg;
-            if (d.status === 'done') {
-              status.textContent = '✓ Event published! ';
-              const a = document.createElement('a');
-              a.href = '/admin/dashboard';
-              a.textContent = '← Back to dashboard';
-              status.appendChild(a);
-              es.close();
-            }
-            if (d.status === 'error') {
-              status.textContent = '⚠ Build error: ' + (d.msg || 'unknown error — check server logs');
-              status.className   = 'form-status error';
-              es.close();
-            }
-          };
-          es.onerror = () => {
-            status.textContent = '⚠ Build connection lost — check server logs';
-            status.className   = 'form-status error';
-            es.close();
-          };
+          const a = document.createElement('a');
+          a.href = '/admin/dashboard';
+          a.textContent = 'Go to Dashboard to publish live →';
+          status.appendChild(a);
         } else {
           status.textContent = '⚠ ' + (result.error || 'Error');
           status.className   = 'form-status error';

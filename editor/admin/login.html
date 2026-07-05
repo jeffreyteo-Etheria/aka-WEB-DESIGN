@@ -58,6 +58,12 @@
         .then(r => r.json()).then(d => { if (d.authed) location.href = '/admin/dashboard'; });
     }
 
+    if (new URLSearchParams(location.search).get('expired')) {
+      const err = document.getElementById('loginError');
+      err.textContent = 'Your session expired — please log in again.';
+      err.style.display = 'block';
+    }
+
     function storeSession(d) {
       localStorage.setItem('aka_cms_token', d.token);
       localStorage.setItem('aka_cms_role',  d.role);
