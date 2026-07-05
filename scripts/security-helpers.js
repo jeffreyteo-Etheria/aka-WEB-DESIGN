@@ -27,6 +27,12 @@ function sanitizeObject(value, depth = 0, redact = true) {
       return acc;
     }, {});
   }
+  // Booleans/numbers/null must survive as their real type — stringifying
+  // `false` into the string "false" made every content-type's "Featured"/
+  // "Active" checkbox stick permanently on: callers coerce with `!!value`,
+  // and a non-empty string is always truthy, so `!!"false"` is `true`.
+  // Once a checkbox was ever unchecked and saved, it could never go back.
+  if (typeof value === 'boolean' || typeof value === 'number' || value === null) return value;
   return sanitizeString(value, 500);
 }
 

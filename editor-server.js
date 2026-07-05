@@ -17,6 +17,7 @@ const fs     = require('fs');
 const path   = require('path');
 const crypto = require('crypto');
 const { exec, execSync } = require('child_process');
+const heicConvert = require('heic-convert');
 const {
   validatePayload,
   getClientIp,
@@ -73,6 +74,25 @@ const EDITOR     = path.join(ROOT, 'editor');
 const ADMIN      = path.join(ROOT, 'editor', 'admin');
 const EDITS      = path.join(DATA,   '_edits.json');
 const UPLOADS    = path.join(PUBLIC, 'images', 'uploads');
+
+/* iPhones (and many Android phones) save camera photos as HEIC/HEIF by
+   default. Virtually no browser except Safari can decode HEIC pixel data —
+   saved as-is, every one of these uploads renders as a broken image on the
+   live site for almost every visitor and in the CMS's own preview. Convert
+   to JPEG server-side so it doesn't matter what format the source phone used. */
+async function saveUploadedImage(buffer, originalFilename) {
+  const ext = (path.extname(originalFilename) || '.jpg').toLowerCase();
+  let data = buffer;
+  let outExt = ext;
+  if (ext === '.heic' || ext === '.heif') {
+    data = Buffer.from(await heicConvert({ buffer, format: 'JPEG', quality: 0.9 }));
+    outExt = '.jpg';
+  }
+  const name = `upload-${Date.now()}${outExt}`;
+  fs.writeFileSync(path.join(UPLOADS, name), data);
+  return `/images/uploads/${name}`;
+}
+
 const BLOG_PAGES = path.join(ROOT, 'src', 'blog');
 const CASE_STUDY_PAGES = path.join(ROOT, 'src', 'case-studies');
 const CMS_USERS  = path.join(ROOT, 'cms_users.json');
@@ -557,6 +577,7 @@ http.createServer(async (req, res) => {
         title:       b.title       || '',
         description: b.description || '',
         date:        b.date        || new Date().toISOString().split('T')[0],
+        date_label:  b.date_label  || '',
         location:    b.location    || '',
         type:        b.type        || 'Event',
         image:       b.image       || '',
@@ -888,10 +909,12 @@ http.createServer(async (req, res) => {
         const b = await readValidatedBody(req, res, 'upload.json');
         if (b === null) return;
         if (!b.base64 || !b.filename) return j(res, 400, { error: 'Missing base64/filename' });
-        const ext  = path.extname(b.filename) || '.jpg';
-        const name = `upload-${Date.now()}${ext}`;
-        fs.writeFileSync(path.join(UPLOADS, name), Buffer.from(b.base64.replace(/^data:[^;]+;base64,/, ''), 'base64'));
-        return j(res, 200, { ok: true, url: `/images/uploads/${name}` });
+        try {
+          const url = await saveUploadedImage(Buffer.from(b.base64.replace(/^data:[^;]+;base64,/, ''), 'base64'), b.filename);
+          return j(res, 200, { ok: true, url });
+        } catch (err) {
+          return j(res, 400, { error: 'Could not process image: ' + err.message });
+        }
       }
       const boundary = (req.headers['content-type'] || '').split('boundary=')[1];
       if (!boundary) return j(res, 400, { error: 'No boundary' });
@@ -899,10 +922,12 @@ http.createServer(async (req, res) => {
       if (parsed === TOO_LARGE) return j(res, 413, { error: 'Image too large (max 15MB)' });
       const file = parsed.files.image;
       if (!file) return j(res, 400, { error: 'No image field' });
-      const ext  = path.extname(file.filename) || '.jpg';
-      const name = `upload-${Date.now()}${ext}`;
-      fs.writeFileSync(path.join(UPLOADS, name), file.data);
-      return j(res, 200, { ok: true, url: `/images/uploads/${name}` });
+      try {
+        const url = await saveUploadedImage(file.data, file.filename);
+        return j(res, 200, { ok: true, url });
+      } catch (err) {
+        return j(res, 400, { error: 'Could not process image: ' + err.message });
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════════

@@ -66,6 +66,12 @@
       </div>
 
       <div class="form-group">
+        <label>Custom date display (optional)</label>
+        <input id="date_label" type="text" placeholder="e.g. Webinar, or 2023 — Ho Chi Minh City" />
+        <p class="form-hint">Overrides how the date shows on event cards. Leave blank to auto-format the date + location above.</p>
+      </div>
+
+      <div class="form-group">
         <label>Event Type</label>
         <select id="type">
           <option>Summit</option>
@@ -166,6 +172,7 @@
         document.getElementById('slug').value        = ev.slug;
         document.getElementById('description').value = ev.description;
         document.getElementById('date').value        = ev.date;
+        document.getElementById('date_label').value  = ev.date_label || '';
         document.getElementById('location').value    = ev.location;
         document.getElementById('type').value        = ev.type;
         document.getElementById('href').value        = ev.href;
@@ -191,6 +198,7 @@
         title:       document.getElementById('title').value,
         description: document.getElementById('description').value,
         date:        document.getElementById('date').value,
+        date_label:  document.getElementById('date_label').value.trim(),
         location:    document.getElementById('location').value,
         type:        document.getElementById('type').value,
         href:        document.getElementById('href').value,

@@ -44,7 +44,7 @@ description: MarTech insights, event recaps, media coverage and industry analysi
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {% for activity in sitedata.activities %}
+      {% for activity in events | sort(true, false, 'date') %}
         <article class="card group flex flex-col gap-4 hover:border-primary/30 hover:shadow-[0_8px_32px_rgba(37,59,194,0.08)] transition-all duration-300">
           <div class="relative aspect-[16/9] overflow-hidden rounded-lg bg-surface-container">
             <img
@@ -58,7 +58,7 @@ description: MarTech insights, event recaps, media coverage and industry analysi
             </span>
           </div>
           <div class="flex-1 flex flex-col gap-2">
-            <p class="text-label-md text-on-surface-variant">{{ activity.date }}</p>
+            <p class="text-label-md text-on-surface-variant">{{ activity | eventDateDisplay }}</p>
             <h3 class="text-headline-sm font-display text-on-surface group-hover:text-primary transition-colors">
               {{ activity.title }}
             </h3>

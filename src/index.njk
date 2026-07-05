@@ -569,7 +569,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
       </a>
     </div>
     <div class="flex overflow-x-auto gap-6 hide-scrollbar snap-x pb-4 md:grid md:grid-cols-4 md:gap-6">
-      {% for activity in sitedata.activities %}
+      {% for activity in events | sort(true, false, 'date') %}
         <div class="min-w-[280px] md:min-w-0 snap-center group reveal-up" style="animation-delay:{{ loop.index0 * 0.1 }}s">
           <a href="{{ activity.href }}">
             <div class="relative aspect-[4/3] mb-4 overflow-hidden rounded-2xl bg-surface-container">
@@ -578,7 +578,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
               <div class="absolute bottom-3 left-3 flex items-center gap-2">
                 <span class="bg-primary text-on-primary text-label-md px-2 py-0.5 rounded-full text-xs font-bold">{{ activity.type }}</span>
-                <span class="text-white/70 text-label-md text-xs">{{ activity.date }}</span>
+                <span class="text-white/70 text-label-md text-xs">{{ activity | eventDateDisplay }}</span>
               </div>
             </div>
             <h3 class="text-headline-sm font-display text-on-surface mb-1 group-hover:text-primary transition-colors">{{ activity.title }}</h3>

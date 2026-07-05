@@ -27,6 +27,11 @@ env.addFilter('first', function (arr, count) {
   if (count !== undefined) return (arr || []).slice(0, count);
   return (arr || [])[0];
 });
+env.addFilter('eventDateDisplay', function (ev) {
+  if (ev.date_label) return ev.date_label;
+  const d = ev.date ? new Date(ev.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+  return ev.location ? `${d} — ${ev.location}` : d;
+});
 env.addGlobal('year', () => `${new Date().getFullYear()}`);
 
 function readJson(name) {
