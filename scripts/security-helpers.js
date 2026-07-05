@@ -13,16 +13,16 @@ function sanitizeString(value, maxLength = 2000) {
   return String(value).replace(/[\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\u000b\u000c\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f\u007f]/g, '').trim();
 }
 
-function sanitizeObject(value, depth = 0) {
+function sanitizeObject(value, depth = 0, redact = true) {
   if (depth > 3) return '[truncated]';
-  if (Array.isArray(value)) return value.slice(0, 20).map((item) => sanitizeObject(item, depth + 1));
+  if (Array.isArray(value)) return value.slice(0, 20).map((item) => sanitizeObject(item, depth + 1, redact));
   if (value && typeof value === 'object') {
     return Object.entries(value).reduce((acc, [key, entryValue]) => {
       const normalizedKey = key.toLowerCase();
-      if (SECRET_KEYS.some((secretKey) => normalizedKey.includes(secretKey))) {
+      if (redact && SECRET_KEYS.some((secretKey) => normalizedKey.includes(secretKey))) {
         acc[key] = '[redacted]';
       } else {
-        acc[key] = sanitizeObject(entryValue, depth + 1);
+        acc[key] = sanitizeObject(entryValue, depth + 1, redact);
       }
       return acc;
     }, {});
@@ -69,7 +69,7 @@ function validatePayload(payload, { maxKeys = 50, maxStringLength = 2000, allowA
     }
   }
 
-  return { valid: true, value: sanitizeObject(payload) };
+  return { valid: true, value: sanitizeObject(payload, 0, false) };
 }
 
 function getClientIp(req) {
