@@ -67,6 +67,7 @@
     <div class="sidebar-footer">
       <div class="user-badge" id="userBadge">—</div>
       <button class="logout-btn" id="logoutBtn">Sign out</button>
+      <div id="buildInfo" style="font-size:10px;color:#64748b;margin-top:8px;line-height:1.5;"></div>
     </div>
   </aside>
 
@@ -182,6 +183,14 @@
       `${localStorage.getItem('aka_cms_user')} (${role})`;
 
     document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    /* Shows what code/build this server is actually running — settles "did
+       my fix actually deploy?" without needing hPanel/SSH access. */
+    fetch('/api/health').then(r => r.json()).then(h => {
+      const fmt = iso => iso ? new Date(iso).toLocaleString() : '—';
+      document.getElementById('buildInfo').innerHTML =
+        `Commit: ${h.gitCommit || '—'}<br>Server started: ${fmt(h.serverStartedAt)}<br>Site last built: ${fmt(h.distBuiltAt)}`;
+    }).catch(() => {});
 
     /* ── SSE stream helper — works with EventSource (GET + token in query) ── */
     function startSSE(endpoint, logEl) {

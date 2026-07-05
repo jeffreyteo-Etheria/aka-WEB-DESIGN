@@ -16,7 +16,7 @@ const http   = require('http');
 const fs     = require('fs');
 const path   = require('path');
 const crypto = require('crypto');
-const { exec } = require('child_process');
+const { exec, execSync } = require('child_process');
 const {
   validatePayload,
   getClientIp,
@@ -76,6 +76,15 @@ const UPLOADS    = path.join(PUBLIC, 'images', 'uploads');
 const BLOG_PAGES = path.join(ROOT, 'src', 'blog');
 const CASE_STUDY_PAGES = path.join(ROOT, 'src', 'case-studies');
 const CMS_USERS  = path.join(ROOT, 'cms_users.json');
+
+/* Answers "is this server actually running the latest code?" without needing
+   SSH/hPanel access — the CMS and the site it publishes to are the same
+   process, but a stale deploy (git pulled, npm install/build/restart never
+   run) looks identical to a real bug from the browser. Surfaced on the
+   Dashboard. */
+const SERVER_STARTED_AT = new Date().toISOString();
+let GIT_COMMIT = 'unknown';
+try { GIT_COMMIT = execSync('git rev-parse --short HEAD', { cwd: ROOT }).toString().trim(); } catch {}
 const SESSIONS_FILE = path.join(ROOT, '.sessions.json');
 
 [UPLOADS, ADMIN, BLOG_PAGES].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
@@ -410,7 +419,15 @@ http.createServer(async (req, res) => {
     }
 
     if (p === '/api/health') {
-      return j(res, 200, { ok: true, uptime: process.uptime().toFixed(2) });
+      let distBuiltAt = null;
+      try { distBuiltAt = fs.statSync(path.join(DIST, 'index.html')).mtime.toISOString(); } catch {}
+      return j(res, 200, {
+        ok: true,
+        uptime: process.uptime().toFixed(2),
+        gitCommit: GIT_COMMIT,
+        serverStartedAt: SERVER_STARTED_AT,
+        distBuiltAt,
+      });
     }
 
     /* ── PUBLIC CONFIG (Google Client ID — safe to expose, it's a public value) ── */
