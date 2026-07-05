@@ -74,6 +74,7 @@ const EDITS      = path.join(DATA,   '_edits.json');
 const UPLOADS    = path.join(PUBLIC, 'images', 'uploads');
 const BLOG_PAGES = path.join(ROOT, 'src', 'blog');
 const CMS_USERS  = path.join(ROOT, 'cms_users.json');
+const SESSIONS_FILE = path.join(ROOT, '.sessions.json');
 
 [UPLOADS, ADMIN, BLOG_PAGES].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
 
@@ -97,9 +98,24 @@ function deleteBlogNjk(slug) {
 
 /* ─────────────────────────────────────────────────────────────────────────
    SESSION STORE  { token → { username, role, display } }
+   Persisted to disk so logins survive a process restart (Hostinger restarts
+   this app on every redeploy — without persistence, that silently logs out
+   every user with a bare "Unauthorized" and no explanation).
    ───────────────────────────────────────────────────────────────────────── */
 
-const SESSIONS = new Map();
+function loadSessions() {
+  try {
+    const raw = JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8'));
+    const now = Date.now();
+    return new Map(Object.entries(raw).filter(([, s]) => !s.expiresAt || s.expiresAt > now));
+  } catch { return new Map(); }
+}
+function persistSessions() {
+  const obj = Object.fromEntries(SESSIONS);
+  fs.writeFile(SESSIONS_FILE, JSON.stringify(obj), () => {});
+}
+
+const SESSIONS = loadSessions();
 const mkToken  = () => crypto.randomBytes(32).toString('hex');
 
 function getSession(req) {
@@ -111,6 +127,7 @@ function getSession(req) {
   if (!session) return null;
   if (session.expiresAt && Date.now() > session.expiresAt) {
     SESSIONS.delete(t);
+    persistSessions();
     return null;
   }
   session.lastSeen = Date.now();
@@ -323,6 +340,7 @@ http.createServer(async (req, res) => {
       }
       const t = mkToken();
       SESSIONS.set(t, { username: user.username, role: user.role, display: user.display, createdAt: Date.now(), expiresAt: Date.now() + securityConfig.sessionTtlMs });
+      persistSessions();
       appendAuditLog('login_succeeded', { username: user.username, role: user.role, clientIp });
       return j(res, 200, { ok: true, token: t, role: user.role, display: user.display });
     }
@@ -331,6 +349,7 @@ http.createServer(async (req, res) => {
     if (p === '/api/logout' && m === 'POST') {
       const t = req.headers['x-editor-token'] || '';
       SESSIONS.delete(t);
+      persistSessions();
       appendAuditLog('logout', { clientIp, token: t ? '[redacted]' : '' });
       return j(res, 200, { ok: true });
     }
@@ -365,6 +384,7 @@ http.createServer(async (req, res) => {
         if (!user) return j(res, 403, { error: 'Access not granted. Ask your administrator to add your Gmail address.' });
         const t = mkToken();
         SESSIONS.set(t, { username: info.email, role: user.role || 'team', display: user.name || info.name || info.email });
+        persistSessions();
         return j(res, 200, { ok: true, token: t, role: user.role || 'team', display: user.name || info.name || info.email });
       } catch (e) {
         return j(res, 500, { error: 'Could not verify with Google: ' + e.message });

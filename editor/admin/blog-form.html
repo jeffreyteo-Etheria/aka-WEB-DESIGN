@@ -29,7 +29,7 @@
     <header class="page-header">
       <div>
         <h1 class="page-title" id="formTitle">New Blog Post</h1>
-        <p class="page-sub">Fill in the fields below and click Publish.</p>
+        <p class="page-sub">Fill in the fields below and click Save. Go to the Dashboard to publish your changes live.</p>
       </div>
     </header>
 
@@ -147,7 +147,7 @@
 
       <!-- Actions -->
       <div class="form-actions full">
-        <button type="submit" class="btn-primary" id="publishBtn">Publish Post</button>
+        <button type="submit" class="btn-primary" id="publishBtn">Save Post</button>
         <a href="/admin/dashboard" class="btn-ghost">Cancel</a>
         <span id="formStatus" class="form-status"></span>
       </div>
@@ -280,7 +280,7 @@
       const btn = document.getElementById('publishBtn');
       const status = document.getElementById('formStatus');
       btn.disabled = true;
-      btn.textContent = editSlug ? 'Saving…' : 'Publishing…';
+      btn.textContent = 'Saving…';
 
       const payload = {
         slug:         document.getElementById('slug').value || slugify(document.getElementById('title').value),
@@ -303,37 +303,12 @@
         const result  = await apiFetch(url, method, payload);
 
         if (result.ok) {
-          status.textContent = '✓ Saved! Triggering build…';
+          status.textContent = '✓ Saved. ';
           status.className   = 'form-status success';
-
-          // Auto-build via SSE (token in query string — EventSource can't send headers)
-          const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
-          es.onmessage = ev => {
-            try {
-              const d = JSON.parse(ev.data);
-              status.textContent = '⚙ ' + d.msg;
-              if (d.status === 'done') {
-                status.textContent = '✓ Published! ';
-                const a = document.createElement('a');
-                a.href = '/blog/' + (result.slug || editSlug || '');
-                a.target = '_blank';
-                a.textContent = 'View post ↗';
-                status.appendChild(a);
-                status.appendChild(document.createTextNode(' · '));
-                const b2 = document.createElement('a');
-                b2.href = '/admin/dashboard';
-                b2.textContent = '← Dashboard';
-                status.appendChild(b2);
-                es.close();
-              }
-              if (d.status === 'error') {
-                status.textContent = '⚠ Build error: ' + (d.msg || 'unknown error — check server logs');
-                status.className   = 'form-status error';
-                es.close();
-              }
-            } catch {}
-          };
-          es.onerror = () => { status.textContent = '⚠ Build stream lost'; es.close(); };
+          const a = document.createElement('a');
+          a.href = '/admin/dashboard';
+          a.textContent = 'Go to Dashboard to publish live →';
+          status.appendChild(a);
         } else {
           status.textContent = '⚠ ' + (result.error || 'Error saving');
           status.className   = 'form-status error';
@@ -344,7 +319,7 @@
       }
 
       btn.disabled = false;
-      btn.textContent = editSlug ? 'Save Changes' : 'Publish Post';
+      btn.textContent = editSlug ? 'Save Changes' : 'Save Post';
     });
   </script>
 </body>

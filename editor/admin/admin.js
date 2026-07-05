@@ -12,7 +12,10 @@ function requireAuth() {
     .catch(() => {});
 }
 
-/* Fetch wrapper — always attaches token, returns parsed JSON */
+/* Fetch wrapper — always attaches token, returns parsed JSON.
+   On a 401 (session expired or server restarted since login), clear the
+   stale token and send the user back to login with an explanation instead
+   of leaving them stuck on a bare "Unauthorized" message. */
 async function apiFetch(url, method = 'GET', body = null) {
   const opts = {
     method,
@@ -20,7 +23,12 @@ async function apiFetch(url, method = 'GET', body = null) {
   };
   if (body && method !== 'GET') opts.body = JSON.stringify(body);
   const r = await fetch(url, opts);
-  return r.json();
+  const data = await r.json();
+  if (r.status === 401) {
+    localStorage.clear();
+    location.href = '/admin?expired=1';
+  }
+  return data;
 }
 
 /* Logout */

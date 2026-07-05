@@ -17,6 +17,7 @@ public/images/uploads/
 
 # Editor runtime state
 src/_data/_edits.json
+.sessions.json
 
 # Temp / OS files
 *.tmp
