@@ -27,6 +27,9 @@ env.addFilter('first', function (arr, count) {
   if (count !== undefined) return (arr || []).slice(0, count);
   return (arr || [])[0];
 });
+env.addFilter('publishedOnly', function (arr) {
+  return (arr || []).filter((item) => item.status === 'published');
+});
 env.addFilter('eventDateDisplay', function (ev) {
   if (ev.date_label) return ev.date_label;
   const d = ev.date ? new Date(ev.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
@@ -74,6 +77,7 @@ function renderCaseStudyPreview(draft) {
     ...baseContext(`/case-studies/${slug}/`),
     case_studies: [draft, ...real],
     studySlug: slug,
+    isPreview: true,
     title: `${draft.client ? draft.client + ' — ' : ''}${draft.title || slug} | AKA Digital Case Study`,
     description: (draft.summary || '').slice(0, 300),
   };
@@ -84,4 +88,48 @@ function renderCaseStudyPreview(draft) {
   return renderInLayout(inner, ctx);
 }
 
-module.exports = { renderCaseStudyPreview };
+/* Renders a blog post exactly as it will appear once published, using the
+   *draft* field values (not yet saved to blogs.json). */
+function renderBlogPreview(draft) {
+  const slug = draft.slug || '__preview__';
+  const real = readJson('blogs').filter(b => b.slug !== slug);
+  const ctx = {
+    ...baseContext(`/blog/${slug}/`),
+    blogs: [draft, ...real],
+    postSlug: slug,
+    isPreview: true,
+  };
+  const templateSrc = stripFrontmatter(
+    fs.readFileSync(path.join(INCLUDES, 'layouts', 'blog-post.njk'), 'utf8')
+  );
+  const inner = env.renderString(templateSrc, ctx);
+  return renderInLayout(inner, ctx);
+}
+
+/* Events and jobs have no individual detail page — they only ever show up
+   inside a listing (Insights/homepage/blog for events, Careers for jobs).
+   So "preview" here means: render that real listing page with the draft
+   spliced in, status forced to 'published' just for this render (never
+   written to disk) so it survives the same publishedOnly/active filters
+   the real page uses — showing exactly where and how it will appear. */
+function renderListingPreview(templateRelPath, pageUrl, dataKey, draft) {
+  const slug = draft.slug || '__preview__';
+  const real = readJson(dataKey).filter(item => item.slug !== slug);
+  const ctx = {
+    ...baseContext(pageUrl),
+    [dataKey]: [{ ...draft, status: 'published' }, ...real],
+  };
+  const templateSrc = stripFrontmatter(fs.readFileSync(path.join(SRC, templateRelPath), 'utf8'));
+  const inner = env.renderString(templateSrc, ctx);
+  return renderInLayout(inner, ctx);
+}
+
+function renderEventPreview(draft) {
+  return renderListingPreview('insights.njk', '/insights/', 'events', draft);
+}
+
+function renderJobPreview(draft) {
+  return renderListingPreview('careers.njk', '/careers/', 'jobs', draft);
+}
+
+module.exports = { renderCaseStudyPreview, renderBlogPreview, renderEventPreview, renderJobPreview };

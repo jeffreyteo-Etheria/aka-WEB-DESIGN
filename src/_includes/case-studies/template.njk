@@ -1,6 +1,6 @@
 {% set study = case_studies | findBySlug(studySlug) %}
 
-{% if not study %}
+{% if not study or (study.status != 'published' and not isPreview) %}
   <div class="section-container py-32 text-center">
     <h1 class="text-headline-md font-display text-on-surface">Case study not found</h1>
     <a href="/case-studies" class="btn-primary mt-8 inline-flex">Back to case studies</a>

@@ -65,6 +65,7 @@
         <h1 class="page-title" id="formTitle">New Case Study</h1>
         <p class="page-sub">Add a new client success story to the Case Studies page.</p>
       </div>
+      <span id="statusBadge" class="status-badge status-draft">Draft</span>
     </header>
 
     <div id="buildLog" class="build-log" style="display:none">
@@ -249,8 +250,9 @@
         </div>
       </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn-primary" id="submitBtn">Save Case Study</button>
+      <div class="form-actions publish-actions">
+        <button type="button" class="btn-draft" id="saveDraftBtn">Save as Draft</button>
+        <button type="button" class="btn-publish" id="publishBtn">Publish</button>
         <a href="/admin/dashboard" class="btn-outline">Cancel</a>
         <span id="saveStatus" class="save-status"></span>
       </div>
@@ -283,12 +285,19 @@
     const editSlug = params.get('edit');
     let existingData = null;
 
+    function setStatusBadge(status) {
+      const badge = document.getElementById('statusBadge');
+      const isPublished = status === 'published';
+      badge.textContent = isPublished ? 'Published' : 'Draft';
+      badge.className = 'status-badge ' + (isPublished ? 'status-published' : 'status-draft');
+    }
+
     if (editSlug) {
       document.getElementById('formTitle').textContent = 'Edit Case Study';
-      document.getElementById('submitBtn').textContent = 'Save Changes';
       apiFetch('/api/case-studies').then(list => {
         existingData = list.find(c => c.slug === editSlug);
         if (!existingData) { alert('Case study not found'); return; }
+        setStatusBadge(existingData.status);
         const f = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v || ''; };
         f('client', existingData.client); f('title', existingData.title);
         f('slug', existingData.slug); f('award', existingData.award);
@@ -391,37 +400,45 @@
       };
     }
 
-    // Submit
-    document.getElementById('csForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
+    // Save as Draft / Publish — same payload, different target status.
+    async function saveCaseStudy(targetStatus, btn) {
+      if (!document.getElementById('client').value.trim() || !document.getElementById('title').value.trim()) {
+        alert('Client name and title are required.');
+        return;
+      }
       const status = document.getElementById('saveStatus');
-      btn.disabled = true; btn.textContent = 'Saving…';
+      const draftBtn = document.getElementById('saveDraftBtn');
+      const pubBtn   = document.getElementById('publishBtn');
+      draftBtn.disabled = true; pubBtn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = targetStatus === 'published' ? 'Publishing…' : 'Saving…';
 
-      const payload = getFormPayload();
+      const payload = { ...getFormPayload(), status: targetStatus };
 
       try {
-        let r;
-        if (editSlug) {
-          r = await apiFetch('/api/case-studies/' + editSlug, 'PUT', payload);
-        } else {
-          r = await apiFetch('/api/case-studies/new', 'POST', payload);
-        }
+        const r = editSlug
+          ? await apiFetch('/api/case-studies/' + editSlug, 'PUT', payload)
+          : await apiFetch('/api/case-studies/new', 'POST', payload);
         if (r.ok || r.slug) {
-          status.innerHTML = '✓ Saved. <a href="/admin/dashboard">Go to Dashboard to publish live →</a>';
+          setStatusBadge(targetStatus);
+          status.innerHTML = targetStatus === 'published'
+            ? '✓ Published. <a href="/admin/dashboard">Go to Dashboard to Build Site to make this live →</a>'
+            : '✓ Saved as draft — not visible on the live site yet.';
           status.style.color = '#22c55e';
-          btn.disabled = false; btn.textContent = editSlug ? 'Save Changes' : 'Save Case Study';
         } else {
           status.textContent = '✗ ' + (r.error || 'Save failed');
           status.style.color = '#ef4444';
-          btn.disabled = false; btn.textContent = editSlug ? 'Save Changes' : 'Save Case Study';
         }
       } catch(err) {
         status.textContent = '✗ Error: ' + err.message;
         status.style.color = '#ef4444';
-        btn.disabled = false; btn.textContent = editSlug ? 'Save Changes' : 'Save Case Study';
       }
-    });
+      draftBtn.disabled = false; pubBtn.disabled = false;
+      btn.textContent = original;
+    }
+
+    document.getElementById('saveDraftBtn').addEventListener('click', e => saveCaseStudy('draft', e.target));
+    document.getElementById('publishBtn').addEventListener('click', e => saveCaseStudy('published', e.target));
 
     document.getElementById('buildBtn').addEventListener('click', async e => {
       e.preventDefault();

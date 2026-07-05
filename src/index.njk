@@ -489,7 +489,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
           <div class="flex-1 h-px bg-outline-variant/20 ml-1"></div>
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-          {% for cs in case_studies %}
+          {% for cs in case_studies | publishedOnly %}
             {% if cs.category == cat.slug and cs.featured_home %}
               <a href="/case-studies/{{ cs.slug }}" class="group card overflow-hidden hover:shadow-[0_20px_60px_rgba(37,59,194,0.12)] hover:-translate-y-1 transition-all duration-300">
                 <div class="relative aspect-video overflow-hidden bg-on-surface">
@@ -569,7 +569,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
       </a>
     </div>
     <div class="flex overflow-x-auto gap-6 hide-scrollbar snap-x pb-4 md:grid md:grid-cols-4 md:gap-6">
-      {% for activity in events | sort(true, false, 'date') %}
+      {% for activity in events | publishedOnly | sort(true, false, 'date') %}
         <div class="min-w-[280px] md:min-w-0 snap-center group reveal-up" style="animation-delay:{{ loop.index0 * 0.1 }}s">
           <a href="{{ activity.href }}">
             <div class="relative aspect-[4/3] mb-4 overflow-hidden rounded-2xl bg-surface-container">

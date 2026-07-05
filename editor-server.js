@@ -27,7 +27,7 @@ const {
   getSecurityHeaders,
 } = require('./scripts/security-helpers');
 const securityConfig = require('./config/security.config');
-const { renderCaseStudyPreview } = require('./scripts/preview-renderer');
+const { renderCaseStudyPreview, renderBlogPreview, renderEventPreview, renderJobPreview } = require('./scripts/preview-renderer');
 
 /* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
    with a PATH that doesn't include the directory npm actually lives in, even
@@ -139,8 +139,18 @@ function yamlQuote(str) {
    up in listings but /case-studies/<slug>/ 404s because Eleventy never
    builds a page for it. */
 function writeCaseStudyNjk(slug, entry) {
-  const title = `${entry.client ? entry.client + ' — ' : ''}${entry.title || slug} | AKA Digital Case Study`;
-  const description = (entry.summary || '').replace(/\s+/g, ' ').trim().slice(0, 300);
+  // Draft pages still get a real file (so the URL exists and a build doesn't
+  // need re-running the moment it's published), but the page's own <title>/
+  // meta description come from this frontmatter unconditionally — the actual
+  // body content is correctly gated by studySlug's published check, but the
+  // meta tags aren't, so a draft's real title/summary must not appear here.
+  const published = entry.status === 'published';
+  const title = published
+    ? `${entry.client ? entry.client + ' — ' : ''}${entry.title || slug} | AKA Digital Case Study`
+    : 'Coming Soon | AKA Digital Case Study';
+  const description = published
+    ? (entry.summary || '').replace(/\s+/g, ' ').trim().slice(0, 300)
+    : 'This case study is not published yet.';
   const content = `---\nlayout: layouts/base.njk\ntitle: ${yamlQuote(title)}\ndescription: ${yamlQuote(description)}\npermalink: /case-studies/${slug}/index.html\nstudySlug: ${slug}\n---\n{% include "case-studies/template.njk" %}\n`;
   fs.writeFileSync(path.join(CASE_STUDY_PAGES, `${slug}.njk`), content);
 }
@@ -521,6 +531,7 @@ http.createServer(async (req, res) => {
         read_time:    parseInt(b.read_time) || 5,
         featured:     !!b.featured,
         body_html:    b.body_html     || '',
+        status:       b.status === 'published' ? 'published' : 'draft',
       };
 
       blogs.unshift(post); // newest first
@@ -583,6 +594,7 @@ http.createServer(async (req, res) => {
         image:       b.image       || '',
         href:        b.href        || '/contact',
         featured:    !!b.featured,
+        status:      b.status === 'published' ? 'published' : 'draft',
       };
 
       events.unshift(event);
@@ -650,6 +662,7 @@ http.createServer(async (req, res) => {
         results:        Array.isArray(b.results) ? b.results : [],
         testimonial:    b.testimonial     || '',
         tags:           Array.isArray(b.tags) ? b.tags : (b.tags || '').split(',').map(t => t.trim()).filter(Boolean),
+        status:         b.status === 'published' ? 'published' : 'draft',
       };
       cs.unshift(entry);
       writeData('case_studies', cs);
@@ -693,6 +706,42 @@ http.createServer(async (req, res) => {
       }
     }
 
+    if (p === '/api/preview/blog' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.blog');
+      if (b === null) return;
+      try {
+        let html = renderBlogPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    if (p === '/api/preview/event' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.event');
+      if (b === null) return;
+      try {
+        let html = renderEventPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    if (p === '/api/preview/job' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.job');
+      if (b === null) return;
+      try {
+        let html = renderJobPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
     /* ═══════════════════════════════════════════════════════════════
        JOBS / CAREERS  (team can create/edit; super can delete)
        ═══════════════════════════════════════════════════════════════ */
@@ -718,6 +767,7 @@ http.createServer(async (req, res) => {
                       : (b.requirements || '').split('\n').map(r => r.trim()).filter(Boolean),
         apply_email: b.apply_email  || 'Hello@akadigital.net',
         active:      b.active !== false,
+        status:      b.status === 'published' ? 'published' : 'draft',
       };
       jobs.push(entry);
       writeData('jobs', jobs);

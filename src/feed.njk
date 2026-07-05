@@ -10,7 +10,7 @@ eleventyExcludeFromCollections: true
     <description>B2B MarTech insights, AI search strategy, and digital marketing from Southeast Asia's leading MarTech agency.</description>
     <language>en</language>
     <atom:link href="https://akadigital.net/feed.xml" rel="self" type="application/rss+xml" />
-    {% for post in blogs | sort(false, true, "date") %}{% if loop.index <= 20 %}
+    {% for post in blogs | publishedOnly | sort(false, true, "date") %}{% if loop.index <= 20 %}
     <item>
       <title><![CDATA[{{ post.title }}]]></title>
       <link>https://akadigital.net/blog/{{ post.slug }}/</link>

@@ -31,6 +31,13 @@ module.exports = function (eleventyConfig) {
     return (arr || [])[0];
   });
 
+  // Filter: publishedOnly — hides draft content (blogs/case studies/events/
+  // jobs) from every public listing, feed, and sitemap. Individual detail
+  // pages gate separately since they look up by slug, not by iterating.
+  eleventyConfig.addFilter("publishedOnly", function (arr) {
+    return (arr || []).filter((item) => item.status === "published");
+  });
+
   // Filter: event card date line. Most events just have a real date + location,
   // formatted automatically; a few historical entries only ever had an
   // approximate label ("2023", "Webinar") with no real date, so date_label

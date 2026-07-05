@@ -2,7 +2,7 @@
 permalink: /api/latest-posts.json
 eleventyExcludeFromCollections: true
 ---
-[{% for post in blogs | sort(false, true, "date") %}{% if loop.index <= 10 %}
+[{% for post in blogs | publishedOnly | sort(false, true, "date") %}{% if loop.index <= 10 %}
   {
     "slug":        "{{ post.slug }}",
     "title":       {{ post.title | dump | safe }},

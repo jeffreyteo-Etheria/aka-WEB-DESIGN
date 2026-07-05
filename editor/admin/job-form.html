@@ -5,6 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Job / Career — AKA Digital CMS</title>
   <link rel="stylesheet" href="/admin/admin.css" />
+  <style>
+    .main-content { max-width: none; }
+    .editor-layout { display: flex; gap: 24px; align-items: flex-start; }
+    .editor-col { flex: 1 1 480px; min-width: 0; }
+    .preview-col { flex: 1 1 480px; min-width: 0; position: sticky; top: 20px; }
+    .preview-frame-wrap {
+      background: var(--white); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; display: flex; flex-direction: column;
+      height: calc(100vh - 140px);
+    }
+    .preview-frame-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid var(--border); background: #fafafa;
+    }
+    .preview-frame-header .btn-xs { cursor: pointer; border: 1px solid var(--border); background: #fff; }
+    #previewStatus { font-size: 12px; color: var(--slate, #64748b); }
+    #previewFrame { flex: 1; width: 100%; border: 0; background: #fff; }
+    @media (max-width: 1200px) {
+      .editor-layout { flex-direction: column; }
+      .preview-col { position: static; width: 100%; }
+      .preview-frame-wrap { height: 700px; }
+    }
+  </style>
 </head>
 <body class="cms-body">
 
@@ -38,6 +61,7 @@
         <h1 class="page-title" id="formTitle">New Job Opening</h1>
         <p class="page-sub">Add a new role to the Careers page. Published instantly after build.</p>
       </div>
+      <span id="statusBadge" class="status-badge status-draft">Draft</span>
     </header>
 
     <div id="buildLog" class="build-log" style="display:none">
@@ -45,6 +69,8 @@
       <div id="buildLogText" class="build-log-text"></div>
     </div>
 
+    <div class="editor-layout">
+    <div class="editor-col">
     <form id="jobForm" class="form-card" autocomplete="off">
 
       <div class="form-section-title">Role Details</div>
@@ -116,13 +142,29 @@
         </div>
       </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn-primary" id="submitBtn">Save Job</button>
+      <div class="form-actions publish-actions">
+        <button type="button" class="btn-draft" id="saveDraftBtn">Save as Draft</button>
+        <button type="button" class="btn-publish" id="publishBtn">Publish</button>
         <a href="/admin/dashboard" class="btn-outline">Cancel</a>
         <span id="saveStatus" class="save-status"></span>
       </div>
 
     </form>
+    </div>
+
+    <div class="preview-col">
+      <div class="preview-frame-wrap">
+        <div class="preview-frame-header">
+          <strong style="font-size:13px">Live Preview — Careers page, as it will publish</strong>
+          <span style="display:flex;align-items:center;gap:10px">
+            <span id="previewStatus">—</span>
+            <button type="button" class="btn-xs" id="refreshPreviewBtn">↻ Refresh</button>
+          </span>
+        </div>
+        <iframe id="previewFrame" title="Job preview"></iframe>
+      </div>
+    </div>
+    </div>
   </main>
 
   <script src="/admin/admin.js"></script>
@@ -134,12 +176,19 @@
     const params = new URLSearchParams(location.search);
     const editSlug = params.get('edit');
 
+    function setStatusBadge(status) {
+      const badge = document.getElementById('statusBadge');
+      const isPublished = status === 'published';
+      badge.textContent = isPublished ? 'Published' : 'Draft';
+      badge.className = 'status-badge ' + (isPublished ? 'status-published' : 'status-draft');
+    }
+
     if (editSlug) {
       document.getElementById('formTitle').textContent = 'Edit Job';
-      document.getElementById('submitBtn').textContent = 'Save Changes';
       apiFetch('/api/jobs').then(list => {
         const job = list.find(j => j.slug === editSlug);
         if (!job) { alert('Job not found'); return; }
+        setStatusBadge(job.status);
         const f = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v || ''; };
         f('title', job.title); f('department', job.department);
         f('location', job.location); f('type', job.type);
@@ -147,16 +196,12 @@
         f('requirements', (job.requirements || []).join('\n'));
         f('apply_email', job.apply_email);
         document.getElementById('active').checked = job.active !== false;
+        refreshPreview();
       });
     }
 
-    document.getElementById('jobForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      const status = document.getElementById('saveStatus');
-      btn.disabled = true; btn.textContent = 'Saving…';
-
-      const payload = {
+    function getFormPayload() {
+      return {
         title:       document.getElementById('title').value.trim(),
         department:  document.getElementById('department').value.trim(),
         location:    document.getElementById('location').value.trim(),
@@ -167,29 +212,81 @@
         apply_email: document.getElementById('apply_email').value.trim(),
         active:      document.getElementById('active').checked,
       };
+    }
+
+    async function saveJob(targetStatus, btn) {
+      if (!document.getElementById('title').value.trim()) {
+        alert('Title is required.');
+        return;
+      }
+      const status = document.getElementById('saveStatus');
+      const draftBtn = document.getElementById('saveDraftBtn');
+      const pubBtn   = document.getElementById('publishBtn');
+      draftBtn.disabled = true; pubBtn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = targetStatus === 'published' ? 'Publishing…' : 'Saving…';
+
+      const payload = { ...getFormPayload(), status: targetStatus };
 
       try {
-        let r;
-        if (editSlug) {
-          r = await apiFetch('/api/jobs/' + editSlug, 'PUT', payload);
-        } else {
-          r = await apiFetch('/api/jobs/new', 'POST', payload);
-        }
+        const r = editSlug
+          ? await apiFetch('/api/jobs/' + editSlug, 'PUT', payload)
+          : await apiFetch('/api/jobs/new', 'POST', payload);
         if (r.ok || r.slug) {
-          status.innerHTML = '✓ Saved. <a href="/admin/dashboard">Go to Dashboard to publish live →</a>';
+          setStatusBadge(targetStatus);
+          status.innerHTML = targetStatus === 'published'
+            ? '✓ Published. <a href="/admin/dashboard">Go to Dashboard to Build Site to make this live →</a>'
+            : '✓ Saved as draft — not visible on the live site yet.';
           status.style.color = '#22c55e';
-          btn.disabled = false; btn.textContent = editSlug ? 'Save Changes' : 'Save Job';
         } else {
           status.textContent = '✗ ' + (r.error || 'Save failed');
           status.style.color = '#ef4444';
-          btn.disabled = false; btn.textContent = editSlug ? 'Save Changes' : 'Save Job';
         }
       } catch(err) {
         status.textContent = '✗ Error: ' + err.message;
         status.style.color = '#ef4444';
-        btn.disabled = false; btn.textContent = editSlug ? 'Save Changes' : 'Save Job';
       }
-    });
+      draftBtn.disabled = false; pubBtn.disabled = false;
+      btn.textContent = original;
+    }
+
+    document.getElementById('saveDraftBtn').addEventListener('click', e => saveJob('draft', e.target));
+    document.getElementById('publishBtn').addEventListener('click', e => saveJob('published', e.target));
+
+    // ── Live preview — renders the real Careers page with this draft
+    // spliced in, so you can see exactly where and how it will appear.
+    const previewFrame  = document.getElementById('previewFrame');
+    const previewStatus = document.getElementById('previewStatus');
+    let previewTimer = null;
+    let previewSeq = 0;
+
+    async function refreshPreview() {
+      const seq = ++previewSeq;
+      previewStatus.textContent = 'Rendering…';
+      try {
+        const r = await apiFetch('/api/preview/job', 'POST', getFormPayload());
+        if (seq !== previewSeq) return;
+        if (r.ok && r.html) {
+          previewFrame.srcdoc = r.html;
+          previewStatus.textContent = 'Updated ' + new Date().toLocaleTimeString();
+        } else {
+          previewStatus.textContent = '✗ ' + (r.error || 'Preview failed');
+        }
+      } catch (err) {
+        if (seq === previewSeq) previewStatus.textContent = '✗ ' + err.message;
+      }
+    }
+
+    function schedulePreview() {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(refreshPreview, 600);
+    }
+
+    document.getElementById('jobForm').addEventListener('input', schedulePreview);
+    document.getElementById('jobForm').addEventListener('change', schedulePreview);
+    document.getElementById('refreshPreviewBtn').addEventListener('click', refreshPreview);
+
+    if (!editSlug) refreshPreview();
 
     document.getElementById('buildBtn').addEventListener('click', async e => {
       e.preventDefault();

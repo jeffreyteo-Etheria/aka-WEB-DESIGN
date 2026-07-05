@@ -8,7 +8,8 @@
     "type": "Summit",
     "image": "/images/activities/2025 Martech Summit/Martech-summit-2025-from-data-chaos-to-performance-delivery.png",
     "href": "/contact",
-    "featured": true
+    "featured": true,
+    "status": "published"
   },
   {
     "slug": "hanoi-data-solution-summit-2024",
@@ -19,7 +20,8 @@
     "type": "Summit",
     "image": "/images/hero/dss-2024.jpg",
     "href": "/insights/hanoi-data-summit-2024",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "slug": "martech-summit-2025",
@@ -31,7 +33,8 @@
     "type": "Summit",
     "image": "/images/hero/home-summit.jpeg",
     "href": "/insights/martech-summit-2025",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "slug": "martech-summit-2024-look-back",
@@ -43,7 +46,8 @@
     "type": "Summit",
     "image": "/images/hero/solutions-summit.jpg",
     "href": "/insights/martech-summit-2024",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "slug": "martech-innovation-day-2023",
@@ -55,7 +59,8 @@
     "type": "Conference",
     "image": "/images/hero/summit-hcm.jpeg",
     "href": "/insights/martech-innovation-2023",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "slug": "mma-smarties-awards-2022",
@@ -67,7 +72,8 @@
     "type": "Awards",
     "image": "/images/hero/home-summit.jpeg",
     "href": "/case-studies/fe-credit-mma-smarties",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "slug": "cdp-deepdive-workshop",
@@ -79,7 +85,8 @@
     "type": "Workshop",
     "image": "/images/hero/workshop-cdp.jpeg",
     "href": "/insights/cdp-deepdive",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "slug": "mixpanel-vs-ga4-roundtable",
@@ -91,7 +98,8 @@
     "type": "Webinar",
     "image": "/images/hero/geo-ai-summit.jpeg",
     "href": "/insights/mixpanel-vs-ga4",
-    "featured": false
+    "featured": false,
+    "status": "published"
   },
   {
     "slug": "dss-2024-partner-workshop",
@@ -102,6 +110,7 @@
     "type": "Workshop",
     "image": "/images/hero/dss-2024.jpg",
     "href": "/insights/hanoi-data-summit-2024",
-    "featured": false
+    "featured": false,
+    "status": "published"
   }
 ]

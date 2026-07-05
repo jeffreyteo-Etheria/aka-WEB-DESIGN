@@ -67,7 +67,7 @@ description: Join AKA Digital — Southeast Asia's leading B2B MarTech agency. W
 
     <div class="space-y-4">
       {% for job in jobs %}
-        {% if job.active %}
+        {% if job.active and job.status == 'published' %}
         <div class="card flex items-start md:items-center justify-between gap-4 p-6 md:p-8 flex-col md:flex-row">
           <div>
             <h3 class="text-headline-sm font-display text-on-surface">{{ job.title }}</h3>

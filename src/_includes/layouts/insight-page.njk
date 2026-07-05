@@ -142,7 +142,7 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
   <div class="section-container">
     <p class="eyebrow mb-8">More from AKA Digital</p>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {% for activity in events | sort(true, false, 'date') | first(3) %}
+      {% for activity in events | publishedOnly | sort(true, false, 'date') | first(3) %}
         <article class="card group flex flex-col">
           <div class="aspect-[16/9] overflow-hidden rounded-t-lg bg-surface-container">
             <img src="{{ activity.image }}" alt="{{ activity.title }}"
