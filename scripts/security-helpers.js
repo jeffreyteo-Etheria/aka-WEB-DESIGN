@@ -41,7 +41,7 @@ function redactSecrets(value) {
   return redacted;
 }
 
-function validatePayload(payload, { maxKeys = 50, maxStringLength = 2000, allowArray = false } = {}) {
+function validatePayload(payload, { maxKeys = 50, maxStringLength = 50000, allowArray = false } = {}) {
   if (payload === null || payload === undefined) {
     return { valid: true, value: {} };
   }

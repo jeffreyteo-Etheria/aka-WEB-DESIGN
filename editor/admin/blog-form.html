@@ -117,13 +117,31 @@
         </label>
       </div>
 
-      <!-- Body HTML -->
+      <!-- Body content -->
       <div class="form-group full">
+        <label>Article Content <span class="req">*</span></label>
         <div class="body-tabs">
-          <button type="button" class="tab active" data-tab="write">Write (HTML)</button>
+          <button type="button" class="tab active" data-tab="write">Write</button>
           <button type="button" class="tab" data-tab="preview">Preview</button>
         </div>
-        <textarea id="body_html" rows="18" placeholder="<p>Start writing your article here...</p>&#10;&#10;<h2>Section Heading</h2>&#10;<p>Body content...</p>&#10;&#10;<ul>&#10;  <li>Bullet point</li>&#10;</ul>"></textarea>
+        <div id="bodyWriteView">
+          <div class="editor-toolbar" id="editorToolbar">
+            <button type="button" data-cmd="bold" title="Bold"><b>B</b></button>
+            <button type="button" data-cmd="italic" title="Italic"><i>I</i></button>
+            <span class="toolbar-sep"></span>
+            <button type="button" data-cmd="formatBlock" data-value="h2" title="Heading">H2</button>
+            <button type="button" data-cmd="formatBlock" data-value="h3" title="Subheading">H3</button>
+            <button type="button" data-cmd="formatBlock" data-value="p" title="Paragraph">¶</button>
+            <span class="toolbar-sep"></span>
+            <button type="button" data-cmd="insertUnorderedList" title="Bullet list">• List</button>
+            <button type="button" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+            <button type="button" data-cmd="formatBlock" data-value="blockquote" title="Quote">" Quote</button>
+            <span class="toolbar-sep"></span>
+            <button type="button" data-cmd="createLink" title="Insert link">🔗 Link</button>
+          </div>
+          <div id="body_editor" class="body-editable" contenteditable="true" data-placeholder="Start writing your article here — no code needed, just type and use the toolbar above to format."></div>
+          <div id="wordCount" class="word-count">0 words</div>
+        </div>
         <div id="bodyPreview" class="body-preview" style="display:none"></div>
       </div>
 
@@ -180,16 +198,48 @@
       }
     });
 
+    // Rich text toolbar — no HTML knowledge required
+    const bodyEditor = document.getElementById('body_editor');
+    document.getElementById('editorToolbar').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-cmd]');
+      if (!btn) return;
+      bodyEditor.focus();
+      const cmd = btn.dataset.cmd;
+      if (cmd === 'createLink') {
+        const url = window.prompt('Link URL (e.g. https://example.com):', 'https://');
+        if (url) document.execCommand('createLink', false, url);
+      } else {
+        document.execCommand(cmd, false, btn.dataset.value || undefined);
+      }
+    });
+
+    // Word / character count with over-limit warning
+    const WORD_WARN_LIMIT = 3000;
+    const CHAR_WARN_LIMIT = 20000;
+    function updateWordCount() {
+      const text  = bodyEditor.innerText.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      const chars = text.length;
+      const el = document.getElementById('wordCount');
+      el.textContent = words + ' words · ' + chars.toLocaleString() + ' characters';
+      el.classList.remove('warn', 'over');
+      if (words > WORD_WARN_LIMIT || chars > CHAR_WARN_LIMIT) {
+        el.textContent += ' — this is quite long, consider shortening or splitting into another post';
+        el.classList.add('over');
+      }
+    }
+    bodyEditor.addEventListener('input', updateWordCount);
+
     // Tab toggle (Write / Preview)
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         const isPreview = tab.dataset.tab === 'preview';
-        document.getElementById('body_html').style.display  = isPreview ? 'none' : '';
-        document.getElementById('bodyPreview').style.display = isPreview ? '' : 'none';
+        document.getElementById('bodyWriteView').style.display = isPreview ? 'none' : '';
+        document.getElementById('bodyPreview').style.display    = isPreview ? '' : 'none';
         if (isPreview) {
-          document.getElementById('bodyPreview').innerHTML = document.getElementById('body_html').value;
+          document.getElementById('bodyPreview').innerHTML = bodyEditor.innerHTML;
         }
       });
     });
@@ -214,7 +264,8 @@
         document.getElementById('read_time').value   = post.read_time;
         document.getElementById('tags').value        = Array.isArray(post.tags) ? post.tags.join(', ') : '';
         document.getElementById('featured').checked  = post.featured;
-        document.getElementById('body_html').value   = post.body_html;
+        bodyEditor.innerHTML = post.body_html || '';
+        updateWordCount();
         if (post.cover_image) {
           preview.src = post.cover_image;
           preview.style.display = 'block';
@@ -243,7 +294,7 @@
         read_time:    parseInt(document.getElementById('read_time').value) || 5,
         tags:         document.getElementById('tags').value.split(',').map(t => t.trim()).filter(Boolean),
         featured:     document.getElementById('featured').checked,
-        body_html:    document.getElementById('body_html').value,
+        body_html:    bodyEditor.innerHTML,
       };
 
       try {
