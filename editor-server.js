@@ -1013,42 +1013,62 @@ http.createServer(async (req, res) => {
        BUILD + EXPORT  (both roles)
        ═══════════════════════════════════════════════════════════════ */
 
+    /* Opens an SSE stream and keeps it alive with heartbeat comments while a
+       long build runs — Hostinger's LiteSpeed proxy kills idle connections,
+       which the browser reports as "Connection lost" even when the build
+       finishes fine server-side. Returns a send() plus a finish() that
+       clears the heartbeat. */
+    function openSse(res) {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*', 'X-Accel-Buffering': 'no' });
+      const heartbeat = setInterval(() => { try { res.write(': ping\n\n'); } catch {} }, 5000);
+      return {
+        send: (status, msg) => { try { res.write(`data: ${JSON.stringify({ status, msg })}\n\n`); } catch {} },
+        finish: () => { clearInterval(heartbeat); try { res.end(); } catch {} },
+      };
+    }
+
     if (p === '/api/build' && (m === 'POST' || m === 'GET')) {
-      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*' });
-      res.write(`data: ${JSON.stringify({ status: 'building', msg: 'Running npm run build...' })}\n\n`);
-      exec('npm run build', { cwd: ROOT, env: EXEC_ENV }, (err, stdout, stderr) => {
-        if (err) res.write(`data: ${JSON.stringify({ status: 'error', msg: (stderr || err.message).slice(0, 800) })}\n\n`);
-        else     res.write(`data: ${JSON.stringify({ status: 'done',  msg: 'Build complete! Site is live.' })}\n\n`);
-        res.end();
+      const sse = openSse(res);
+      sse.send('building', 'Running npm run build...');
+      exec('npm run build', { cwd: ROOT, env: EXEC_ENV, maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
+        if (err) sse.send('error', (stderr || err.message).slice(0, 800));
+        else     sse.send('done', 'Build complete! Site is live.');
+        sse.finish();
       });
       return;
     }
 
     /* Export ZIP for Hostinger */
     if (p === '/api/export' && (m === 'POST' || m === 'GET')) {
+      /* Errors must go out as SSE, not plain JSON — the caller is an
+         EventSource, which turns any non-stream response into a generic
+         "Connection lost" with the real reason invisible. */
+      const sse = openSse(res);
       if (!fs.existsSync(path.join(ROOT, 'dist', 'index.html'))) {
-        return j(res, 400, { error: 'Run build first' });
+        sse.send('error', 'Run Build Site first, then export.');
+        return sse.finish();
       }
-      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*' });
-      res.write(`data: ${JSON.stringify({ status: 'building', msg: 'Packaging for Hostinger...' })}\n\n`);
+      sse.send('building', 'Packaging for Hostinger...');
       const date    = new Date().toISOString().slice(0,10).replace(/-/g,'');
       const zipName = `akadigital-hostinger-deploy-${date}.zip`;
       fs.mkdirSync(path.join(ROOT, 'exports'), { recursive: true });
       const zipCmd = process.platform === 'win32'
         ? `powershell -Command "Compress-Archive -Force -Path dist\\* -DestinationPath exports\\${zipName}"`
         : `cd dist && zip -r ../exports/${zipName} .`;
-      exec(zipCmd, { cwd: ROOT }, (err) => {
-        if (err) res.write(`data: ${JSON.stringify({ status: 'error', msg: err.message.slice(0, 400) })}\n\n`);
-        else     res.write(`data: ${JSON.stringify({ status: 'done',  msg: `ZIP ready: exports/${zipName}` })}\n\n`);
-        res.end();
+      exec(zipCmd, { cwd: ROOT, maxBuffer: 10 * 1024 * 1024 }, (err) => {
+        if (err) sse.send('error', err.message.slice(0, 400));
+        else     sse.send('done', `ZIP ready: exports/${zipName}`);
+        sse.finish();
       });
       return;
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       DEPLOY TO HOSTINGER VIA FTP  (super admin only)
-       Env vars required: FTP_HOST, FTP_USER, FTP_PASS
-       Optional:          FTP_DIR (default: /public_html)
+       PUBLISH LIVE  (super admin only)
+       This server serves dist/ directly to akadigital.net, so rebuilding
+       IS publishing. The FTP upload is an optional extra hop for setups
+       where a separate host serves the files — only used when
+       FTP_HOST/FTP_USER/FTP_PASS are configured.
        ═══════════════════════════════════════════════════════════════ */
 
     if (p === '/api/deploy' && (m === 'POST' || m === 'GET')) {
@@ -1058,24 +1078,21 @@ http.createServer(async (req, res) => {
       const FTP_USER = process.env.FTP_USER || '';
       const FTP_PASS = process.env.FTP_PASS || '';
       const FTP_DIR  = process.env.FTP_DIR  || '/public_html';
+      const useFtp   = !!(FTP_HOST && FTP_USER && FTP_PASS);
 
-      if (!FTP_HOST || !FTP_USER || !FTP_PASS) {
-        return j(res, 400, {
-          error: 'FTP credentials not set. Add FTP_HOST, FTP_USER, FTP_PASS as environment variables in Render dashboard.',
-        });
-      }
+      const sse = openSse(res);
+      sse.send('building', 'Building site...');
 
-      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*' });
-      const send = (status, msg) => res.write(`data: ${JSON.stringify({ status, msg })}\n\n`);
-
-      send('building', 'Building site...');
-
-      exec('npm run build', { cwd: ROOT, env: EXEC_ENV }, async (err, stdout, stderr) => {
+      exec('npm run build', { cwd: ROOT, env: EXEC_ENV, maxBuffer: 10 * 1024 * 1024 }, async (err, stdout, stderr) => {
         if (err) {
-          send('error', 'Build failed: ' + (stderr || err.message).slice(0, 500));
-          return res.end();
+          sse.send('error', 'Build failed: ' + (stderr || err.message).slice(0, 500));
+          return sse.finish();
         }
-        send('deploying', 'Build complete. Connecting to Hostinger FTP...');
+        if (!useFtp) {
+          sse.send('done', 'Published! The rebuilt site is now live at akadigital.net (this server serves it directly — no FTP needed).');
+          return sse.finish();
+        }
+        sse.send('deploying', 'Build complete. Connecting to Hostinger FTP...');
 
         try {
           const ftp    = require('basic-ftp');
@@ -1083,17 +1100,17 @@ http.createServer(async (req, res) => {
           client.ftp.verbose = false;
 
           await client.access({ host: FTP_HOST, user: FTP_USER, password: FTP_PASS, secure: false });
-          send('deploying', 'Connected. Uploading files to ' + FTP_DIR + '...');
+          sse.send('deploying', 'Connected. Uploading files to ' + FTP_DIR + '...');
 
           await client.ensureDir(FTP_DIR);
           await client.uploadFromDir(path.join(ROOT, 'dist'), FTP_DIR);
           client.close();
 
-          send('done', 'Live! Site deployed to akadigital.net');
+          sse.send('done', 'Live! Site deployed to akadigital.net');
         } catch (ftpErr) {
-          send('error', 'FTP error: ' + ftpErr.message);
+          sse.send('error', 'FTP error: ' + ftpErr.message);
         }
-        res.end();
+        sse.finish();
       });
       return;
     }
