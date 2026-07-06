@@ -227,6 +227,7 @@
       btn.textContent = targetStatus === 'published' ? 'Publishing…' : 'Saving…';
 
       const payload = { ...getFormPayload(), status: targetStatus };
+      const unlock = () => { draftBtn.disabled = false; pubBtn.disabled = false; btn.textContent = original; };
 
       try {
         const r = editSlug
@@ -234,9 +235,22 @@
           : await apiFetch('/api/jobs/new', 'POST', payload);
         if (r.ok || r.slug) {
           setStatusBadge(targetStatus);
-          status.innerHTML = targetStatus === 'published'
-            ? '✓ Published. <a href="/admin/dashboard">Go to Dashboard to Build Site to make this live →</a>'
-            : '✓ Saved as draft — not visible on the live site yet.';
+          if (targetStatus === 'published') {
+            status.textContent = '⏳ Saved — publishing to the live site…';
+            status.style.color = '';
+            buildAndReport(status, (ok, msg) => {
+              if (ok) {
+                status.innerHTML = '✓ Published — LIVE. <a href="/careers/" target="_blank">See it on the Careers page →</a>';
+                status.style.color = '#22c55e';
+              } else {
+                status.textContent = '⚠ Saved, but the site rebuild failed: ' + msg;
+                status.style.color = '#ef4444';
+              }
+              unlock();
+            });
+            return;
+          }
+          status.textContent = '✓ Saved as draft — not visible on the live site until you Publish.';
           status.style.color = '#22c55e';
         } else {
           status.textContent = '✗ ' + (r.error || 'Save failed');
@@ -246,8 +260,7 @@
         status.textContent = '✗ Error: ' + err.message;
         status.style.color = '#ef4444';
       }
-      draftBtn.disabled = false; pubBtn.disabled = false;
-      btn.textContent = original;
+      unlock();
     }
 
     document.getElementById('saveDraftBtn').addEventListener('click', e => saveJob('draft', e.target));

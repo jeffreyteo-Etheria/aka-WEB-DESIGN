@@ -38,6 +38,27 @@ async function logout() {
   location.href = '/admin';
 }
 
+/* Runs a full site build, streaming progress into statusEl, then calls
+   done(success, message). Chained after a Publish save so that the Publish
+   button on each form is the single, final action that takes an article all
+   the way to the live site — no separate Dashboard step. */
+function buildAndReport(statusEl, done) {
+  let finished = false;
+  const es = new EventSource('/api/build?token=' + encodeURIComponent(getToken()));
+  es.onmessage = ev => {
+    try {
+      const d = JSON.parse(ev.data);
+      if (d.status === 'building') statusEl.textContent = '⏳ Saved — publishing to the live site…';
+      if (d.status === 'done')  { finished = true; es.close(); done(true, d.msg); }
+      if (d.status === 'error') { finished = true; es.close(); done(false, d.msg); }
+    } catch {}
+  };
+  es.onerror = () => {
+    es.close();
+    if (!finished) done(false, 'Lost connection during the site rebuild. Your article IS saved — go to the Dashboard and click Build Site to finish publishing.');
+  };
+}
+
 /* Slugify a string */
 function slugify(str) {
   return str.toLowerCase()
