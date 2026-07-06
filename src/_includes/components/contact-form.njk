@@ -125,13 +125,13 @@
   </p>
 </form>
 
-<!-- ── Phase 2: Google Sheets CRM webhook ───────────────────────────────
-     Replace REPLACE_WITH_YOUR_APPS_SCRIPT_URL with your Google Apps Script
-     web app URL. See setup guide: /admin → CRM Setup.
+<!-- ── Google Sheets CRM webhook ─────────────────────────────────────────
+     URL comes from cms_settings.webhook_url — set it in /admin/crm-hub
+     (Settings tab) and Build Site. No source editing needed.
      ─────────────────────────────────────────────────────────────────── -->
 <script>
 (function() {
-  var WEBHOOK_URL = '{{ settings.google_sheets_webhook }}';
+  var WEBHOOK_URL = '{{ cms_settings.webhook_url }}';
 
   var form = document.getElementById('contact-form');
   if (!form || !WEBHOOK_URL || WEBHOOK_URL.indexOf('REPLACE') !== -1) return;

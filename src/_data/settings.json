@@ -5,7 +5,6 @@
   "siteUrl": "https://akadigital.net",
   "region": "Southeast Asia & Korea",
   "foundedYear": 2014,
-  "google_sheets_webhook": "https://script.google.com/a/macros/akadigital.net/s/AKfycbxkyWZQ9HZm6xCd68zmd1Ttfy6bLiDRYzWpdvkckUuNXmBxJ9yj3Zt0HFZQJe3jbA_wHA/exec",
   "google_form_id": "YOUR_GOOGLE_FORM_ID",
   "google_form_entries": {
     "name":             "entry.REPLACE_NAME_ID",

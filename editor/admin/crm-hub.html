@@ -332,14 +332,15 @@
           </div>
 
           <div class="hub-card" style="margin-top:28px; border-color:#F5C400/20; background:rgba(245,196,0,0.04)">
-            <div class="hub-card-title">📋 After saving webhook URL — update contact form</div>
+            <div class="hub-card-title">🚀 Save &amp; publish this webhook URL</div>
             <div class="hub-card-desc">
-              Once you have a Google Apps Script URL, you also need to paste it into
-              <code>src/_includes/components/contact-form.njk</code> — replace the
-              <code>REPLACE_WITH_YOUR_APPS_SCRIPT_URL</code> placeholder on line 134.
-              Then run a site build so the live site sends leads to your sheet.
+              Saves the URL above and rebuilds the site in one step — every form (contact, careers,
+              the lead quiz) starts sending to it as soon as the build finishes. No code editing, ever.
             </div>
-            <button class="btn-outline" id="patchWebhookBtn" style="margin-top:10px">Auto-Patch contact-form.njk + Build</button>
+            <button class="btn-primary" id="patchWebhookBtn" style="margin-top:10px">Save &amp; Build</button>
+            <div id="patchLog" class="build-log" style="display:none;margin-top:10px">
+              <div id="patchLogText" class="build-log-text"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -431,11 +432,14 @@
         '</tbody></table>';
     });
 
-    // Save settings
-    async function saveSettings() {
+    // Save settings. Pass { silent: true } to skip touching the Save
+    // Settings button/status (used by the webhook Save & Build action,
+    // which has its own status area) — returns { ok, error } either way.
+    async function saveSettings(opts) {
+      opts = opts || {};
       const btn = document.getElementById('saveSettingsBtn');
       const status = document.getElementById('settingsStatus');
-      btn.disabled = true; btn.textContent = 'Saving…';
+      if (!opts.silent) { btn.disabled = true; btn.textContent = 'Saving…'; }
       const gv = id => document.getElementById(id).value.trim();
       const payload = {
         webhook_url:      gv('s_webhook_url'),
@@ -448,30 +452,47 @@
         crmmind_url:      gv('s_crmmind_url'),
       };
       const r = await apiFetch('/api/settings', 'PUT', payload);
-      if (r.ok) {
-        status.textContent = '✓ Saved! Rebuild the site to apply platform URL changes.';
-        status.style.color = '#22c55e';
-      } else {
-        status.textContent = '✗ ' + (r.error || 'Failed');
-        status.style.color = '#ef4444';
+      if (!opts.silent) {
+        if (r.ok) {
+          status.textContent = '✓ Saved! Rebuild the site to apply platform URL changes.';
+          status.style.color = '#22c55e';
+        } else {
+          status.textContent = '✗ ' + (r.error || 'Failed');
+          status.style.color = '#ef4444';
+        }
+        btn.disabled = false; btn.textContent = 'Save Settings';
       }
-      btn.disabled = false; btn.textContent = 'Save Settings';
+      return { ok: !!r.ok, error: r.error };
     }
 
-    // Auto-patch contact-form.njk with new webhook URL
+    // Save the webhook URL (and every other setting on this tab) and
+    // immediately rebuild — every lead form reads this field live, so no
+    // source-code editing is ever needed.
     document.getElementById('patchWebhookBtn').addEventListener('click', async () => {
       const url = document.getElementById('s_webhook_url').value.trim();
       if (!url || url.indexOf('REPLACE') !== -1) {
-        alert('Please enter a valid webhook URL in the field above first, then click Save Settings before patching.');
+        alert('Paste your Google Apps Script web app URL into the field above first.');
         return;
       }
-      // Use the /api/data generic endpoint to patch the setting
-      const status = document.getElementById('settingsStatus');
-      status.textContent = 'Patching…';
-      // We store the URL in settings — the user still needs to manually update the .njk file for now
-      // or we do it via a dedicated API route
-      status.textContent = '⚠ To patch the contact form: open src/_includes/components/contact-form.njk and replace REPLACE_WITH_YOUR_APPS_SCRIPT_URL with your URL, then run Build Site.';
-      status.style.color = '#eab308';
+      const btn = document.getElementById('patchWebhookBtn');
+      const log = document.getElementById('patchLog');
+      const txt = document.getElementById('patchLogText');
+      btn.disabled = true;
+      log.style.display = 'block';
+      txt.textContent = 'Saving settings…\n';
+
+      const saved = await saveSettings({ silent: true });
+      if (!saved.ok) {
+        txt.textContent += '✗ ' + (saved.error || 'Save failed') + '\n';
+        btn.disabled = false;
+        return;
+      }
+      txt.textContent += '✓ Saved. Rebuilding the site…\n';
+      buildAndReport(txt, (ok, msg) => {
+        txt.textContent += (ok ? '✓ ' : '✗ ') + msg + '\n';
+        if (ok) txt.textContent += '\nDone — the contact form, careers page, and lead quiz are now sending to this webhook.\n';
+        btn.disabled = false;
+      });
     });
 
     // Build / Export
