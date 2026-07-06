@@ -565,10 +565,16 @@ http.createServer(async (req, res) => {
     /* DELETE blog post (super admin only) */
     if (p.startsWith('/api/blogs/') && m === 'DELETE') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
-      const slug  = p.replace('/api/blogs/', '');
+      /* Slugs are always slugified at creation, so re-slugifying here both
+         matches every real item and keeps traversal characters out of the
+         filesystem paths below. */
+      const slug  = slugify(p.replace('/api/blogs/', ''));
       const blogs = readData('blogs').filter(x => x.slug !== slug);
       writeData('blogs', blogs);
       deleteBlogNjk(slug);
+      /* Eleventy never removes stale output — without this, the deleted
+         article's page stays live in dist/ forever. */
+      fs.rmSync(path.join(DIST, 'blog', slug), { recursive: true, force: true });
       return j(res, 200, { ok: true });
     }
 
@@ -694,9 +700,10 @@ http.createServer(async (req, res) => {
 
     if (p.startsWith('/api/case-studies/') && m === 'DELETE') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
-      const slug = p.replace('/api/case-studies/', '');
+      const slug = slugify(p.replace('/api/case-studies/', ''));
       writeData('case_studies', readData('case_studies').filter(x => x.slug !== slug));
       deleteCaseStudyNjk(slug);
+      fs.rmSync(path.join(DIST, 'case-studies', slug), { recursive: true, force: true });
       return j(res, 200, { ok: true });
     }
 
