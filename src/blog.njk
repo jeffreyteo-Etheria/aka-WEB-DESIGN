@@ -34,7 +34,9 @@ permalink: /blog/index.html
 <!-- Featured article -->
 <section class="py-16 bg-surface-off-white">
   <div class="section-container">
-    {% set featured = blogs | publishedOnly | where("featured") | first %}
+    {# Hero always shows the newest published article, regardless of the
+       Featured flag — publishing a post automatically makes it the lead. #}
+    {% set featured = blogs | publishedOnly | sort(true, false, "date") | first %}
     {% if featured %}
       <div class="mb-8">
         <p class="eyebrow mb-2">Featured Article</p>
@@ -72,7 +74,7 @@ permalink: /blog/index.html
 <section class="py-16 bg-background" id="articles">
   <div class="section-container">
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="blog-grid">
-      {% for post in blogs | publishedOnly %}
+      {% for post in blogs | publishedOnly | sort(true, false, "date") %}
         <article class="group card overflow-hidden hover:shadow-[0_10px_40px_rgba(37,59,194,0.10)] hover:-translate-y-1 transition-all duration-300 flex flex-col blog-card" data-category="{{ post.category }}">
           <a href="/blog/{{ post.slug }}" class="block aspect-[16/9] overflow-hidden bg-surface-container shrink-0">
             <img src="{{ post.cover_image }}" alt="{{ post.title }}"
