@@ -1,5 +1,5 @@
 {
-  "webhook_url": "REPLACE_WITH_YOUR_APPS_SCRIPT_URL",
+  "webhook_url": "https://script.google.com/a/macros/akadigital.net/s/AKfycbxkyWZQ9HZm6xCd68zmd1Ttfy6bLiDRYzWpdvkckUuNXmBxJ9yj3Zt0HFZQJe3jbA_wHA/exec",
   "make_webhook_url": "",
   "google_sheet_url": "",
   "make_dashboard_url": "https://www.make.com/en/login",

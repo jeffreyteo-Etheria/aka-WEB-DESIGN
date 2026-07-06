@@ -177,7 +177,7 @@ function submitApplication() {
   if (!name || !email) { alert('Please enter your name and email.'); return; }
 
   const payload = { form_type:'career', role, name, email, phone, linkedin, cover };
-  const webhookUrl = '{{ settings.google_sheets_webhook }}';
+  const webhookUrl = '{{ cms_settings.webhook_url }}';
 
   if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {
     fetch(webhookUrl, {

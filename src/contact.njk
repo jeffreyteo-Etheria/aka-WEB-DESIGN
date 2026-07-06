@@ -516,7 +516,7 @@ function openContactThankYou() {
       message:      document.getElementById("fc-message").value
     };
 
-    var webhookUrl = "{{ settings.google_sheets_webhook }}";
+    var webhookUrl = "{{ cms_settings.webhook_url }}";
     if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {
       fetch(webhookUrl, {
         method: "POST",
