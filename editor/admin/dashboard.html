@@ -59,9 +59,9 @@
       <a href="#" class="nav-item" id="exportBtn">
         <span class="nav-icon">⬇</span> Export ZIP
       </a>
-      <a href="#" class="nav-item super-only" id="deployBtn" style="display:none;color:#22c55e">
-        <span class="nav-icon">🚀</span> Publish Live
-      </a>
+      <!-- "Publish Live" removed: the Publish button on each article form now
+           saves AND rebuilds the live site in one action. Build Site remains
+           as the manual republish-everything tool. -->
     </nav>
 
     <div class="sidebar-footer">
@@ -123,8 +123,9 @@
     </div>
 
     <p style="font-size:13px;color:var(--slate);margin:4px 0 16px;">
-      "View" on any post below shows the <strong>currently published</strong> site. After saving edits, click
-      <strong>Build Site</strong> (or <strong>Publish Live</strong>) in the sidebar to make them visible there.
+      <strong>Publish</strong> on any article form is the final step — it saves AND puts the article live in one click.
+      <strong>Save as Draft</strong> keeps it private until you're ready. Use <strong>Build Site</strong> only to manually
+      republish everything (e.g. after deleting content).
     </p>
 
     <!-- Blog post list -->
@@ -236,16 +237,6 @@
       startSSE('export', logEl);
     });
 
-    // Publish Live (super admin)
-    const deployBtn = document.getElementById('deployBtn');
-    if (deployBtn) {
-      deployBtn.addEventListener('click', e => {
-        e.preventDefault();
-        if (!confirm('This will rebuild the site and publish it LIVE to akadigital.net. Continue?')) return;
-        startSSE('deploy', logEl);
-      });
-    }
-
     // ── Content status summary (Published / Draft counts across everything) ──
     function statusBadgeHtml(status) {
       const isPublished = status === 'published';
@@ -275,7 +266,7 @@
             <span class="list-item-meta">${b.category} · ${b.date} · ${b.read_time} min read</span>
           </div>
           <div class="list-item-actions">
-            <a href="/blog/${b.slug}" target="_blank" class="btn-xs">View</a>
+            ${b.status === 'published' ? `<a href="/blog/${b.slug}" target="_blank" class="btn-xs">View</a>` : ''}
             <a href="/admin/blog-form?edit=${b.slug}" class="btn-xs">Edit</a>
             ${role === 'super' ? `<button class="btn-xs danger" onclick="delBlog('${b.slug}')">Delete</button>` : ''}
           </div>
@@ -334,26 +325,30 @@
     });
 
     // ── Delete helpers ───────────────────────────────────────────────────
-    async function delBlog(slug) {
-      if (!confirm(`Delete blog post "${slug}"? This cannot be undone.`)) return;
-      await apiFetch('/api/blogs/' + slug, 'DELETE');
-      location.reload();
+    /* Deleting removes the item from the CMS immediately, then rebuilds the
+       live site so the deleted content disappears there too (and e.g. the
+       blog hero re-points to the next-newest article). Reloads when done. */
+    async function delAndRebuild(url, label) {
+      if (!confirm(`Delete ${label}? This cannot be undone.`)) return;
+      const r = await apiFetch(url, 'DELETE');
+      if (!r.ok) { alert('Delete failed: ' + (r.error || 'unknown error')); return; }
+      document.getElementById('buildLog').style.display = 'block';
+      logEl.textContent = 'Deleted. Updating the live site…\n';
+      let finished = false;
+      const es = new EventSource('/api/build?token=' + encodeURIComponent(getToken()));
+      es.onmessage = ev => {
+        try {
+          const d = JSON.parse(ev.data);
+          logEl.textContent += d.msg + '\n';
+          if (d.status === 'done' || d.status === 'error') { finished = true; es.close(); location.reload(); }
+        } catch {}
+      };
+      es.onerror = () => { es.close(); if (!finished) location.reload(); };
     }
-    async function delCase(slug) {
-      if (!confirm(`Delete case study "${slug}"? This cannot be undone.`)) return;
-      await apiFetch('/api/case-studies/' + slug, 'DELETE');
-      location.reload();
-    }
-    async function delEvent(slug) {
-      if (!confirm(`Delete event "${slug}"? This cannot be undone.`)) return;
-      await apiFetch('/api/events/' + slug, 'DELETE');
-      location.reload();
-    }
-    async function delJob(slug) {
-      if (!confirm(`Delete job "${slug}"? This cannot be undone.`)) return;
-      await apiFetch('/api/jobs/' + slug, 'DELETE');
-      location.reload();
-    }
+    function delBlog(slug)  { delAndRebuild('/api/blogs/' + slug, `blog post "${slug}"`); }
+    function delCase(slug)  { delAndRebuild('/api/case-studies/' + slug, `case study "${slug}"`); }
+    function delEvent(slug) { delAndRebuild('/api/events/' + slug, `event "${slug}"`); }
+    function delJob(slug)   { delAndRebuild('/api/jobs/' + slug, `job "${slug}"`); }
   </script>
 </body>
 </html>

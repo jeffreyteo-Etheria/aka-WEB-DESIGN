@@ -195,6 +195,14 @@ function getSession(req) {
     return null;
   }
   session.lastSeen = Date.now();
+  /* Sliding expiry: any activity keeps the session alive, so an editor can't
+     be logged out in the middle of writing an article. Persist at most once
+     a minute — the extension only needs to survive a restart approximately. */
+  session.expiresAt = Date.now() + securityConfig.sessionTtlMs;
+  if (!getSession._lastPersist || Date.now() - getSession._lastPersist > 60000) {
+    getSession._lastPersist = Date.now();
+    persistSessions();
+  }
   return session;
 }
 function isSuper(req) { const s = getSession(req); return s && s.role === 'super'; }

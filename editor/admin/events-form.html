@@ -267,6 +267,8 @@
 
       const payload = { ...getFormPayload(), status: targetStatus };
 
+      const unlock = () => { draftBtn.disabled = false; pubBtn.disabled = false; btn.textContent = original; };
+
       try {
         const method = editSlug ? 'PUT' : 'POST';
         const url    = editSlug ? `/api/events/${editSlug}` : '/api/events/new';
@@ -277,14 +279,26 @@
           status.textContent = '';
           status.className   = 'form-status success';
           if (targetStatus === 'published') {
-            status.append('✓ Published. ');
-            const a = document.createElement('a');
-            a.href = '/admin/dashboard';
-            a.textContent = 'Go to Dashboard to Build Site to make this live →';
-            status.appendChild(a);
-          } else {
-            status.textContent = '✓ Saved as draft — not visible on the live site yet.';
+            status.textContent = '⏳ Saved — publishing to the live site…';
+            buildAndReport(status, (ok, msg) => {
+              if (ok) {
+                status.textContent = '';
+                status.className = 'form-status success';
+                status.append('✓ Published — LIVE. ');
+                const a = document.createElement('a');
+                a.href = '/insights/';
+                a.target = '_blank';
+                a.textContent = 'See it on the Insights page →';
+                status.appendChild(a);
+              } else {
+                status.textContent = '⚠ Saved, but the site rebuild failed: ' + msg;
+                status.className = 'form-status error';
+              }
+              unlock();
+            });
+            return;
           }
+          status.textContent = '✓ Saved as draft — not visible on the live site until you Publish.';
         } else {
           status.textContent = '⚠ ' + (result.error || 'Error');
           status.className   = 'form-status error';
@@ -293,8 +307,7 @@
         status.textContent = '⚠ Network error';
         status.className   = 'form-status error';
       }
-      draftBtn.disabled = false; pubBtn.disabled = false;
-      btn.textContent = original;
+      unlock();
     }
 
     document.getElementById('saveDraftBtn').addEventListener('click', e => saveEvent('draft', e.target));
