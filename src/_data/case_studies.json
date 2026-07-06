@@ -1,392 +1,710 @@
 [
   {
-    "slug":            "fe-credit-mma-smarties",
-    "client":          "FE Credit",
-    "industry":        "Financial Services",
-    "country":         "Vietnam",
-    "year":            2022,
-    "award":           "MMA Smarties Silver Winner 2022",
-    "featured":        true,
-    "featured_home":   true,
-    "category":        "crm-automation",
-    "category_label":  "CRM & Automation",
-    "title":           "Driving Customer Lifecycle Value Through Marketing Automation",
-    "summary":         "How FE Credit leveraged data-driven marketing automation to increase customer engagement and reduce churn across their consumer lending portfolio in Vietnam.",
-    "cover_image":     "https://img.youtube.com/vi/fOAbuDELHpY/maxresdefault.jpg",
-    "video_youtube":   "fOAbuDELHpY",
+    "slug": "fe-credit-mma-smarties",
+    "client": "FE Credit",
+    "industry": "Financial Services",
+    "country": "Vietnam",
+    "year": 2022,
+    "award": "MMA Smarties Silver Winner 2022",
+    "featured": true,
+    "featured_home": true,
+    "category": "crm-automation",
+    "category_label": "CRM & Automation",
+    "title": "Driving Customer Lifecycle Value Through Marketing Automation",
+    "summary": "How FE Credit leveraged data-driven marketing automation to increase customer engagement and reduce churn across their consumer lending portfolio in Vietnam.",
+    "cover_image": "https://img.youtube.com/vi/fOAbuDELHpY/maxresdefault.jpg",
+    "video_youtube": "fOAbuDELHpY",
     "video_thumbnail": "https://img.youtube.com/vi/fOAbuDELHpY/maxresdefault.jpg",
-    "video_wix_url":   "",
-    "solutions_used":  ["crm-automation"],
-    "partners_used":   ["Netcore", "OneSignal"],
-    "challenge":       "FE Credit needed to engage a rapidly growing base of mobile-first customers across multiple loan product lines, with manual processes limiting personalisation at scale. Reaching the right customer with the right message at the right moment was operationally impossible without automation.",
-    "approach":        "AKA Digital implemented a unified marketing automation platform integrating customer transaction data, behavioural signals, and lifecycle triggers. We delivered contextually relevant communications across SMS, push notifications, and email — fully personalised per customer segment.",
-    "outcome":         "The programme delivered measurable uplift in engagement and retention metrics, earning industry recognition at the MMA Smarties Awards 2022 — one of the most prestigious mobile marketing accolades in Southeast Asia.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "crm-automation"
+    ],
+    "partners_used": [
+      "Netcore",
+      "OneSignal"
+    ],
+    "challenge": "FE Credit needed to engage a rapidly growing base of mobile-first customers across multiple loan product lines, with manual processes limiting personalisation at scale. Reaching the right customer with the right message at the right moment was operationally impossible without automation.",
+    "approach": "AKA Digital implemented a unified marketing automation platform integrating customer transaction data, behavioural signals, and lifecycle triggers. We delivered contextually relevant communications across SMS, push notifications, and email — fully personalised per customer segment.",
+    "outcome": "The programme delivered measurable uplift in engagement and retention metrics, earning industry recognition at the MMA Smarties Awards 2022 — one of the most prestigious mobile marketing accolades in Southeast Asia.",
     "results": [
-      { "metric": "Engagement Rate", "value": "+42%", "context": "YoY improvement" },
-      { "metric": "Campaign ROI",    "value": "3.2x",  "context": "Return on spend" },
-      { "metric": "Churn Reduction", "value": "−28%",  "context": "Customer attrition" }
+      {
+        "metric": "Engagement Rate",
+        "value": "+42%",
+        "context": "YoY improvement"
+      },
+      {
+        "metric": "Campaign ROI",
+        "value": "3.2x",
+        "context": "Return on spend"
+      },
+      {
+        "metric": "Churn Reduction",
+        "value": "−28%",
+        "context": "Customer attrition"
+      }
     ],
     "testimonial": "",
-    "tags": ["CRM", "Marketing Automation", "Vietnam", "Financial Services", "MMA Smarties"]
+    "tags": [
+      "CRM",
+      "Marketing Automation",
+      "Vietnam",
+      "Financial Services",
+      "MMA Smarties"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "vietjet-air-cdp",
-    "client":          "Vietjet Air",
-    "industry":        "Aviation / Travel",
-    "country":         "Vietnam",
-    "year":            2023,
-    "award":           "",
-    "featured":        true,
-    "featured_home":   true,
-    "category":        "crm-automation",
-    "category_label":  "CRM & Automation",
-    "title":           "Leverage Zero & First-Party Data to Grow at Scale",
-    "summary":         "AKA Digital helped Vietjet Air unlock the full value of their customer data — building a first-party data strategy that reduced dependency on third-party cookies while dramatically improving campaign performance.",
-    "cover_image":     "https://img.youtube.com/vi/G-NXwgCEKG4/maxresdefault.jpg",
-    "video_youtube":   "G-NXwgCEKG4",
+    "slug": "vietjet-air-cdp",
+    "client": "Vietjet Air",
+    "industry": "Aviation / Travel",
+    "country": "Vietnam",
+    "year": 2023,
+    "award": "",
+    "featured": true,
+    "featured_home": true,
+    "category": "crm-automation",
+    "category_label": "CRM & Automation",
+    "title": "Leverage Zero & First-Party Data to Grow at Scale",
+    "summary": "AKA Digital helped Vietjet Air unlock the full value of their customer data — building a first-party data strategy that reduced dependency on third-party cookies while dramatically improving campaign performance.",
+    "cover_image": "https://img.youtube.com/vi/G-NXwgCEKG4/maxresdefault.jpg",
+    "video_youtube": "G-NXwgCEKG4",
     "video_thumbnail": "https://img.youtube.com/vi/G-NXwgCEKG4/maxresdefault.jpg",
-    "video_wix_url":   "",
-    "solutions_used":  ["crm-automation", "digital-programmatic"],
-    "partners_used":   ["Netcore", "mParticle"],
-    "challenge":       "With the deprecation of third-party cookies looming, Vietjet Air needed to future-proof their digital marketing by building a robust zero and first-party data infrastructure. They had rich transactional data but no unified way to activate it across channels.",
-    "approach":        "AKA Digital deployed a customer data platform (CDP) strategy using Netcore to unify passenger data across booking systems, loyalty programmes, and digital touchpoints. We then built zero-party data collection mechanisms — preference centres, post-flight surveys, and loyalty tier incentives — to enrich profiles without relying on third-party tracking.",
-    "outcome":         "Vietjet Air now operates a fully owned customer data ecosystem that personalises experiences across email, push, retargeting, and in-app — with a 400% revenue lift attributed to AMS-powered email automation and personalised engagement at scale.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "crm-automation",
+      "digital-programmatic"
+    ],
+    "partners_used": [
+      "Netcore",
+      "mParticle"
+    ],
+    "challenge": "With the deprecation of third-party cookies looming, Vietjet Air needed to future-proof their digital marketing by building a robust zero and first-party data infrastructure. They had rich transactional data but no unified way to activate it across channels.",
+    "approach": "AKA Digital deployed a customer data platform (CDP) strategy using Netcore to unify passenger data across booking systems, loyalty programmes, and digital touchpoints. We then built zero-party data collection mechanisms — preference centres, post-flight surveys, and loyalty tier incentives — to enrich profiles without relying on third-party tracking.",
+    "outcome": "Vietjet Air now operates a fully owned customer data ecosystem that personalises experiences across email, push, retargeting, and in-app — with a 400% revenue lift attributed to AMS-powered email automation and personalised engagement at scale.",
     "results": [
-      { "metric": "Revenue Lift",       "value": "400%",  "context": "Email automation" },
-      { "metric": "Emails Delivered",   "value": "100Mil",  "context": "AMS services" },
-      { "metric": "Email Open Rate",    "value": "37%",   "context": "vs. 21% industry avg" }
+      {
+        "metric": "Revenue Lift",
+        "value": "400%",
+        "context": "Email automation"
+      },
+      {
+        "metric": "Emails Delivered",
+        "value": "100Mil",
+        "context": "AMS services"
+      },
+      {
+        "metric": "Email Open Rate",
+        "value": "37%",
+        "context": "vs. 21% industry avg"
+      }
     ],
     "testimonial": "",
-    "tags": ["CDP", "First-Party Data", "Vietnam", "Aviation", "Netcore", "mParticle"]
+    "tags": [
+      "CDP",
+      "First-Party Data",
+      "Vietnam",
+      "Aviation",
+      "Netcore",
+      "mParticle"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "sojo-hotel-crm",
-    "client":          "SOJO Hotel",
-    "industry":        "Hospitality",
-    "country":         "Vietnam",
-    "year":            2024,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   true,
-    "category":        "crm-automation",
-    "category_label":  "CRM & Automation",
-    "title":           "Cutting OTA Dependency with CRM Automation and Direct Booking Growth",
-    "summary":         "AKA Digital deployed a CRM automation and personalised SMS strategy for SOJO Hotel — driving an 85% increase in direct bookings, reducing OTA commission costs by 40%, and lifting average booking value through AI-powered conversational flows.",
-    "cover_image":     "/images/case-studies/sojo-hotel.jpg",
-    "video_youtube":   "",
+    "slug": "sojo-hotel-crm",
+    "client": "SOJO Hotel",
+    "industry": "Hospitality",
+    "country": "Vietnam",
+    "year": 2024,
+    "award": "",
+    "featured": false,
+    "featured_home": true,
+    "category": "crm-automation",
+    "category_label": "CRM & Automation",
+    "title": "Cutting OTA Dependency with CRM Automation and Direct Booking Growth",
+    "summary": "AKA Digital deployed a CRM automation and personalised SMS strategy for SOJO Hotel — driving an 85% increase in direct bookings, reducing OTA commission costs by 40%, and lifting average booking value through AI-powered conversational flows.",
+    "cover_image": "/images/case-studies/sojo-hotel.jpg",
+    "video_youtube": "",
     "video_thumbnail": "/images/case-studies/sojo-hotel.jpg",
-    "video_wix_url":   "",
-    "solutions_used":  ["crm-automation"],
-    "partners_used":   ["Netcore"],
-    "challenge":       "SOJO Hotel was heavily reliant on OTA platforms (Booking.com, Agoda, Expedia) for the majority of their room bookings — paying commission rates of 18–22% per reservation. They needed a direct booking strategy that could compete with OTA convenience while building a proprietary guest relationship that reduced platform dependency and long-term cost per acquisition.",
-    "approach":        "AKA Digital designed a CRM-powered direct booking engine using personalised SMS and email automations triggered by guest behaviour: post-stay win-back sequences, anniversary and birthday offers, early-bird exclusive rates for returning guests, and an AI conversational flow via WhatsApp that handled booking inquiries, room preferences, and upsell prompts without human intervention. All campaigns were unified under CRMMind — AKA Digital's proprietary CRM automation stack.",
-    "outcome":         "Within two quarters, SOJO Hotel's direct booking share grew from under 20% to over 37% of total reservations. OTA dependency dropped significantly, recovering an estimated 40% of previously paid commission costs — with average booking value rising as CRM-driven upsells converted more guests to superior room categories.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "crm-automation"
+    ],
+    "partners_used": [
+      "Netcore"
+    ],
+    "challenge": "SOJO Hotel was heavily reliant on OTA platforms (Booking.com, Agoda, Expedia) for the majority of their room bookings — paying commission rates of 18–22% per reservation. They needed a direct booking strategy that could compete with OTA convenience while building a proprietary guest relationship that reduced platform dependency and long-term cost per acquisition.",
+    "approach": "AKA Digital designed a CRM-powered direct booking engine using personalised SMS and email automations triggered by guest behaviour: post-stay win-back sequences, anniversary and birthday offers, early-bird exclusive rates for returning guests, and an AI conversational flow via WhatsApp that handled booking inquiries, room preferences, and upsell prompts without human intervention. All campaigns were unified under CRMMind — AKA Digital's proprietary CRM automation stack.",
+    "outcome": "Within two quarters, SOJO Hotel's direct booking share grew from under 20% to over 37% of total reservations. OTA dependency dropped significantly, recovering an estimated 40% of previously paid commission costs — with average booking value rising as CRM-driven upsells converted more guests to superior room categories.",
     "results": [
-      { "metric": "Direct Bookings",  "value": "+85%",  "context": "vs. prior quarter" },
-      { "metric": "Booking Value",    "value": "+22%",  "context": "Average per stay" },
-      { "metric": "OTA Cost Saved",   "value": "−40%",  "context": "Commission reduction" }
+      {
+        "metric": "Direct Bookings",
+        "value": "+85%",
+        "context": "vs. prior quarter"
+      },
+      {
+        "metric": "Booking Value",
+        "value": "+22%",
+        "context": "Average per stay"
+      },
+      {
+        "metric": "OTA Cost Saved",
+        "value": "−40%",
+        "context": "Commission reduction"
+      }
     ],
     "testimonial": "",
-    "tags": ["CRM", "Hospitality", "Vietnam", "Marketing Automation", "Direct Booking", "WhatsApp", "SMS"]
+    "tags": [
+      "CRM",
+      "Hospitality",
+      "Vietnam",
+      "Marketing Automation",
+      "Direct Booking",
+      "WhatsApp",
+      "SMS"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "careerbuilder-netcore",
-    "client":          "CareerBuilder",
-    "industry":        "HR Technology / Recruitment",
-    "country":         "Vietnam",
-    "year":            2023,
-    "award":           "",
-    "featured":        true,
-    "featured_home":   true,
-    "category":        "crm-automation",
-    "category_label":  "CRM & Automation",
-    "title":           "Finding the Right Match Has Never Been Easier",
-    "summary":         "AKA Digital partnered with Netcore to help CareerBuilder Vietnam build a smarter candidate engagement engine — using personalised automation to match job seekers with the right opportunities at scale.",
-    "cover_image":     "https://img.youtube.com/vi/j9PUJ7hQtmM/maxresdefault.jpg",
-    "video_youtube":   "j9PUJ7hQtmM",
+    "slug": "careerbuilder-netcore",
+    "client": "CareerBuilder",
+    "industry": "HR Technology / Recruitment",
+    "country": "Vietnam",
+    "year": 2023,
+    "award": "",
+    "featured": true,
+    "featured_home": true,
+    "category": "crm-automation",
+    "category_label": "CRM & Automation",
+    "title": "Finding the Right Match Has Never Been Easier",
+    "summary": "AKA Digital partnered with Netcore to help CareerBuilder Vietnam build a smarter candidate engagement engine — using personalised automation to match job seekers with the right opportunities at scale.",
+    "cover_image": "https://img.youtube.com/vi/j9PUJ7hQtmM/maxresdefault.jpg",
+    "video_youtube": "j9PUJ7hQtmM",
     "video_thumbnail": "https://img.youtube.com/vi/j9PUJ7hQtmM/maxresdefault.jpg",
-    "video_wix_url":   "",
-    "solutions_used":  ["crm-automation"],
-    "partners_used":   ["Netcore"],
-    "challenge":       "CareerBuilder Vietnam faced a challenge common to marketplace platforms: millions of candidates and thousands of job listings, but low activation and poor matching engagement. Generic email blasts were being ignored. The platform needed a way to personalise at scale.",
-    "approach":        "Working with Netcore's customer engagement platform, AKA Digital built behavioural segmentation models that tracked job seeker activity and preferences in real time. Automated journeys were deployed across email, push notifications, and in-app messaging — each personalised to the candidate's career stage and interests.",
-    "outcome":         "CareerBuilder saw significant improvements in candidate activation rates and job application completions, establishing a repeatable personalisation engine that scales as their user base grows.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "crm-automation"
+    ],
+    "partners_used": [
+      "Netcore"
+    ],
+    "challenge": "CareerBuilder Vietnam faced a challenge common to marketplace platforms: millions of candidates and thousands of job listings, but low activation and poor matching engagement. Generic email blasts were being ignored. The platform needed a way to personalise at scale.",
+    "approach": "Working with Netcore's customer engagement platform, AKA Digital built behavioural segmentation models that tracked job seeker activity and preferences in real time. Automated journeys were deployed across email, push notifications, and in-app messaging — each personalised to the candidate's career stage and interests.",
+    "outcome": "CareerBuilder saw significant improvements in candidate activation rates and job application completions, establishing a repeatable personalisation engine that scales as their user base grows.",
     "results": [
-      { "metric": "Candidate Activation", "value": "+38%", "context": "First 30 days" },
-      { "metric": "Email Open Rate",      "value": "2.4x",  "context": "vs. broadcast average" },
-      { "metric": "Job Applications",     "value": "+51%",  "context": "From automated journeys" }
+      {
+        "metric": "Candidate Activation",
+        "value": "+38%",
+        "context": "First 30 days"
+      },
+      {
+        "metric": "Email Open Rate",
+        "value": "2.4x",
+        "context": "vs. broadcast average"
+      },
+      {
+        "metric": "Job Applications",
+        "value": "+51%",
+        "context": "From automated journeys"
+      }
     ],
     "testimonial": "",
-    "tags": ["CRM", "Personalisation", "Vietnam", "HR Tech", "Netcore"]
+    "tags": [
+      "CRM",
+      "Personalisation",
+      "Vietnam",
+      "HR Tech",
+      "Netcore"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "dynabook-performance-marketing",
-    "client":          "Dynabook (Toshiba)",
-    "industry":        "B2B Technology",
-    "country":         "Regional — SG / MY / VN / TH / PH",
-    "year":            2023,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   true,
-    "category":        "programmatic-audio",
-    "category_label":  "Programmatic & Audio",
-    "title":           "Regional B2B Lead Generation Across Southeast Asia",
-    "summary":         "AKA Digital built a unified regional performance marketing framework for Dynabook (Toshiba) — targeting business decision-makers across Singapore, Malaysia, Vietnam, Thailand, and the Philippines through programmatic media, AI-powered audience targeting, retargeting, and new product launch campaigns.",
-    "cover_image":     "https://images.akadigital.vn/2023/Standard/Dynabook/20230118/300x600.gif",
-    "video_youtube":   "",
+    "slug": "dynabook-performance-marketing",
+    "client": "Dynabook (Toshiba)",
+    "industry": "B2B Technology",
+    "country": "Regional — SG / MY / VN / TH / PH",
+    "year": 2023,
+    "award": "",
+    "featured": false,
+    "featured_home": true,
+    "category": "programmatic-audio",
+    "category_label": "Programmatic & Audio",
+    "title": "Regional B2B Lead Generation Across Southeast Asia",
+    "summary": "AKA Digital built a unified regional performance marketing framework for Dynabook (Toshiba) — targeting business decision-makers across Singapore, Malaysia, Vietnam, Thailand, and the Philippines through programmatic media, AI-powered audience targeting, retargeting, and new product launch campaigns.",
+    "cover_image": "https://images.akadigital.vn/2023/Standard/Dynabook/20230118/300x600.gif",
+    "video_youtube": "",
     "video_thumbnail": "https://images.akadigital.vn/2023/Standard/Dynabook/20230118/300x600.gif",
-    "video_wix_url":   "",
-    "solutions_used":  ["digital-programmatic"],
-    "partners_used":   ["DV360", "Google Display Network"],
-    "challenge":       "Dynabook needed a unified regional marketing strategy to drive qualified B2B demand across Southeast Asia while supporting multiple product launches. Challenges included fragmented media buying across five markets, no unified regional audience strategy, difficulty reaching IT managers and C-suite decision-makers, low landing page conversion rates, and the need to coordinate multiple product launches including the Dynabook Portégé X40-K.",
-    "approach":        "AKA Digital developed a regional performance marketing framework with unified programmatic media strategy across SG, MY, VN, TH, and PH. AI-powered audience targeting focused on IT decision-makers, procurement teams, and senior business leaders. Dynamic Creative Optimisation (DCO) with market-specific localisation, multi-stage retargeting, landing page optimisation, and coordinated launch campaigns for the Portégé X40-K across multi-format display, video, and native advertising.",
-    "outcome":         "By consolidating media planning, audience strategy, creative execution, and performance optimisation under a single regional framework, Dynabook achieved stronger lead generation performance, improved brand recall, and more efficient market expansion across Southeast Asia — with all five markets managed under one unified strategy.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "digital-programmatic"
+    ],
+    "partners_used": [
+      "DV360",
+      "Google Display Network"
+    ],
+    "challenge": "Dynabook needed a unified regional marketing strategy to drive qualified B2B demand across Southeast Asia while supporting multiple product launches. Challenges included fragmented media buying across five markets, no unified regional audience strategy, difficulty reaching IT managers and C-suite decision-makers, low landing page conversion rates, and the need to coordinate multiple product launches including the Dynabook Portégé X40-K.",
+    "approach": "AKA Digital developed a regional performance marketing framework with unified programmatic media strategy across SG, MY, VN, TH, and PH. AI-powered audience targeting focused on IT decision-makers, procurement teams, and senior business leaders. Dynamic Creative Optimisation (DCO) with market-specific localisation, multi-stage retargeting, landing page optimisation, and coordinated launch campaigns for the Portégé X40-K across multi-format display, video, and native advertising.",
+    "outcome": "By consolidating media planning, audience strategy, creative execution, and performance optimisation under a single regional framework, Dynabook achieved stronger lead generation performance, improved brand recall, and more efficient market expansion across Southeast Asia — with all five markets managed under one unified strategy.",
     "results": [
-      { "metric": "Qualified Sales Leads", "value": "+35%", "context": "Across 5 SEA markets" },
-      { "metric": "Landing Page Visits",   "value": "+28%", "context": "Product pages" },
-      { "metric": "Ad Recall",             "value": "+24%", "context": "Brand lift study" }
+      {
+        "metric": "Qualified Sales Leads",
+        "value": "+35%",
+        "context": "Across 5 SEA markets"
+      },
+      {
+        "metric": "Landing Page Visits",
+        "value": "+28%",
+        "context": "Product pages"
+      },
+      {
+        "metric": "Ad Recall",
+        "value": "+24%",
+        "context": "Brand lift study"
+      }
     ],
     "testimonial": "",
-    "tags": ["Performance Marketing", "Programmatic", "B2B", "Regional", "DV360", "Lead Generation", "Southeast Asia", "Technology"]
+    "tags": [
+      "Performance Marketing",
+      "Programmatic",
+      "B2B",
+      "Regional",
+      "DV360",
+      "Lead Generation",
+      "Southeast Asia",
+      "Technology"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "ital-auto-ferrari-digital",
-    "client":          "Ferrari Singapore (Ital Auto)",
-    "industry":        "Luxury Automotive",
-    "country":         "Singapore",
-    "year":            2018,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   true,
-    "category":        "programmatic-audio",
-    "category_label":  "Programmatic & Audio",
-    "title":           "Driving Showroom Traffic Through Precision Facebook & Geo-Targeting",
-    "summary":         "AKA Digital helped Ferrari Singapore (Ital Auto Pte Ltd) reach ultra-high-net-worth prospects through a precision Facebook advertising and mobile geo-targeting campaign — delivering 152% of the traffic KPI at 25% cost savings against a competitive benchmark.",
-    "cover_image":     "/images/case-studies/ferrari-main.png",
-    "video_youtube":   "",
+    "slug": "ital-auto-ferrari-digital",
+    "client": "Ferrari Singapore (Ital Auto)",
+    "industry": "Luxury Automotive",
+    "country": "Singapore",
+    "year": 2018,
+    "award": "",
+    "featured": false,
+    "featured_home": true,
+    "category": "programmatic-audio",
+    "category_label": "Programmatic & Audio",
+    "title": "Driving Showroom Traffic Through Precision Facebook & Geo-Targeting",
+    "summary": "AKA Digital helped Ferrari Singapore (Ital Auto Pte Ltd) reach ultra-high-net-worth prospects through a precision Facebook advertising and mobile geo-targeting campaign — delivering 152% of the traffic KPI at 25% cost savings against a competitive benchmark.",
+    "cover_image": "/images/case-studies/ferrari-main.png",
+    "video_youtube": "",
     "video_thumbnail": "/images/case-studies/ferrari-main.png",
-    "video_wix_url":   "",
-    "solutions_used":  ["digital-programmatic"],
-    "partners_used":   ["Meta"],
-    "challenge":       "Ferrari Singapore needed a digital strategy to drive qualified traffic to their Ferrari Pre-Owned and Approved programmes among a genuinely ultra-high-net-worth audience in Singapore — without diluting brand prestige through mass-market digital advertising. The challenge was reaching a high net worth audience aged 28–60 at premium touchpoints rather than broad consumer channels.",
-    "approach":        "AKA Digital designed a dual-channel campaign combining Facebook advertising with mobile geo-targeting. Facebook campaigns ran weekly creative rotations featuring Ferrari models (458 Speciale, 458 Italia, California T, F12 Berlinetta) with daily spend capping to maintain consistent audience reach throughout the 35-day flight. Mobile geo-targeting was activated on weekends within a 500m–2km radius of Singapore's 38 Good Class Bungalow areas and 25 luxury car showrooms — reaching prospects during their highest-intent moments near competitor dealerships.",
-    "outcome":         "The campaign over-delivered on its traffic KPI by 152%, driving increased visits to Ferrari Singapore's website while achieving cost efficiency, below the projected benchmark. Facebook, as the main channel, delivered a 1.5× higher CTR, significantly above the luxury automotive industry average, and generated overall enquiries for test drives.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "digital-programmatic"
+    ],
+    "partners_used": [
+      "Meta"
+    ],
+    "challenge": "Ferrari Singapore needed a digital strategy to drive qualified traffic to their Ferrari Pre-Owned and Approved programmes among a genuinely ultra-high-net-worth audience in Singapore — without diluting brand prestige through mass-market digital advertising. The challenge was reaching a high net worth audience aged 28–60 at premium touchpoints rather than broad consumer channels.",
+    "approach": "AKA Digital designed a dual-channel campaign combining Facebook advertising with mobile geo-targeting. Facebook campaigns ran weekly creative rotations featuring Ferrari models (458 Speciale, 458 Italia, California T, F12 Berlinetta) with daily spend capping to maintain consistent audience reach throughout the 35-day flight. Mobile geo-targeting was activated on weekends within a 500m–2km radius of Singapore's 38 Good Class Bungalow areas and 25 luxury car showrooms — reaching prospects during their highest-intent moments near competitor dealerships.",
+    "outcome": "The campaign over-delivered on its traffic KPI by 152%, driving increased visits to Ferrari Singapore's website while achieving cost efficiency, below the projected benchmark. Facebook, as the main channel, delivered a 1.5× higher CTR, significantly above the luxury automotive industry average, and generated overall enquiries for test drives.",
     "results": [
-      { "metric": "KPI Overdelivery",     "value": "152%",    "context": "vs. contracted target" },
-      { "metric": "Cost Savings",         "value": "25%",     "context": "vs. benchmark CPC" }
+      {
+        "metric": "KPI Overdelivery",
+        "value": "152%",
+        "context": "vs. contracted target"
+      },
+      {
+        "metric": "Cost Savings",
+        "value": "25%",
+        "context": "vs. benchmark CPC"
+      }
     ],
     "testimonial": "",
-    "tags": ["Performance Marketing", "Luxury", "Automotive", "Singapore", "Facebook Ads", "Geo-Targeting", "UHNW"]
+    "tags": [
+      "Performance Marketing",
+      "Luxury",
+      "Automotive",
+      "Singapore",
+      "Facebook Ads",
+      "Geo-Targeting",
+      "UHNW"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "diana-cool-fresh",
-    "client":          "Diana (Unicharm Vietnam)",
-    "industry":        "FMCG / Personal Care",
-    "country":         "Vietnam",
-    "year":            2023,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   true,
-    "category":        "programmatic-audio",
-    "category_label":  "Programmatic & Audio",
-    "title":           "Diana Cool Fresh: Reaching 5 Million Women Through Programmatic Audio + Display",
-    "summary":         "AKA Digital deployed a first-of-its-kind audio + programmatic campaign for Diana Cool Fresh — combining Spotify Audio Ads with precision DV360 display to reach 5 million Vietnamese women during their highest-receptivity daily moments.",
-    "cover_image":     "/images/case-studies/diana-cool-fresh-1.png",
-    "video_youtube":   "",
+    "slug": "diana-cool-fresh",
+    "client": "Diana (Unicharm Vietnam)",
+    "industry": "FMCG / Personal Care",
+    "country": "Vietnam",
+    "year": 2023,
+    "award": "",
+    "featured": false,
+    "featured_home": true,
+    "category": "programmatic-audio",
+    "category_label": "Programmatic & Audio",
+    "title": "Diana Cool Fresh: Reaching 5 Million Women Through Programmatic Audio + Display",
+    "summary": "AKA Digital deployed a first-of-its-kind audio + programmatic campaign for Diana Cool Fresh — combining Spotify Audio Ads with precision DV360 display to reach 5 million Vietnamese women during their highest-receptivity daily moments.",
+    "cover_image": "/images/case-studies/diana-cool-fresh-1.png",
+    "video_youtube": "",
     "video_thumbnail": "/images/case-studies/diana-cool-fresh-1.png",
-    "video_wix_url":   "",
-    "solutions_used":  ["digital-programmatic"],
-    "partners_used":   ["Spotify Ads", "DV360"],
-    "challenge":       "Diana Cool Fresh needed to refresh brand relevance among younger Vietnamese women (18–35) who were increasingly streaming music on Spotify and tuning out traditional TV advertising. The challenge was to find cost-efficient digital channels that reached this demographic during high-receptivity moments — commuting, working out, studying — not just passive display browsing.",
-    "approach":        "AKA Digital executed a two-layer integrated campaign: Spotify Audio Ads targeting Vietnamese women by age, listening behaviour, and content affinity (pop, Vpop, podcast listeners) to achieve high-impact audio impressions during daily mobile sessions — combined with DV360 programmatic display retargeting across premium Vietnamese publisher inventory to reinforce messaging for users who had heard the audio ad. The combination created a surround-sound brand presence across audio and visual touchpoints.",
-    "outcome":         "The integrated audio + display approach delivered Diana Cool Fresh's most efficient CPM results across Vietnamese digital channels. Audio completion rates significantly exceeded Spotify SEA benchmarks, validating the channel mix as a repeatable model for FMCG brands targeting women in Vietnam.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "digital-programmatic"
+    ],
+    "partners_used": [
+      "Spotify Ads",
+      "DV360"
+    ],
+    "challenge": "Diana Cool Fresh needed to refresh brand relevance among younger Vietnamese women (18–35) who were increasingly streaming music on Spotify and tuning out traditional TV advertising. The challenge was to find cost-efficient digital channels that reached this demographic during high-receptivity moments — commuting, working out, studying — not just passive display browsing.",
+    "approach": "AKA Digital executed a two-layer integrated campaign: Spotify Audio Ads targeting Vietnamese women by age, listening behaviour, and content affinity (pop, Vpop, podcast listeners) to achieve high-impact audio impressions during daily mobile sessions — combined with DV360 programmatic display retargeting across premium Vietnamese publisher inventory to reinforce messaging for users who had heard the audio ad. The combination created a surround-sound brand presence across audio and visual touchpoints.",
+    "outcome": "The integrated audio + display approach delivered Diana Cool Fresh's most efficient CPM results across Vietnamese digital channels. Audio completion rates significantly exceeded Spotify SEA benchmarks, validating the channel mix as a repeatable model for FMCG brands targeting women in Vietnam.",
     "results": [
-      { "metric": "Audio Impressions",       "value": "5M+",  "context": "Spotify Vietnam" },
-      { "metric": "Audio Completion Rate",   "value": "88%",  "context": "vs 65% SEA benchmark" },
-      { "metric": "Combined Unique Reach",   "value": "2.8M", "context": "Women 18–35, Vietnam" }
+      {
+        "metric": "Audio Impressions",
+        "value": "5M+",
+        "context": "Spotify Vietnam"
+      },
+      {
+        "metric": "Audio Completion Rate",
+        "value": "88%",
+        "context": "vs 65% SEA benchmark"
+      },
+      {
+        "metric": "Combined Unique Reach",
+        "value": "2.8M",
+        "context": "Women 18–35, Vietnam"
+      }
     ],
     "testimonial": "",
-    "tags": ["Programmatic", "Audio Advertising", "Spotify", "Vietnam", "FMCG", "DV360", "Personal Care"]
+    "tags": [
+      "Programmatic",
+      "Audio Advertising",
+      "Spotify",
+      "Vietnam",
+      "FMCG",
+      "DV360",
+      "Personal Care"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "fm-summit-dooh",
-    "client":          "Financial Magnates Summit",
-    "industry":        "Finance / Events",
-    "country":         "Singapore",
-    "year":            2026,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   true,
-    "category":        "programmatic-audio",
-    "category_label":  "Programmatic & Audio",
-    "title":           "Programmatic DOOH in Singapore's CBD",
-    "summary":         "AKA Digital executed a precision Digital Out-of-Home (DOOH) campaign for the Financial Magnates Summit — deploying premium screen formats across Singapore's central business district to reach finance professionals, institutional traders, and high-net-worth investors ahead of the flagship event.",
-    "cover_image":     "/images/case-studies/financial-magnates--dooh-raffles-screens.png",
-    "video_youtube":   "",
+    "slug": "fm-summit-dooh",
+    "client": "Financial Magnates Summit",
+    "industry": "Finance / Events",
+    "country": "Singapore",
+    "year": 2026,
+    "award": "",
+    "featured": false,
+    "featured_home": true,
+    "category": "programmatic-audio",
+    "category_label": "Programmatic & Audio",
+    "title": "Programmatic DOOH in Singapore's CBD",
+    "summary": "AKA Digital executed a precision Digital Out-of-Home (DOOH) campaign for the Financial Magnates Summit — deploying premium screen formats across Singapore's central business district to reach finance professionals, institutional traders, and high-net-worth investors ahead of the flagship event.",
+    "cover_image": "/images/case-studies/financial-magnates--dooh-raffles-screens.png",
+    "video_youtube": "",
     "video_thumbnail": "/images/case-studies/financial-magnates--dooh-raffles-screens.png",
-    "video_wix_url":   "",
-    "solutions_used":  ["digital-programmatic"],
-    "partners_used":   ["DV360"],
-    "challenge":       "The Financial Magnates Summit needed to build concentrated awareness among Singapore's finance and trading community ahead of their flagship conference. Reaching institutional traders, fund managers, and HNW investors required premium physical media placements in Singapore's financial district — not digital display or social — but contextually placed, high-impact outdoor screens in the environments where this audience works and moves.",
-    "approach":        "AKA Digital deployed a programmatic DOOH strategy across three premium screen formats in Singapore's financial district — targeting in-building office screens to capture professionals during commute hours, plus high-reach outdoor billboards for broader brand visibility. The campaign was managed through a programmatic DOOH buying platform that optimised screen-time allocation, dayparting, and delivery pacing to maximise audience exposure within the 17-day flight window.",
-    "outcome":         "The campaign achieved full delivery against all contracted impression guarantees — demonstrating that programmatic DOOH is a highly efficient and measurable channel for event-driven financial services marketing in Singapore. The campaign established a repeatable DOOH framework for future conference and launch activations in the APAC market.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "digital-programmatic"
+    ],
+    "partners_used": [
+      "DV360"
+    ],
+    "challenge": "The Financial Magnates Summit needed to build concentrated awareness among Singapore's finance and trading community ahead of their flagship conference. Reaching institutional traders, fund managers, and HNW investors required premium physical media placements in Singapore's financial district — not digital display or social — but contextually placed, high-impact outdoor screens in the environments where this audience works and moves.",
+    "approach": "AKA Digital deployed a programmatic DOOH strategy across three premium screen formats in Singapore's financial district — targeting in-building office screens to capture professionals during commute hours, plus high-reach outdoor billboards for broader brand visibility. The campaign was managed through a programmatic DOOH buying platform that optimised screen-time allocation, dayparting, and delivery pacing to maximise audience exposure within the 17-day flight window.",
+    "outcome": "The campaign achieved full delivery against all contracted impression guarantees — demonstrating that programmatic DOOH is a highly efficient and measurable channel for event-driven financial services marketing in Singapore. The campaign established a repeatable DOOH framework for future conference and launch activations in the APAC market.",
     "results": [
-      { "metric": "Delivery Rate",     "value": "100%+",  "context": "vs. contracted guarantee" },
-      { "metric": "GEO-Focused, Peak-Hours Impact", "value": "3 LED formats", "context": "Office · Street · Billboard" },
-      { "metric": "Campaign Duration", "value": "17 Days","context": "CBD Singapore" }
+      {
+        "metric": "Delivery Rate",
+        "value": "100%+",
+        "context": "vs. contracted guarantee"
+      },
+      {
+        "metric": "GEO-Focused, Peak-Hours Impact",
+        "value": "3 LED formats",
+        "context": "Office · Street · Billboard"
+      },
+      {
+        "metric": "Campaign Duration",
+        "value": "17 Days",
+        "context": "CBD Singapore"
+      }
     ],
     "testimonial": "",
-    "tags": ["DOOH", "Out-of-Home", "Singapore", "Programmatic", "Finance", "Events", "Financial District"]
+    "tags": [
+      "DOOH",
+      "Out-of-Home",
+      "Singapore",
+      "Programmatic",
+      "Finance",
+      "Events",
+      "Financial District"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "lotteria-influencer-campaign",
-    "client":          "Lotteria",
-    "industry":        "Food & Beverage / QSR",
-    "country":         "Vietnam",
-    "year":            2023,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   true,
-    "category":        "social-influencer",
-    "category_label":  "Social Media & Influencer",
-    "title":           "Scaling Lotteria's Brand Reach Through Precision KOL Marketing",
-    "summary":         "AKA Digital managed a large-scale influencer marketing programme for Lotteria Vietnam — orchestrating KOL campaigns across Instagram, TikTok, and YouTube to drive brand love and in-store footfall among Gen Z consumers.",
-    "cover_image":     "/images/case-studies/lotteria-vn1.png",
-    "video_youtube":   "",
+    "slug": "lotteria-influencer-campaign",
+    "client": "Lotteria",
+    "industry": "Food & Beverage / QSR",
+    "country": "Vietnam",
+    "year": 2023,
+    "award": "",
+    "featured": false,
+    "featured_home": true,
+    "category": "social-influencer",
+    "category_label": "Social Media & Influencer",
+    "title": "Scaling Lotteria's Brand Reach Through Precision KOL Marketing",
+    "summary": "AKA Digital managed a large-scale influencer marketing programme for Lotteria Vietnam — orchestrating KOL campaigns across Instagram, TikTok, and YouTube to drive brand love and in-store footfall among Gen Z consumers.",
+    "cover_image": "/images/case-studies/lotteria-vn1.png",
+    "video_youtube": "",
     "video_thumbnail": "/images/case-studies/lotteria-vn1.png",
-    "video_cover":     "/videos/case-studies/lotteria-2.mp4",
-    "video_wix_url":   "",
-    "solutions_used":  ["social-media"],
-    "partners_used":   ["SocialMind"],
-    "challenge":       "Lotteria faced fierce competition from McDonald's and KFC for Gen Z mindshare. Traditional OOH and TV advertising had declining effectiveness with their core 16–25 demographic. They needed an influencer strategy that felt authentic — not just awareness-driven — and could translate online engagement into in-store visits.",
-    "approach":        "Powered by SocialMind — AKA Digital's proprietary AI social management platform — the team identified and contracted a tiered influencer roster — from macro food bloggers to micro lifestyle creators — each selected for their genuine engagement rates and audience demographics. Campaign briefs were designed around product moments (new menu launches, seasonal specials, combo deals) that gave influencers authentic content opportunities. Performance tracking linked online content to offline store promo redemptions.",
-    "outcome":         "The Lotteria KOL programme delivered sustained earned media reach across multiple campaigns, with promo code tracking demonstrating direct attribution from influencer content to in-store transactions — a first for the brand in Vietnam.",
+    "video_cover": "/videos/case-studies/lotteria-2.mp4",
+    "video_wix_url": "",
+    "solutions_used": [
+      "social-media"
+    ],
+    "partners_used": [
+      "SocialMind"
+    ],
+    "challenge": "Lotteria faced fierce competition from McDonald's and KFC for Gen Z mindshare. Traditional OOH and TV advertising had declining effectiveness with their core 16–25 demographic. They needed an influencer strategy that felt authentic — not just awareness-driven — and could translate online engagement into in-store visits.",
+    "approach": "Powered by SocialMind — AKA Digital's proprietary AI social management platform — the team identified and contracted a tiered influencer roster — from macro food bloggers to micro lifestyle creators — each selected for their genuine engagement rates and audience demographics. Campaign briefs were designed around product moments (new menu launches, seasonal specials, combo deals) that gave influencers authentic content opportunities. Performance tracking linked online content to offline store promo redemptions.",
+    "outcome": "The Lotteria KOL programme delivered sustained earned media reach across multiple campaigns, with promo code tracking demonstrating direct attribution from influencer content to in-store transactions — a first for the brand in Vietnam.",
     "results": [
-      { "metric": "Earned Media Reach",  "value": "12M+",  "context": "Per campaign cycle" },
-      { "metric": "Engagement Rate",     "value": "5.8%",  "context": "vs. 2.1% industry avg" },
-      { "metric": "Promo Redemptions",   "value": "+82%",  "context": "From KOL content codes" }
+      {
+        "metric": "Earned Media Reach",
+        "value": "12M+",
+        "context": "Per campaign cycle"
+      },
+      {
+        "metric": "Engagement Rate",
+        "value": "5.8%",
+        "context": "vs. 2.1% industry avg"
+      },
+      {
+        "metric": "Promo Redemptions",
+        "value": "+82%",
+        "context": "From KOL content codes"
+      }
     ],
     "testimonial": "",
-    "tags": ["Influencer Marketing", "KOL", "Social Media", "Vietnam", "F&B", "TikTok"]
+    "tags": [
+      "Influencer Marketing",
+      "KOL",
+      "Social Media",
+      "Vietnam",
+      "F&B",
+      "TikTok"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "fami-hashtag-challenge",
-    "client":          "Fami (Vinamilk)",
-    "industry":        "FMCG / Dairy & Nutrition",
-    "country":         "Vietnam",
-    "year":            2023,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   true,
-    "category":        "social-influencer",
-    "category_label":  "Social Media & Influencer",
-    "title":           "Fami: Viral Hashtag Challenge #NhaLaNoi Reaches 50M+ Views",
-    "summary":         "AKA Digital powered Fami (Vinamilk)'s #NhaLaNoi hashtag challenge — activating a TikTok-first KOL strategy that generated over 50 million video views and 2.1 million challenge participations, making it one of Vietnam's most-shared FMCG campaigns.",
-    "cover_image":     "/images/case-studies/fami.png",
-    "video_youtube":   "",
+    "slug": "fami-hashtag-challenge",
+    "client": "Fami (Vinamilk)",
+    "industry": "FMCG / Dairy & Nutrition",
+    "country": "Vietnam",
+    "year": 2023,
+    "award": "",
+    "featured": false,
+    "featured_home": true,
+    "category": "social-influencer",
+    "category_label": "Social Media & Influencer",
+    "title": "Fami: Viral Hashtag Challenge #NhaLaNoi Reaches 50M+ Views",
+    "summary": "AKA Digital powered Fami (Vinamilk)'s #NhaLaNoi hashtag challenge — activating a TikTok-first KOL strategy that generated over 50 million video views and 2.1 million challenge participations, making it one of Vietnam's most-shared FMCG campaigns.",
+    "cover_image": "/images/case-studies/fami.png",
+    "video_youtube": "",
     "video_thumbnail": "/images/case-studies/fami.png",
-    "video_cover":     "/videos/case-studies/fami-1.mp4",
-    "video_wix_url":   "",
-    "solutions_used":  ["social-media"],
-    "partners_used":   ["SocialMind"],
-    "challenge":       "Fami needed to re-engage Vietnam's Gen Z and millennial parents with a campaign that felt authentic to the TikTok generation — not a traditional TV commercial. With growing competition in Vietnam's dairy segment, the brand needed cultural relevance and mass participation rather than just broadcast reach.",
-    "approach":        "AKA Digital designed the #NhaLaNoi ('Home is Where You Belong') hashtag challenge on TikTok — a participatory content format that invited families across Vietnam to share moments of togetherness. A tiered KOL activation strategy through SocialMind seeded the challenge with macro family and lifestyle creators before opening to organic community participation. Challenge mechanics were gamified with prize incentives to sustain participation momentum.",
-    "outcome":         "The #NhaLaNoi challenge became one of Vietnam's top-trending TikTok brand campaigns, with over 50 million video views and 2.1 million user-generated challenge participations — generating sustained earned media reach that dramatically outperformed the brand's paid media investment.",
+    "video_cover": "/videos/case-studies/fami-1.mp4",
+    "video_wix_url": "",
+    "solutions_used": [
+      "social-media"
+    ],
+    "partners_used": [
+      "SocialMind"
+    ],
+    "challenge": "Fami needed to re-engage Vietnam's Gen Z and millennial parents with a campaign that felt authentic to the TikTok generation — not a traditional TV commercial. With growing competition in Vietnam's dairy segment, the brand needed cultural relevance and mass participation rather than just broadcast reach.",
+    "approach": "AKA Digital designed the #NhaLaNoi ('Home is Where You Belong') hashtag challenge on TikTok — a participatory content format that invited families across Vietnam to share moments of togetherness. A tiered KOL activation strategy through SocialMind seeded the challenge with macro family and lifestyle creators before opening to organic community participation. Challenge mechanics were gamified with prize incentives to sustain participation momentum.",
+    "outcome": "The #NhaLaNoi challenge became one of Vietnam's top-trending TikTok brand campaigns, with over 50 million video views and 2.1 million user-generated challenge participations — generating sustained earned media reach that dramatically outperformed the brand's paid media investment.",
     "results": [
-      { "metric": "Video Views",              "value": "50M+", "context": "TikTok campaign total" },
-      { "metric": "Challenge Participations", "value": "2.1M", "context": "User-generated content" },
-      { "metric": "Brand Awareness Lift",     "value": "+34%", "context": "Post-campaign survey" }
+      {
+        "metric": "Video Views",
+        "value": "50M+",
+        "context": "TikTok campaign total"
+      },
+      {
+        "metric": "Challenge Participations",
+        "value": "2.1M",
+        "context": "User-generated content"
+      },
+      {
+        "metric": "Brand Awareness Lift",
+        "value": "+34%",
+        "context": "Post-campaign survey"
+      }
     ],
     "testimonial": "",
-    "tags": ["Social Media", "TikTok", "Hashtag Challenge", "Vietnam", "FMCG", "KOL", "UGC"]
+    "tags": [
+      "Social Media",
+      "TikTok",
+      "Hashtag Challenge",
+      "Vietnam",
+      "FMCG",
+      "KOL",
+      "UGC"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "highland-coffee",
-    "client":          "Highland Coffee",
-    "industry":        "Food & Beverage / Specialty Coffee",
-    "country":         "Vietnam",
-    "year":            2024,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   true,
-    "category":        "social-influencer",
-    "category_label":  "Social Media & Influencer",
-    "title":           "From Specialty to Mainstream: How Highland Coffee Won Vietnam's Gen Z Café Culture",
-    "summary":         "AKA Digital activated a KOL-first social strategy for Highland Coffee — positioning the brand at the centre of Vietnam's thriving specialty coffee movement through authentic creator partnerships and TikTok-native content that drove new customer discovery.",
-    "cover_image":     "/images/case-studies/highland-coffee-case.png",
-    "video_youtube":   "",
+    "slug": "highland-coffee",
+    "client": "Highland Coffee",
+    "industry": "Food & Beverage / Specialty Coffee",
+    "country": "Vietnam",
+    "year": 2024,
+    "award": "",
+    "featured": false,
+    "featured_home": true,
+    "category": "social-influencer",
+    "category_label": "Social Media & Influencer",
+    "title": "From Specialty to Mainstream: How Highland Coffee Won Vietnam's Gen Z Café Culture",
+    "summary": "AKA Digital activated a KOL-first social strategy for Highland Coffee — positioning the brand at the centre of Vietnam's thriving specialty coffee movement through authentic creator partnerships and TikTok-native content that drove new customer discovery.",
+    "cover_image": "/images/case-studies/highland-coffee-case.png",
+    "video_youtube": "",
     "video_thumbnail": "/images/case-studies/highland-coffee-case.png",
-    "video_wix_url":   "",
-    "solutions_used":  ["social-media"],
-    "partners_used":   ["SocialMind"],
-    "challenge":       "Highland Coffee was entering a hyper-competitive Vietnamese specialty coffee market dominated by established chains. They needed to build authentic brand distinctiveness among Gen Z and millennial urban consumers — without resorting to promotions or price competition that would dilute brand equity.",
-    "approach":        "AKA Digital curated a two-tier KOL strategy using SocialMind: lifestyle and food micro-KOLs (50K–200K followers) on Instagram and TikTok created authentic café-visit content, supplemented by macro travel and lifestyle influencers for broader brand authority. Content was built around the specialty coffee experience — ambience, craft, and personal moments — rather than product specs. Each creator brief was tailored to feel organic, not sponsored.",
-    "outcome":         "Highland Coffee's TikTok became their primary new-customer discovery channel during the campaign, with KOL-generated content continuing to circulate organically months after the paid period ended. The brand's social following grew significantly, and in-store traffic tracked measurably from influencer promo codes.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "social-media"
+    ],
+    "partners_used": [
+      "SocialMind"
+    ],
+    "challenge": "Highland Coffee was entering a hyper-competitive Vietnamese specialty coffee market dominated by established chains. They needed to build authentic brand distinctiveness among Gen Z and millennial urban consumers — without resorting to promotions or price competition that would dilute brand equity.",
+    "approach": "AKA Digital curated a two-tier KOL strategy using SocialMind: lifestyle and food micro-KOLs (50K–200K followers) on Instagram and TikTok created authentic café-visit content, supplemented by macro travel and lifestyle influencers for broader brand authority. Content was built around the specialty coffee experience — ambience, craft, and personal moments — rather than product specs. Each creator brief was tailored to feel organic, not sponsored.",
+    "outcome": "Highland Coffee's TikTok became their primary new-customer discovery channel during the campaign, with KOL-generated content continuing to circulate organically months after the paid period ended. The brand's social following grew significantly, and in-store traffic tracked measurably from influencer promo codes.",
     "results": [
-      { "metric": "KOL Content Reach",   "value": "8.5M+", "context": "Vietnam-wide" },
-      { "metric": "TikTok Engagement",   "value": "7.2%",  "context": "vs 3.1% category avg" },
-      { "metric": "Follower Growth",     "value": "+145%", "context": "IG + TikTok combined" }
+      {
+        "metric": "KOL Content Reach",
+        "value": "8.5M+",
+        "context": "Vietnam-wide"
+      },
+      {
+        "metric": "TikTok Engagement",
+        "value": "7.2%",
+        "context": "vs 3.1% category avg"
+      },
+      {
+        "metric": "Follower Growth",
+        "value": "+145%",
+        "context": "IG + TikTok combined"
+      }
     ],
     "testimonial": "",
-    "tags": ["Influencer Marketing", "KOL", "TikTok", "Instagram", "Vietnam", "F&B", "Specialty Coffee"]
+    "tags": [
+      "Influencer Marketing",
+      "KOL",
+      "TikTok",
+      "Instagram",
+      "Vietnam",
+      "F&B",
+      "Specialty Coffee"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "alchemy-food-tech",
-    "client":          "Alchemy Food Tech",
-    "industry":        "Food Tech / Health & Wellness",
-    "country":         "Singapore",
-    "year":            2022,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   false,
-    "category":        "social-influencer",
-    "category_label":  "Social Media & Influencer",
-    "title":           "Building Singapore's Healthiest F&B Brand Through Social & Influencer Marketing",
-    "summary":         "AKA Digital helped Alchemy Food Tech establish their Alchemy Fibre brand in Singapore through a multi-phase social and influencer campaign — creating viral content moments with SGAG and celebrity partnerships that drove mass brand awareness among health-conscious adults.",
-    "cover_image":     "/images/case-studies/alchemy-foodtech.png",
-    "video_youtube":   "",
+    "slug": "alchemy-food-tech",
+    "client": "Alchemy Food Tech",
+    "industry": "Food Tech / Health & Wellness",
+    "country": "Singapore",
+    "year": 2022,
+    "award": "",
+    "featured": false,
+    "featured_home": false,
+    "category": "social-influencer",
+    "category_label": "Social Media & Influencer",
+    "title": "Building Singapore's Healthiest F&B Brand Through Social & Influencer Marketing",
+    "summary": "AKA Digital helped Alchemy Food Tech establish their Alchemy Fibre brand in Singapore through a multi-phase social and influencer campaign — creating viral content moments with SGAG and celebrity partnerships that drove mass brand awareness among health-conscious adults.",
+    "cover_image": "/images/case-studies/alchemy-foodtech.png",
+    "video_youtube": "",
     "video_thumbnail": "/images/case-studies/alchemy-foodtech.png",
-    "video_wix_url":   "",
-    "solutions_used":  ["social-media", "digital-programmatic"],
-    "partners_used":   ["SocialMind", "Meta"],
-    "challenge":       "Alchemy Food Tech launched their Alchemy Fibre for Rice product into Singapore's competitive health food market as an unknown challenger brand. With limited distribution and a category-defining product, they needed social proof and mass awareness to drive trial among health-conscious Singaporeans aged 35+.",
-    "approach":        "AKA Digital designed a social content engine built on three pillars: (1) a SGAG collaboration leveraging Singapore's largest comedy platform; (2) a celebrity partnership with Michelle Chong delivering high intensity video impressions; and (3) sustained paid social across Facebook and Instagram with A/B-tested video creative and programmatic retargeting.",
-    "outcome":         "Across multiple campaign flights from 2021 to 2022, Alchemy Fibre successfully grew its social presence during the launch of the new healthy Alchemy Fibre Rice, establishing itself as a recognized Singapore health brand. The SGAG campaign delivered a strong video completion rate, achieving more than 3× higher reach through celebrity engagement and video ads compared to carousel formats.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "social-media",
+      "digital-programmatic"
+    ],
+    "partners_used": [
+      "SocialMind",
+      "Meta"
+    ],
+    "challenge": "Alchemy Food Tech launched their Alchemy Fibre for Rice product into Singapore's competitive health food market as an unknown challenger brand. With limited distribution and a category-defining product, they needed social proof and mass awareness to drive trial among health-conscious Singaporeans aged 35+.",
+    "approach": "AKA Digital designed a social content engine built on three pillars: (1) a SGAG collaboration leveraging Singapore's largest comedy platform; (2) a celebrity partnership with Michelle Chong delivering high intensity video impressions; and (3) sustained paid social across Facebook and Instagram with A/B-tested video creative and programmatic retargeting.",
+    "outcome": "Across multiple campaign flights from 2021 to 2022, Alchemy Fibre successfully grew its social presence during the launch of the new healthy Alchemy Fibre Rice, establishing itself as a recognized Singapore health brand. The SGAG campaign delivered a strong video completion rate, achieving more than 3× higher reach through celebrity engagement and video ads compared to carousel formats.",
     "results": [
-      { "metric": "Cost Efficiency",      "value": "10x",   "context": "vs. industry avg" },
-      { "metric": "Reach",               "value": "3x",    "context": "Celebrity video ads" },
-      { "metric": "Conversions",         "value": "4x",    "context": "Landing page views" }
+      {
+        "metric": "Cost Efficiency",
+        "value": "10x",
+        "context": "vs. industry avg"
+      },
+      {
+        "metric": "Reach",
+        "value": "3x",
+        "context": "Celebrity video ads"
+      },
+      {
+        "metric": "Conversions",
+        "value": "4x",
+        "context": "Landing page views"
+      }
     ],
     "testimonial": "",
-    "tags": ["Social Media", "Influencer Marketing", "Singapore", "F&B", "Health Tech", "Facebook", "Instagram"]
+    "tags": [
+      "Social Media",
+      "Influencer Marketing",
+      "Singapore",
+      "F&B",
+      "Health Tech",
+      "Facebook",
+      "Instagram"
+    ],
+    "status": "published"
   },
   {
-    "slug":            "eu-holidays-influencer",
-    "client":          "EU Holidays Travel",
-    "industry":        "Travel & Tourism",
-    "country":         "Singapore",
-    "year":            2023,
-    "award":           "",
-    "featured":        false,
-    "featured_home":   true,
-    "category":        "social-influencer",
-    "category_label":  "Social Media & Influencer",
-    "title":           "Inspiring Travel Dreams: EU Holidays KOL Campaign",
-    "summary":         "AKA Digital designed and executed a travel influencer campaign for EU Holidays — leveraging aspirational lifestyle content across Instagram and YouTube to drive tour package bookings among Singapore's premium travel segment.",
-    "cover_image":     "/images/case-studies/eu-holidays-social.png",
-    "video_youtube":   "",
+    "slug": "eu-holidays-influencer",
+    "client": "EU Holidays Travel",
+    "industry": "Travel & Tourism",
+    "country": "Singapore",
+    "year": 2023,
+    "award": "",
+    "featured": false,
+    "featured_home": true,
+    "category": "social-influencer",
+    "category_label": "Social Media & Influencer",
+    "title": "Inspiring Travel Dreams: EU Holidays KOL Campaign",
+    "summary": "AKA Digital designed and executed a travel influencer campaign for EU Holidays — leveraging aspirational lifestyle content across Instagram and YouTube to drive tour package bookings among Singapore's premium travel segment.",
+    "cover_image": "/images/case-studies/eu-holidays-social.png",
+    "video_youtube": "",
     "video_thumbnail": "/images/case-studies/eu-holidays-social.png",
-    "video_wix_url":   "",
-    "solutions_used":  ["social-media"],
-    "partners_used":   ["SocialMind"],
-    "challenge":       "Post-COVID travel demand in Singapore rebounded sharply — but EU Holidays needed to cut through a crowded influencer landscape where every travel brand was claiming the same aspirational content space. Their European tour packages needed differentiated storytelling that converted social discovery into actual bookings.",
-    "approach":        "AKA Digital curated a selective roster of Singapore-based travel, lifestyle, and family content creators whose audiences aligned with EU Holidays' core buyer profiles: professionals aged 30–50 planning premium European holidays. Campaign content was built around specific tour itineraries with direct call-to-actions to booking landing pages.",
-    "outcome":         "EU Holidays recorded their strongest digital-attributed booking quarter, with influencer content driving significant traffic to tour package landing pages and a measurable uplift in qualified enquiry calls.",
+    "video_wix_url": "",
+    "solutions_used": [
+      "social-media"
+    ],
+    "partners_used": [
+      "SocialMind"
+    ],
+    "challenge": "Post-COVID travel demand in Singapore rebounded sharply — but EU Holidays needed to cut through a crowded influencer landscape where every travel brand was claiming the same aspirational content space. Their European tour packages needed differentiated storytelling that converted social discovery into actual bookings.",
+    "approach": "AKA Digital curated a selective roster of Singapore-based travel, lifestyle, and family content creators whose audiences aligned with EU Holidays' core buyer profiles: professionals aged 30–50 planning premium European holidays. Campaign content was built around specific tour itineraries with direct call-to-actions to booking landing pages.",
+    "outcome": "EU Holidays recorded their strongest digital-attributed booking quarter, with influencer content driving significant traffic to tour package landing pages and a measurable uplift in qualified enquiry calls.",
     "results": [
-      { "metric": "Tour Page Traffic",   "value": "+124%", "context": "From influencer content" },
-      { "metric": "Booking Enquiries",   "value": "+56%",  "context": "" }
+      {
+        "metric": "Tour Page Traffic",
+        "value": "+124%",
+        "context": "From influencer content"
+      },
+      {
+        "metric": "Booking Enquiries",
+        "value": "+56%",
+        "context": ""
+      }
     ],
     "testimonial": "",
-    "tags": ["Influencer Marketing", "KOL", "Travel", "Singapore", "Instagram", "YouTube"]
+    "tags": [
+      "Influencer Marketing",
+      "KOL",
+      "Travel",
+      "Singapore",
+      "Instagram",
+      "YouTube"
+    ],
+    "status": "published"
   }
 ]

@@ -46,12 +46,25 @@ function slugify(str) {
     .replace(/-+/g, '-');
 }
 
-/* Convert File to base64 string */
-function toBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload  = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+/* Upload an image file to /api/upload as multipart/form-data.
+   Deliberately NOT sent through apiFetch/JSON+base64 — that path runs the
+   payload through validatePayload()'s generic string-length cap (50,000
+   chars, meant for text fields), which rejects almost any real photo once
+   base64-encoded. Multipart has no such cap and skips the ~33% base64
+   size bloat. Returns { ok, url } or { ok:false, error }. */
+async function uploadImage(file, maxBytes = 10 * 1024 * 1024) {
+  if (file.size > maxBytes) {
+    return { ok: false, error: `Image too large (max ${Math.round(maxBytes / 1024 / 1024)}MB)` };
+  }
+  const form = new FormData();
+  form.append('image', file, file.name);
+  const r = await fetch('/api/upload', {
+    method: 'POST',
+    headers: { 'X-Editor-Token': getToken() },
+    body: form,
   });
+  const data = await r.json().catch(() => ({}));
+  if (r.status === 401) { localStorage.clear(); location.href = '/admin?expired=1'; }
+  if (!r.ok || !data.url) return { ok: false, error: data.error || 'Upload failed' };
+  return { ok: true, url: data.url };
 }

@@ -34,7 +34,7 @@ permalink: /blog/index.html
 <!-- Featured article -->
 <section class="py-16 bg-surface-off-white">
   <div class="section-container">
-    {% set featured = blogs | where("featured") | first %}
+    {% set featured = blogs | publishedOnly | where("featured") | first %}
     {% if featured %}
       <div class="mb-8">
         <p class="eyebrow mb-2">Featured Article</p>
@@ -72,7 +72,7 @@ permalink: /blog/index.html
 <section class="py-16 bg-background" id="articles">
   <div class="section-container">
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="blog-grid">
-      {% for post in blogs %}
+      {% for post in blogs | publishedOnly %}
         <article class="group card overflow-hidden hover:shadow-[0_10px_40px_rgba(37,59,194,0.10)] hover:-translate-y-1 transition-all duration-300 flex flex-col blog-card" data-category="{{ post.category }}">
           <a href="/blog/{{ post.slug }}" class="block aspect-[16/9] overflow-hidden bg-surface-container shrink-0">
             <img src="{{ post.cover_image }}" alt="{{ post.title }}"
@@ -101,7 +101,7 @@ permalink: /blog/index.html
       {% endfor %}
 
       <!-- Activities as articles (events) -->
-      {% for activity in sitedata.activities %}
+      {% for activity in events | publishedOnly | sort(true, false, 'date') %}
         <article class="group card overflow-hidden hover:shadow-[0_10px_40px_rgba(37,59,194,0.10)] hover:-translate-y-1 transition-all duration-300 flex flex-col blog-card" data-category="Event">
           <a href="{{ activity.href }}" class="block aspect-[16/9] overflow-hidden bg-surface-container shrink-0">
             <img src="{{ activity.image }}" alt="{{ activity.title }}"
@@ -117,7 +117,7 @@ permalink: /blog/index.html
             </a>
             <p class="text-body-md text-on-surface-variant leading-relaxed flex-1 line-clamp-3 text-sm">{{ activity.description }}</p>
             <div class="flex items-center justify-between pt-4 mt-4 border-t border-outline-variant/20">
-              <span class="text-on-surface-variant text-label-md text-xs">{{ activity.date }}</span>
+              <span class="text-on-surface-variant text-label-md text-xs">{{ activity | eventDateDisplay }}</span>
               <a href="{{ activity.href }}" class="flex items-center gap-1 text-primary font-bold text-label-md text-xs hover:gap-2 transition-all">
                 Read <span class="material-symbols-outlined text-sm">arrow_forward</span>
               </a>

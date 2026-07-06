@@ -4,6 +4,13 @@ layout: layouts/base.njk
 {# Individual blog post layout. Pages set: postSlug #}
 {% set post = blogs | findBySlug(postSlug) %}
 
+{% if not post or (post.status != 'published' and not isPreview) %}
+  <div class="section-container py-32 text-center">
+    <h1 class="text-headline-md font-display text-on-surface">Post not found</h1>
+    <a href="/blog" class="btn-primary mt-8 inline-flex">Back to Blog</a>
+  </div>
+{% else %}
+
 <!-- Blog Post Schema.org -->
 <script type="application/ld+json">
 {
@@ -144,7 +151,7 @@ layout: layouts/base.njk
         <div>
           <p class="eyebrow mb-4">Related Articles</p>
           <div class="space-y-4">
-            {% for related in blogs %}
+            {% for related in blogs | publishedOnly %}
               {% if related.slug != post.slug %}
                 <a href="/blog/{{ related.slug }}" class="group flex gap-3 card p-3 hover:border-primary/40 transition-all">
                   <img src="{{ related.cover_image }}" alt="{{ related.title }}" class="w-16 h-12 object-cover rounded-lg shrink-0" loading="lazy" />
@@ -169,3 +176,5 @@ layout: layouts/base.njk
     <span class="material-symbols-outlined text-base">arrow_back</span> Back to all articles
   </a>
 </div>
+
+{% endif %}

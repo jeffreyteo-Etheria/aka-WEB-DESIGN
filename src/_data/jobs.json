@@ -14,7 +14,8 @@
       "Self-starter who thrives in a fast-paced environment"
     ],
     "apply_email": "Hello@akadigital.net",
-    "active": true
+    "active": true,
+    "status": "published"
   },
   {
     "slug": "martech-implementation-consultant",
@@ -31,6 +32,7 @@
       "Technical aptitude — comfortable with APIs, data pipelines, and event tracking"
     ],
     "apply_email": "Hello@akadigital.net",
-    "active": true
+    "active": true,
+    "status": "published"
   }
 ]

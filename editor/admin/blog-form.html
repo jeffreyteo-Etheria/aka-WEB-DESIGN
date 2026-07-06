@@ -5,6 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blog Post — AKA Digital CMS</title>
   <link rel="stylesheet" href="/admin/admin.css" />
+  <style>
+    .main-content { max-width: none; }
+    .editor-layout { display: flex; gap: 24px; align-items: flex-start; }
+    .editor-col { flex: 1 1 480px; min-width: 0; }
+    .preview-col { flex: 1 1 480px; min-width: 0; position: sticky; top: 20px; }
+    .preview-frame-wrap {
+      background: var(--white); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; display: flex; flex-direction: column;
+      height: calc(100vh - 140px);
+    }
+    .preview-frame-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid var(--border); background: #fafafa;
+    }
+    .preview-frame-header .btn-xs { cursor: pointer; border: 1px solid var(--border); background: #fff; }
+    #previewStatus { font-size: 12px; color: var(--slate, #64748b); }
+    #previewFrame { flex: 1; width: 100%; border: 0; background: #fff; }
+    @media (max-width: 1200px) {
+      .editor-layout { flex-direction: column; }
+      .preview-col { position: static; width: 100%; }
+      .preview-frame-wrap { height: 700px; }
+    }
+  </style>
 </head>
 <body class="cms-body">
 
@@ -31,10 +54,13 @@
         <h1 class="page-title" id="formTitle">New Blog Post</h1>
         <p class="page-sub">Fill in the fields below and click Save. Go to the Dashboard to publish your changes live.</p>
       </div>
+      <span id="statusBadge" class="status-badge status-draft">Draft</span>
     </header>
 
     <div id="statusBanner" class="status-banner" style="display:none"></div>
 
+    <div class="editor-layout">
+    <div class="editor-col">
     <form id="blogForm" class="cms-form">
 
       <!-- Row 1: Title -->
@@ -117,6 +143,21 @@
         </label>
       </div>
 
+      <!-- AI Writing Assistant -->
+      <div class="form-group full" style="background:var(--paper,#f8fafc);border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+        <label>✨ AI Writing Assistant <span class="hint">— drafts the article below from your title + brief; you review and edit before saving</span></label>
+        <textarea id="ai_brief" rows="4" placeholder="What should this article cover? Paste your key points, facts, figures, client names, links — the AI only uses what you give it here. It will not invent statistics or examples; if something's missing, it asks instead."></textarea>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;">
+          <button type="button" class="btn-primary" id="aiGenerateBtn">Generate Draft</button>
+          <span id="aiStatus" class="form-status"></span>
+        </div>
+        <div id="aiNeedsInfo" style="display:none;margin-top:12px;padding:12px 14px;background:#fffbeb;border:1px solid #f2a13d55;border-radius:8px;">
+          <strong style="font-size:13px;">The AI needs more information before it can write this without guessing:</strong>
+          <ul id="aiNeedsInfoList" style="margin:8px 0 0;padding-left:20px;font-size:13.5px;"></ul>
+          <p class="hint" style="margin:8px 0 0;">Add the answers to the brief above and generate again.</p>
+        </div>
+      </div>
+
       <!-- Body content -->
       <div class="form-group full">
         <label>Article Content <span class="req">*</span></label>
@@ -146,13 +187,29 @@
       </div>
 
       <!-- Actions -->
-      <div class="form-actions full">
-        <button type="submit" class="btn-primary" id="publishBtn">Save Post</button>
+      <div class="form-actions full publish-actions">
+        <button type="button" class="btn-draft" id="saveDraftBtn">Save as Draft</button>
+        <button type="button" class="btn-publish" id="publishBtn">Publish</button>
         <a href="/admin/dashboard" class="btn-ghost">Cancel</a>
         <span id="formStatus" class="form-status"></span>
       </div>
 
     </form>
+    </div>
+
+    <div class="preview-col">
+      <div class="preview-frame-wrap">
+        <div class="preview-frame-header">
+          <strong style="font-size:13px">Live Preview — as it will publish</strong>
+          <span style="display:flex;align-items:center;gap:10px">
+            <span id="previewStatus">—</span>
+            <button type="button" class="btn-xs" id="refreshPreviewBtn">↻ Refresh</button>
+          </span>
+        </div>
+        <iframe id="previewFrame" title="Blog post preview"></iframe>
+      </div>
+    </div>
+    </div>
   </main>
 
   <script src="/admin/admin.js"></script>
@@ -180,13 +237,16 @@
     coverFile.addEventListener('change', async () => {
       const file = coverFile.files[0];
       if (!file) return;
-      const base64 = await toBase64(file);
-      const r = await apiFetch('/api/upload', 'POST', { base64, filename: file.name });
-      if (r.url) {
+      prompt.textContent = 'Uploading…';
+      const r = await uploadImage(file);
+      if (r.ok) {
         coverImg.value = r.url;
         preview.src = r.url;
         preview.style.display = 'block';
         prompt.style.display  = 'none';
+        schedulePreview();
+      } else {
+        prompt.textContent = '✗ ' + r.error;
       }
     });
 
@@ -248,11 +308,19 @@
     const params = new URLSearchParams(location.search);
     const editSlug = params.get('edit');
 
+    function setStatusBadge(status) {
+      const badge = document.getElementById('statusBadge');
+      const isPublished = status === 'published';
+      badge.textContent = isPublished ? 'Published' : 'Draft';
+      badge.className = 'status-badge ' + (isPublished ? 'status-published' : 'status-draft');
+    }
+
     if (editSlug) {
       document.getElementById('formTitle').textContent = 'Edit Blog Post';
       apiFetch('/api/blogs').then(blogs => {
         const post = blogs.find(b => b.slug === editSlug);
         if (!post) return;
+        setStatusBadge(post.status);
         document.getElementById('title').value       = post.title;
         document.getElementById('slug').value        = post.slug;
         document.getElementById('excerpt').value     = post.excerpt;
@@ -271,18 +339,12 @@
           preview.style.display = 'block';
           prompt.style.display  = 'none';
         }
+        refreshPreview();
       });
     }
 
-    // Submit
-    document.getElementById('blogForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('publishBtn');
-      const status = document.getElementById('formStatus');
-      btn.disabled = true;
-      btn.textContent = 'Saving…';
-
-      const payload = {
+    function getFormPayload() {
+      return {
         slug:         document.getElementById('slug').value || slugify(document.getElementById('title').value),
         title:        document.getElementById('title').value,
         excerpt:      document.getElementById('excerpt').value,
@@ -296,6 +358,22 @@
         featured:     document.getElementById('featured').checked,
         body_html:    bodyEditor.innerHTML,
       };
+    }
+
+    // Save as Draft / Publish — same payload, different target status.
+    async function saveBlogPost(targetStatus, btn) {
+      if (!document.getElementById('title').value.trim()) {
+        alert('Title is required.');
+        return;
+      }
+      const status = document.getElementById('formStatus');
+      const draftBtn = document.getElementById('saveDraftBtn');
+      const pubBtn   = document.getElementById('publishBtn');
+      draftBtn.disabled = true; pubBtn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = targetStatus === 'published' ? 'Publishing…' : 'Saving…';
+
+      const payload = { ...getFormPayload(), status: targetStatus };
 
       try {
         const method  = editSlug ? 'PUT' : 'POST';
@@ -303,12 +381,18 @@
         const result  = await apiFetch(url, method, payload);
 
         if (result.ok) {
-          status.textContent = '✓ Saved. ';
+          setStatusBadge(targetStatus);
+          status.textContent = '';
           status.className   = 'form-status success';
-          const a = document.createElement('a');
-          a.href = '/admin/dashboard';
-          a.textContent = 'Go to Dashboard to publish live →';
-          status.appendChild(a);
+          if (targetStatus === 'published') {
+            status.append('✓ Published. ');
+            const a = document.createElement('a');
+            a.href = '/admin/dashboard';
+            a.textContent = 'Go to Dashboard to Build Site to make this live →';
+            status.appendChild(a);
+          } else {
+            status.textContent = '✓ Saved as draft — not visible on the live site yet.';
+          }
         } else {
           status.textContent = '⚠ ' + (result.error || 'Error saving');
           status.className   = 'form-status error';
@@ -318,9 +402,127 @@
         status.className   = 'form-status error';
       }
 
-      btn.disabled = false;
-      btn.textContent = editSlug ? 'Save Changes' : 'Save Post';
+      draftBtn.disabled = false; pubBtn.disabled = false;
+      btn.textContent = original;
+    }
+
+    document.getElementById('saveDraftBtn').addEventListener('click', e => saveBlogPost('draft', e.target));
+    document.getElementById('publishBtn').addEventListener('click', e => saveBlogPost('published', e.target));
+
+    // ── AI Writing Assistant ─────────────────────────────────────────────
+    // Drops the generated draft into the editor exactly as if typed by hand
+    // — still a Draft, still needs review + Publish + Build to go live.
+
+    /* The model is instructed to emit only a small whitelist of tags, but
+       never trust generated markup blindly: strip anything executable
+       before it touches innerHTML. */
+    function sanitizeAiHtml(html) {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      doc.querySelectorAll('script,style,iframe,object,embed,form,link,meta').forEach(el => el.remove());
+      doc.querySelectorAll('*').forEach(el => {
+        [...el.attributes].forEach(attr => {
+          if (/^on/i.test(attr.name)) el.removeAttribute(attr.name);
+        });
+        const href = el.getAttribute && el.getAttribute('href');
+        if (href && /^\s*javascript:/i.test(href)) el.removeAttribute('href');
+      });
+      return doc.body.innerHTML;
+    }
+
+    document.getElementById('aiGenerateBtn').addEventListener('click', async () => {
+      const aiBtn      = document.getElementById('aiGenerateBtn');
+      const aiStatus   = document.getElementById('aiStatus');
+      const needsInfo  = document.getElementById('aiNeedsInfo');
+      const title      = document.getElementById('title').value.trim();
+
+      if (!title) {
+        aiStatus.textContent = '⚠ Enter a title first — the AI writes from your title and brief.';
+        aiStatus.className = 'form-status error';
+        return;
+      }
+      if (bodyEditor.innerText.trim() && !confirm('This will replace the current article content with the AI draft. Continue?')) {
+        return;
+      }
+
+      needsInfo.style.display = 'none';
+      aiBtn.disabled = true;
+      aiBtn.textContent = 'Writing…';
+      aiStatus.textContent = 'Drafting the article — this can take a minute or two.';
+      aiStatus.className = 'form-status';
+
+      try {
+        const r = await apiFetch('/api/ai/generate-blog', 'POST', {
+          title,
+          category: document.getElementById('category').value,
+          brief: document.getElementById('ai_brief').value.trim(),
+        });
+
+        if (r.ok && r.status === 'ok') {
+          bodyEditor.innerHTML = sanitizeAiHtml(r.body_html);
+          const excerptEl = document.getElementById('excerpt');
+          if (!excerptEl.value.trim() && r.excerpt) excerptEl.value = r.excerpt;
+          updateWordCount();
+          schedulePreview();
+          aiStatus.textContent = '✓ Draft ready — review and edit it below, then Save as Draft or Publish.';
+          aiStatus.className = 'form-status success';
+        } else if (r.ok && r.status === 'needs_info') {
+          const list = document.getElementById('aiNeedsInfoList');
+          list.innerHTML = '';
+          (r.needs_info || []).forEach(q => {
+            const li = document.createElement('li');
+            li.textContent = q;
+            list.appendChild(li);
+          });
+          needsInfo.style.display = 'block';
+          aiStatus.textContent = 'More information needed — see below.';
+          aiStatus.className = 'form-status';
+        } else {
+          aiStatus.textContent = '⚠ ' + (r.error || 'Generation failed.');
+          aiStatus.className = 'form-status error';
+        }
+      } catch (err) {
+        aiStatus.textContent = '⚠ ' + err.message;
+        aiStatus.className = 'form-status error';
+      }
+
+      aiBtn.disabled = false;
+      aiBtn.textContent = 'Generate Draft';
     });
+
+    // ── Live preview — renders the draft through the real template, so it
+    // looks exactly like the published page will, without saving anything.
+    const previewFrame  = document.getElementById('previewFrame');
+    const previewStatus = document.getElementById('previewStatus');
+    let previewTimer = null;
+    let previewSeq = 0;
+
+    async function refreshPreview() {
+      const seq = ++previewSeq;
+      previewStatus.textContent = 'Rendering…';
+      try {
+        const r = await apiFetch('/api/preview/blog', 'POST', getFormPayload());
+        if (seq !== previewSeq) return;
+        if (r.ok && r.html) {
+          previewFrame.srcdoc = r.html;
+          previewStatus.textContent = 'Updated ' + new Date().toLocaleTimeString();
+        } else {
+          previewStatus.textContent = '✗ ' + (r.error || 'Preview failed');
+        }
+      } catch (err) {
+        if (seq === previewSeq) previewStatus.textContent = '✗ ' + err.message;
+      }
+    }
+
+    function schedulePreview() {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(refreshPreview, 600);
+    }
+
+    document.getElementById('blogForm').addEventListener('input', schedulePreview);
+    document.getElementById('blogForm').addEventListener('change', schedulePreview);
+    document.getElementById('refreshPreviewBtn').addEventListener('click', refreshPreview);
+
+    if (!editSlug) refreshPreview();
   </script>
 </body>
 </html>

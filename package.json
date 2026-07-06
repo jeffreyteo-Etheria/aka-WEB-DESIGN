@@ -24,13 +24,14 @@
     "export:all": "npm run export:css && npm run export:json && npm run export:assets && npm run export:build"
   },
   "dependencies": {
-    "basic-ftp": "^5.3.1",
     "@11ty/eleventy": "^3.0.0",
+    "@anthropic-ai/sdk": "^0.110.0",
     "@tailwindcss/forms": "^0.5.7",
     "autoprefixer": "^10.4.19",
+    "basic-ftp": "^5.3.1",
     "concurrently": "^9.0.0",
+    "heic-convert": "^2.1.0",
     "postcss": "^8.4.40",
     "tailwindcss": "^3.4.10"
-  },
-  "devDependencies": {}
+  }
 }

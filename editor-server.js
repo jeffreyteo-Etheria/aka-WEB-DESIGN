@@ -16,7 +16,8 @@ const http   = require('http');
 const fs     = require('fs');
 const path   = require('path');
 const crypto = require('crypto');
-const { exec } = require('child_process');
+const { exec, execSync } = require('child_process');
+const heicConvert = require('heic-convert');
 const {
   validatePayload,
   getClientIp,
@@ -26,6 +27,8 @@ const {
   getSecurityHeaders,
 } = require('./scripts/security-helpers');
 const securityConfig = require('./config/security.config');
+const { renderCaseStudyPreview, renderBlogPreview, renderEventPreview, renderJobPreview } = require('./scripts/preview-renderer');
+const { generateBlogDraft, describeAiError } = require('./scripts/ai-writer');
 
 /* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
    with a PATH that doesn't include the directory npm actually lives in, even
@@ -72,8 +75,37 @@ const EDITOR     = path.join(ROOT, 'editor');
 const ADMIN      = path.join(ROOT, 'editor', 'admin');
 const EDITS      = path.join(DATA,   '_edits.json');
 const UPLOADS    = path.join(PUBLIC, 'images', 'uploads');
+
+/* iPhones (and many Android phones) save camera photos as HEIC/HEIF by
+   default. Virtually no browser except Safari can decode HEIC pixel data —
+   saved as-is, every one of these uploads renders as a broken image on the
+   live site for almost every visitor and in the CMS's own preview. Convert
+   to JPEG server-side so it doesn't matter what format the source phone used. */
+async function saveUploadedImage(buffer, originalFilename) {
+  const ext = (path.extname(originalFilename) || '.jpg').toLowerCase();
+  let data = buffer;
+  let outExt = ext;
+  if (ext === '.heic' || ext === '.heif') {
+    data = Buffer.from(await heicConvert({ buffer, format: 'JPEG', quality: 0.9 }));
+    outExt = '.jpg';
+  }
+  const name = `upload-${Date.now()}${outExt}`;
+  fs.writeFileSync(path.join(UPLOADS, name), data);
+  return `/images/uploads/${name}`;
+}
+
 const BLOG_PAGES = path.join(ROOT, 'src', 'blog');
+const CASE_STUDY_PAGES = path.join(ROOT, 'src', 'case-studies');
 const CMS_USERS  = path.join(ROOT, 'cms_users.json');
+
+/* Answers "is this server actually running the latest code?" without needing
+   SSH/hPanel access — the CMS and the site it publishes to are the same
+   process, but a stale deploy (git pulled, npm install/build/restart never
+   run) looks identical to a real bug from the browser. Surfaced on the
+   Dashboard. */
+const SERVER_STARTED_AT = new Date().toISOString();
+let GIT_COMMIT = 'unknown';
+try { GIT_COMMIT = execSync('git rev-parse --short HEAD', { cwd: ROOT }).toString().trim(); } catch {}
 const SESSIONS_FILE = path.join(ROOT, '.sessions.json');
 
 [UPLOADS, ADMIN, BLOG_PAGES].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
@@ -93,6 +125,38 @@ function writeBlogNjk(slug) {
 }
 function deleteBlogNjk(slug) {
   const fp = path.join(BLOG_PAGES, `${slug}.njk`);
+  if (fs.existsSync(fp)) fs.unlinkSync(fp);
+}
+
+/* Quote a string for safe use as a YAML frontmatter scalar — user-entered
+   text can contain ":", quotes, or newlines that would otherwise corrupt
+   the frontmatter block. */
+function yamlQuote(str) {
+  return '"' + String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, ' ') + '"';
+}
+
+/* Write / delete the Eleventy .njk wrapper that gives a case study its URL.
+   Without this file, a case study only exists in case_studies.json — it shows
+   up in listings but /case-studies/<slug>/ 404s because Eleventy never
+   builds a page for it. */
+function writeCaseStudyNjk(slug, entry) {
+  // Draft pages still get a real file (so the URL exists and a build doesn't
+  // need re-running the moment it's published), but the page's own <title>/
+  // meta description come from this frontmatter unconditionally — the actual
+  // body content is correctly gated by studySlug's published check, but the
+  // meta tags aren't, so a draft's real title/summary must not appear here.
+  const published = entry.status === 'published';
+  const title = published
+    ? `${entry.client ? entry.client + ' — ' : ''}${entry.title || slug} | AKA Digital Case Study`
+    : 'Coming Soon | AKA Digital Case Study';
+  const description = published
+    ? (entry.summary || '').replace(/\s+/g, ' ').trim().slice(0, 300)
+    : 'This case study is not published yet.';
+  const content = `---\nlayout: layouts/base.njk\ntitle: ${yamlQuote(title)}\ndescription: ${yamlQuote(description)}\npermalink: /case-studies/${slug}/index.html\nstudySlug: ${slug}\n---\n{% include "case-studies/template.njk" %}\n`;
+  fs.writeFileSync(path.join(CASE_STUDY_PAGES, `${slug}.njk`), content);
+}
+function deleteCaseStudyNjk(slug) {
+  const fp = path.join(CASE_STUDY_PAGES, `${slug}.njk`);
   if (fs.existsSync(fp)) fs.unlinkSync(fp);
 }
 
@@ -171,25 +235,36 @@ function reply(res, status, data, ct) {
 const j   = (res, st, d) => reply(res, st, d, 'application/json');
 const h   = (res, st, d) => reply(res, st, d, 'text/html');
 
+const TOO_LARGE = Symbol('tooLarge');
+
 function readBody(req) {
   return new Promise((res) => {
     let b = '';
     let size = 0;
+    let tooLarge = false;
     req.on('data', c => {
+      if (tooLarge) return;
       size += Buffer.byteLength(c);
       if (size > securityConfig.maxPayloadSizeBytes) {
+        tooLarge = true;
         req.destroy();
+        res(TOO_LARGE); // resolve now — destroy() never fires 'end', so without
+                         // this the caller would hang waiting forever
         return;
       }
       b += c;
     });
-    req.on('end', () => { try { res(JSON.parse(b || '{}')); } catch { res({}); } });
+    req.on('end', () => { if (tooLarge) return; try { res(JSON.parse(b || '{}')); } catch { res({}); } });
     req.on('error', () => res({}));
   });
 }
 
 async function readValidatedBody(req, res, context) {
   const payload = await readBody(req);
+  if (payload === TOO_LARGE) {
+    j(res, 413, { error: 'Payload too large' });
+    return null;
+  }
   const validation = validatePayload(payload);
   if (!validation.valid) {
     appendSecurityLog('invalid_payload', { context, path: req.url, error: validation.error, clientIp: getClientIp(req) });
@@ -199,11 +274,24 @@ async function readValidatedBody(req, res, context) {
   return validation.value;
 }
 
-function readMultipart(req, boundary) {
+function readMultipart(req, boundary, maxBytes = 15 * 1024 * 1024) {
   return new Promise((res) => {
     const chunks = [];
-    req.on('data', c => chunks.push(c));
+    let size = 0;
+    let tooLarge = false;
+    req.on('data', c => {
+      if (tooLarge) return;
+      size += c.length;
+      if (size > maxBytes) {
+        tooLarge = true;
+        req.destroy();
+        res(TOO_LARGE);
+        return;
+      }
+      chunks.push(c);
+    });
     req.on('end', () => {
+      if (tooLarge) return;
       const buf = Buffer.concat(chunks);
       const sep = Buffer.from('--' + boundary);
       const files = {}, fields = {};
@@ -226,6 +314,7 @@ function readMultipart(req, boundary) {
       }
       res({ files, fields });
     });
+    req.on('error', () => res({ files: {}, fields: {} }));
   });
 }
 
@@ -361,7 +450,15 @@ http.createServer(async (req, res) => {
     }
 
     if (p === '/api/health') {
-      return j(res, 200, { ok: true, uptime: process.uptime().toFixed(2) });
+      let distBuiltAt = null;
+      try { distBuiltAt = fs.statSync(path.join(DIST, 'index.html')).mtime.toISOString(); } catch {}
+      return j(res, 200, {
+        ok: true,
+        uptime: process.uptime().toFixed(2),
+        gitCommit: GIT_COMMIT,
+        serverStartedAt: SERVER_STARTED_AT,
+        distBuiltAt,
+      });
     }
 
     /* ── PUBLIC CONFIG (Google Client ID — safe to expose, it's a public value) ── */
@@ -435,6 +532,7 @@ http.createServer(async (req, res) => {
         read_time:    parseInt(b.read_time) || 5,
         featured:     !!b.featured,
         body_html:    b.body_html     || '',
+        status:       b.status === 'published' ? 'published' : 'draft',
       };
 
       blogs.unshift(post); // newest first
@@ -491,11 +589,13 @@ http.createServer(async (req, res) => {
         title:       b.title       || '',
         description: b.description || '',
         date:        b.date        || new Date().toISOString().split('T')[0],
+        date_label:  b.date_label  || '',
         location:    b.location    || '',
         type:        b.type        || 'Event',
         image:       b.image       || '',
         href:        b.href        || '/contact',
         featured:    !!b.featured,
+        status:      b.status === 'published' ? 'published' : 'draft',
       };
 
       events.unshift(event);
@@ -563,9 +663,11 @@ http.createServer(async (req, res) => {
         results:        Array.isArray(b.results) ? b.results : [],
         testimonial:    b.testimonial     || '',
         tags:           Array.isArray(b.tags) ? b.tags : (b.tags || '').split(',').map(t => t.trim()).filter(Boolean),
+        status:         b.status === 'published' ? 'published' : 'draft',
       };
       cs.unshift(entry);
       writeData('case_studies', cs);
+      writeCaseStudyNjk(entry.slug, entry);
       return j(res, 200, { ok: true, slug: entry.slug });
     }
 
@@ -578,6 +680,7 @@ http.createServer(async (req, res) => {
       if (b === null) return;
       cs[idx] = { ...cs[idx], ...b, slug };
       writeData('case_studies', cs);
+      writeCaseStudyNjk(slug, cs[idx]);
       return j(res, 200, { ok: true });
     }
 
@@ -585,7 +688,87 @@ http.createServer(async (req, res) => {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
       const slug = p.replace('/api/case-studies/', '');
       writeData('case_studies', readData('case_studies').filter(x => x.slug !== slug));
+      deleteCaseStudyNjk(slug);
       return j(res, 200, { ok: true });
+    }
+
+    /* Live "as-is" preview — renders the draft (unsaved) case study through
+       the real template, so it looks exactly like the published page will,
+       without writing any file or running a build. */
+    if (p === '/api/preview/case-study' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.case-study');
+      if (b === null) return;
+      try {
+        let html = renderCaseStudyPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    if (p === '/api/preview/blog' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.blog');
+      if (b === null) return;
+      try {
+        let html = renderBlogPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    if (p === '/api/preview/event' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.event');
+      if (b === null) return;
+      try {
+        let html = renderEventPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    if (p === '/api/preview/job' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.job');
+      if (b === null) return;
+      try {
+        let html = renderJobPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       AI WRITING ASSISTANT  (both roles)
+       Drafts a blog article from title + brief. Never publishes — the
+       draft lands in the form for the editor to review, exactly like
+       hand-written content. Requires ANTHROPIC_API_KEY on the server.
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/ai/generate-blog' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'ai.generate-blog');
+      if (b === null) return;
+      if (!b.title || !String(b.title).trim()) {
+        return j(res, 400, { error: 'A title is required — the AI writes from your title and brief.' });
+      }
+      try {
+        const result = await generateBlogDraft({
+          title: String(b.title),
+          category: b.category ? String(b.category) : '',
+          brief: b.brief ? String(b.brief) : '',
+        });
+        if (result.status === 'error') return j(res, 502, { error: result.error });
+        appendAuditLog('ai_generate_blog', { user: getSession(req)?.username, title: String(b.title).slice(0, 120), status: result.status });
+        return j(res, 200, { ok: true, ...result });
+      } catch (err) {
+        const { httpStatus, error } = describeAiError(err);
+        return j(res, httpStatus, { error });
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -613,6 +796,7 @@ http.createServer(async (req, res) => {
                       : (b.requirements || '').split('\n').map(r => r.trim()).filter(Boolean),
         apply_email: b.apply_email  || 'Hello@akadigital.net',
         active:      b.active !== false,
+        status:      b.status === 'published' ? 'published' : 'draft',
       };
       jobs.push(entry);
       writeData('jobs', jobs);
@@ -804,20 +988,25 @@ http.createServer(async (req, res) => {
         const b = await readValidatedBody(req, res, 'upload.json');
         if (b === null) return;
         if (!b.base64 || !b.filename) return j(res, 400, { error: 'Missing base64/filename' });
-        const ext  = path.extname(b.filename) || '.jpg';
-        const name = `upload-${Date.now()}${ext}`;
-        fs.writeFileSync(path.join(UPLOADS, name), Buffer.from(b.base64.replace(/^data:[^;]+;base64,/, ''), 'base64'));
-        return j(res, 200, { ok: true, url: `/images/uploads/${name}` });
+        try {
+          const url = await saveUploadedImage(Buffer.from(b.base64.replace(/^data:[^;]+;base64,/, ''), 'base64'), b.filename);
+          return j(res, 200, { ok: true, url });
+        } catch (err) {
+          return j(res, 400, { error: 'Could not process image: ' + err.message });
+        }
       }
       const boundary = (req.headers['content-type'] || '').split('boundary=')[1];
       if (!boundary) return j(res, 400, { error: 'No boundary' });
-      const { files } = await readMultipart(req, boundary);
-      const file = files.image;
+      const parsed = await readMultipart(req, boundary);
+      if (parsed === TOO_LARGE) return j(res, 413, { error: 'Image too large (max 15MB)' });
+      const file = parsed.files.image;
       if (!file) return j(res, 400, { error: 'No image field' });
-      const ext  = path.extname(file.filename) || '.jpg';
-      const name = `upload-${Date.now()}${ext}`;
-      fs.writeFileSync(path.join(UPLOADS, name), file.data);
-      return j(res, 200, { ok: true, url: `/images/uploads/${name}` });
+      try {
+        const url = await saveUploadedImage(file.data, file.filename);
+        return j(res, 200, { ok: true, url });
+      } catch (err) {
+        return j(res, 400, { error: 'Could not process image: ' + err.message });
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════════

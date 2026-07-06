@@ -57,7 +57,7 @@ description: Real results from real clients. Explore AKA Digital's award-winning
 
     <!-- Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="cs-grid">
-      {% for study in case_studies %}
+      {% for study in case_studies | publishedOnly %}
         {% set study = study %}
         <div class="cs-card" data-category="{{ study.category }}">
           {% include "components/case-study-card.njk" %}

@@ -67,6 +67,7 @@
     <div class="sidebar-footer">
       <div class="user-badge" id="userBadge">—</div>
       <button class="logout-btn" id="logoutBtn">Sign out</button>
+      <div id="buildInfo" style="font-size:10px;color:#64748b;margin-top:8px;line-height:1.5;"></div>
     </div>
   </aside>
 
@@ -112,11 +113,19 @@
       </a>
     </div>
 
+    <!-- Content status summary -->
+    <div id="statusSummary" class="status-summary"></div>
+
     <!-- Build log -->
     <div id="buildLog" class="build-log" style="display:none">
       <div class="build-log-header">Build Output <button onclick="document.getElementById('buildLog').style.display='none'" style="float:right;background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:14px">✕ close</button></div>
       <div id="buildLogText" class="build-log-text"></div>
     </div>
+
+    <p style="font-size:13px;color:var(--slate);margin:4px 0 16px;">
+      "View" on any post below shows the <strong>currently published</strong> site. After saving edits, click
+      <strong>Build Site</strong> (or <strong>Publish Live</strong>) in the sidebar to make them visible there.
+    </p>
 
     <!-- Blog post list -->
     <section class="content-section">
@@ -178,6 +187,14 @@
 
     document.getElementById('logoutBtn').addEventListener('click', logout);
 
+    /* Shows what code/build this server is actually running — settles "did
+       my fix actually deploy?" without needing hPanel/SSH access. */
+    fetch('/api/health').then(r => r.json()).then(h => {
+      const fmt = iso => iso ? new Date(iso).toLocaleString() : '—';
+      document.getElementById('buildInfo').innerHTML =
+        `Commit: ${h.gitCommit || '—'}<br>Server started: ${fmt(h.serverStartedAt)}<br>Site last built: ${fmt(h.distBuiltAt)}`;
+    }).catch(() => {});
+
     /* ── SSE stream helper — works with EventSource (GET + token in query) ── */
     function startSSE(endpoint, logEl) {
       const token = getToken();
@@ -185,17 +202,22 @@
       document.getElementById('buildLog').style.display = 'block';
       logEl.textContent = '';
 
+      let finished = false;
       const es = new EventSource(url);
       es.onmessage = ev => {
         try {
           const d = JSON.parse(ev.data);
           logEl.textContent += d.msg + '\n';
           logEl.scrollTop = logEl.scrollHeight;
-          if (d.status === 'done' || d.status === 'error') es.close();
+          if (d.status === 'done' || d.status === 'error') { finished = true; es.close(); }
         } catch {}
       };
       es.onerror = () => {
-        logEl.textContent += '\n⚠ Connection lost — check server logs.\n';
+        /* The server closes the connection right after its final message —
+           the browser can race this as a network error even though the
+           build already finished cleanly. Only report it if we never got
+           a done/error status. */
+        if (!finished) logEl.textContent += '\n⚠ Connection lost — check server logs.\n';
         es.close();
       };
     }
@@ -224,6 +246,24 @@
       });
     }
 
+    // ── Content status summary (Published / Draft counts across everything) ──
+    function statusBadgeHtml(status) {
+      const isPublished = status === 'published';
+      return `<span class="status-badge ${isPublished ? 'status-published' : 'status-draft'}" style="margin-left:8px;vertical-align:middle;">${isPublished ? 'Published' : 'Draft'}</span>`;
+    }
+    Promise.all([
+      apiFetch('/api/blogs'), apiFetch('/api/case-studies'),
+      apiFetch('/api/events'), apiFetch('/api/jobs'),
+    ]).then(lists => {
+      const all = lists.flat();
+      const published = all.filter(x => x.status === 'published').length;
+      const drafts = all.filter(x => x.status !== 'published').length;
+      document.getElementById('statusSummary').innerHTML = `
+        <div class="stat"><div class="stat-num">${all.length}</div><div class="stat-label">Total Content</div></div>
+        <div class="stat"><div class="stat-num" style="color:#16a34a">${published}</div><div class="stat-label">Published</div></div>
+        <div class="stat"><div class="stat-num" style="color:#64748b">${drafts}</div><div class="stat-label">Drafts</div></div>`;
+    });
+
     // ── Load blog posts ──────────────────────────────────────────────────
     apiFetch('/api/blogs').then(blogs => {
       const el = document.getElementById('blogList');
@@ -231,7 +271,7 @@
       el.innerHTML = blogs.slice(0, 10).map(b => `
         <div class="list-item">
           <div class="list-item-info">
-            <span class="list-item-title">${b.title}</span>
+            <span class="list-item-title">${b.title}</span>${statusBadgeHtml(b.status)}
             <span class="list-item-meta">${b.category} · ${b.date} · ${b.read_time} min read</span>
           </div>
           <div class="list-item-actions">
@@ -249,7 +289,7 @@
       el.innerHTML = list.slice(0, 10).map(c => `
         <div class="list-item">
           <div class="list-item-info">
-            <span class="list-item-title">${c.client}: ${c.title}</span>
+            <span class="list-item-title">${c.client}: ${c.title}</span>${statusBadgeHtml(c.status)}
             <span class="list-item-meta">${c.category_label || c.category} · ${c.country} · ${c.year}</span>
           </div>
           <div class="list-item-actions">
@@ -266,7 +306,7 @@
       el.innerHTML = events.map(ev => `
         <div class="list-item">
           <div class="list-item-info">
-            <span class="list-item-title">${ev.title}</span>
+            <span class="list-item-title">${ev.title}</span>${statusBadgeHtml(ev.status)}
             <span class="list-item-meta">${ev.type} · ${ev.date} · ${ev.location}</span>
           </div>
           <div class="list-item-actions">
@@ -283,7 +323,7 @@
       el.innerHTML = jobs.map(j => `
         <div class="list-item">
           <div class="list-item-info">
-            <span class="list-item-title">${j.title}</span>
+            <span class="list-item-title">${j.title}</span>${statusBadgeHtml(j.status)}
             <span class="list-item-meta">${j.location} · ${j.type} · ${j.active ? '<span style="color:#22c55e">Active</span>' : '<span style="color:#ef4444">Hidden</span>'}</span>
           </div>
           <div class="list-item-actions">
