@@ -28,6 +28,7 @@ const {
 } = require('./scripts/security-helpers');
 const securityConfig = require('./config/security.config');
 const { renderCaseStudyPreview, renderBlogPreview, renderEventPreview, renderJobPreview } = require('./scripts/preview-renderer');
+const { generateBlogDraft, describeAiError } = require('./scripts/ai-writer');
 
 /* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
    with a PATH that doesn't include the directory npm actually lives in, even
@@ -739,6 +740,34 @@ http.createServer(async (req, res) => {
         return j(res, 200, { ok: true, html });
       } catch (err) {
         return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       AI WRITING ASSISTANT  (both roles)
+       Drafts a blog article from title + brief. Never publishes — the
+       draft lands in the form for the editor to review, exactly like
+       hand-written content. Requires ANTHROPIC_API_KEY on the server.
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/ai/generate-blog' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'ai.generate-blog');
+      if (b === null) return;
+      if (!b.title || !String(b.title).trim()) {
+        return j(res, 400, { error: 'A title is required — the AI writes from your title and brief.' });
+      }
+      try {
+        const result = await generateBlogDraft({
+          title: String(b.title),
+          category: b.category ? String(b.category) : '',
+          brief: b.brief ? String(b.brief) : '',
+        });
+        if (result.status === 'error') return j(res, 502, { error: result.error });
+        appendAuditLog('ai_generate_blog', { user: getSession(req)?.username, title: String(b.title).slice(0, 120), status: result.status });
+        return j(res, 200, { ok: true, ...result });
+      } catch (err) {
+        const { httpStatus, error } = describeAiError(err);
+        return j(res, httpStatus, { error });
       }
     }
 
