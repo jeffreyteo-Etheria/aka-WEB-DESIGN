@@ -282,8 +282,9 @@
     document.getElementById('logoutBtn').addEventListener('click', logout);
 
     const params = new URLSearchParams(location.search);
-    const editSlug = params.get('edit');
+    let editSlug = params.get('edit');
     let existingData = null;
+    let currentStatus = 'draft'; // status as last saved — drives the unpublish rebuild
 
     function setStatusBadge(status) {
       const badge = document.getElementById('statusBadge');
@@ -297,6 +298,7 @@
       apiFetch('/api/case-studies').then(list => {
         existingData = list.find(c => c.slug === editSlug);
         if (!existingData) { alert('Case study not found'); return; }
+        currentStatus = existingData.status || 'draft';
         setStatusBadge(existingData.status);
         const f = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v || ''; };
         f('client', existingData.client); f('title', existingData.title);
@@ -422,18 +424,42 @@
           ? await apiFetch('/api/case-studies/' + editSlug, 'PUT', payload)
           : await apiFetch('/api/case-studies/new', 'POST', payload);
         if (r.ok || r.slug) {
+          /* First save of a new case study: switch into edit mode so the next
+             click updates it instead of re-creating it (server rejects the
+             re-create with "Slug already exists" and it stays a draft). */
+          if (!editSlug) {
+            editSlug = r.slug || payload.slug;
+            document.getElementById('slug').value = editSlug;
+            history.replaceState(null, '', location.pathname + '?edit=' + encodeURIComponent(editSlug));
+            document.getElementById('formTitle').textContent = 'Edit Case Study';
+          }
+          const wasLive = currentStatus === 'published';
+          currentStatus = targetStatus;
           setStatusBadge(targetStatus);
           if (targetStatus === 'published') {
             status.textContent = '⏳ Saved — publishing to the live site…';
             status.style.color = '';
             buildAndReport(status, (ok, msg) => {
               if (ok) {
-                status.innerHTML = '✓ Published — LIVE. <a href="/case-studies/' + payload.slug + '" target="_blank">View it on akadigital.net →</a>';
+                status.innerHTML = '✓ Published — LIVE. <a href="/case-studies/' + editSlug + '" target="_blank">View it on akadigital.net →</a>';
                 status.style.color = '#22c55e';
               } else {
                 status.textContent = '⚠ Saved, but the site rebuild failed: ' + msg;
                 status.style.color = '#ef4444';
               }
+              unlock();
+            });
+            return;
+          }
+          if (wasLive) {
+            // Was live, now draft: the static pages keep showing it until a rebuild.
+            status.textContent = '⏳ Unpublishing — removing it from the live site…';
+            status.style.color = '';
+            buildAndReport(status, (ok, msg) => {
+              status.textContent = ok
+                ? '✓ Unpublished — removed from the live site. Publish again to restore it.'
+                : '⚠ Saved as draft, but the site rebuild failed: ' + msg;
+              status.style.color = ok ? '#22c55e' : '#ef4444';
               unlock();
             });
             return;

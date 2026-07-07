@@ -559,7 +559,11 @@ http.createServer(async (req, res) => {
       if (b === null) return;
       blogs[idx] = { ...blogs[idx], ...b, slug }; // preserve slug
       writeData('blogs', blogs);
-      return j(res, 200, { ok: true });
+      /* Re-write the per-slug wrapper on every update: if it ever went
+         missing (deploy overwrite, manual cleanup), the post would save fine
+         but its /blog/<slug>/ page would 404 after the next build. */
+      writeBlogNjk(slug);
+      return j(res, 200, { ok: true, slug });
     }
 
     /* DELETE blog post (super admin only) */
