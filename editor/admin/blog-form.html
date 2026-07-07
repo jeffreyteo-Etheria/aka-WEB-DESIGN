@@ -306,7 +306,8 @@
 
     // Check if editing existing post
     const params = new URLSearchParams(location.search);
-    const editSlug = params.get('edit');
+    let editSlug = params.get('edit');
+    let currentStatus = 'draft'; // status as last saved — drives the unpublish rebuild
 
     function setStatusBadge(status) {
       const badge = document.getElementById('statusBadge');
@@ -320,6 +321,7 @@
       apiFetch('/api/blogs').then(blogs => {
         const post = blogs.find(b => b.slug === editSlug);
         if (!post) return;
+        currentStatus = post.status || 'draft';
         setStatusBadge(post.status);
         document.getElementById('title').value       = post.title;
         document.getElementById('slug').value        = post.slug;
@@ -383,6 +385,18 @@
         const result  = await apiFetch(url, method, payload);
 
         if (result.ok) {
+          /* First save of a new post: switch into edit mode immediately, so
+             the next click (e.g. Publish after Save-Draft) updates this post
+             instead of re-creating it — the server rejects a re-create with
+             "slug already exists" and the post would stay a draft forever. */
+          if (!editSlug) {
+            editSlug = result.slug || payload.slug;
+            document.getElementById('slug').value = editSlug;
+            history.replaceState(null, '', location.pathname + '?edit=' + encodeURIComponent(editSlug));
+            document.getElementById('formTitle').textContent = 'Edit Blog Post';
+          }
+          const wasLive = currentStatus === 'published';
+          currentStatus = targetStatus;
           setStatusBadge(targetStatus);
           status.textContent = '';
           status.className   = 'form-status success';
@@ -396,7 +410,7 @@
                 status.className = 'form-status success';
                 status.append('✓ Published — the article is LIVE. ');
                 const a = document.createElement('a');
-                a.href = '/blog/' + payload.slug;
+                a.href = '/blog/' + editSlug;
                 a.target = '_blank';
                 a.textContent = 'View it on akadigital.net →';
                 status.appendChild(a);
@@ -407,6 +421,18 @@
               unlock();
             });
             return; // buttons stay locked until the build reports back
+          }
+          if (wasLive) {
+            // Was live, now draft: the static pages keep showing it until a rebuild.
+            status.textContent = '⏳ Unpublishing — removing it from the live site…';
+            buildAndReport(status, (ok, msg) => {
+              status.textContent = ok
+                ? '✓ Unpublished — removed from the live site. Publish again to restore it.'
+                : '⚠ Saved as draft, but the site rebuild failed: ' + msg;
+              status.className = 'form-status ' + (ok ? 'success' : 'error');
+              unlock();
+            });
+            return;
           }
           status.textContent = '✓ Saved as draft — not visible on the live site until you Publish.';
         } else {

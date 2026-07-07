@@ -12,8 +12,9 @@ npm-debug.log*
 # Large binary assets — keep locally, do not push to GitHub
 ASSETS/
 
-# User uploads via CMS
-public/images/uploads/
+# CMS image uploads are TRACKED on purpose: Hostinger deploys reset the app
+# directory to the repo state, so any upload not in git is destroyed on the
+# next deploy (this killed every cover image uploaded before 2026-07-06).
 
 # Editor runtime state
 src/_data/_edits.json

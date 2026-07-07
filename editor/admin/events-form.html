@@ -212,12 +212,14 @@
     }
 
     // Edit mode
-    const editSlug = new URLSearchParams(location.search).get('edit');
+    let editSlug = new URLSearchParams(location.search).get('edit');
+    let currentStatus = 'draft'; // status as last saved — drives the unpublish rebuild
     if (editSlug) {
       document.getElementById('formTitle').textContent = 'Edit Event';
       apiFetch('/api/events').then(events => {
         const ev = events.find(e => e.slug === editSlug);
         if (!ev) return;
+        currentStatus = ev.status || 'draft';
         setStatusBadge(ev.status);
         document.getElementById('title').value       = ev.title;
         document.getElementById('slug').value        = ev.slug;
@@ -275,6 +277,17 @@
         const result = await apiFetch(url, method, payload);
 
         if (result.ok) {
+          /* First save of a new event: switch into edit mode so the next
+             click updates it instead of re-creating it (server rejects the
+             re-create with "slug already exists" and it stays a draft). */
+          if (!editSlug) {
+            editSlug = result.slug || payload.slug;
+            document.getElementById('slug').value = editSlug;
+            history.replaceState(null, '', location.pathname + '?edit=' + encodeURIComponent(editSlug));
+            document.getElementById('formTitle').textContent = 'Edit Event';
+          }
+          const wasLive = currentStatus === 'published';
+          currentStatus = targetStatus;
           setStatusBadge(targetStatus);
           status.textContent = '';
           status.className   = 'form-status success';
@@ -294,6 +307,18 @@
                 status.textContent = '⚠ Saved, but the site rebuild failed: ' + msg;
                 status.className = 'form-status error';
               }
+              unlock();
+            });
+            return;
+          }
+          if (wasLive) {
+            // Was live, now draft: the static pages keep showing it until a rebuild.
+            status.textContent = '⏳ Unpublishing — removing it from the live site…';
+            buildAndReport(status, (ok, msg) => {
+              status.textContent = ok
+                ? '✓ Unpublished — removed from the live site. Publish again to restore it.'
+                : '⚠ Saved as draft, but the site rebuild failed: ' + msg;
+              status.className = 'form-status ' + (ok ? 'success' : 'error');
               unlock();
             });
             return;

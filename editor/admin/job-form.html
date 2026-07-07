@@ -174,7 +174,8 @@
     document.getElementById('logoutBtn').addEventListener('click', logout);
 
     const params = new URLSearchParams(location.search);
-    const editSlug = params.get('edit');
+    let editSlug = params.get('edit');
+    let currentStatus = 'draft'; // status as last saved — drives the unpublish rebuild
 
     function setStatusBadge(status) {
       const badge = document.getElementById('statusBadge');
@@ -188,6 +189,7 @@
       apiFetch('/api/jobs').then(list => {
         const job = list.find(j => j.slug === editSlug);
         if (!job) { alert('Job not found'); return; }
+        currentStatus = job.status || 'draft';
         setStatusBadge(job.status);
         const f = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v || ''; };
         f('title', job.title); f('department', job.department);
@@ -234,6 +236,16 @@
           ? await apiFetch('/api/jobs/' + editSlug, 'PUT', payload)
           : await apiFetch('/api/jobs/new', 'POST', payload);
         if (r.ok || r.slug) {
+          /* First save of a new job: switch into edit mode so the next click
+             updates it instead of re-creating it (server rejects the
+             re-create with "slug already exists" and it stays a draft). */
+          if (!editSlug && r.slug) {
+            editSlug = r.slug;
+            history.replaceState(null, '', location.pathname + '?edit=' + encodeURIComponent(editSlug));
+            document.getElementById('formTitle').textContent = 'Edit Job';
+          }
+          const wasLive = currentStatus === 'published';
+          currentStatus = targetStatus;
           setStatusBadge(targetStatus);
           if (targetStatus === 'published') {
             status.textContent = '⏳ Saved — publishing to the live site…';
@@ -246,6 +258,19 @@
                 status.textContent = '⚠ Saved, but the site rebuild failed: ' + msg;
                 status.style.color = '#ef4444';
               }
+              unlock();
+            });
+            return;
+          }
+          if (wasLive) {
+            // Was live, now draft: the static pages keep showing it until a rebuild.
+            status.textContent = '⏳ Unpublishing — removing it from the live site…';
+            status.style.color = '';
+            buildAndReport(status, (ok, msg) => {
+              status.textContent = ok
+                ? '✓ Unpublished — removed from the live site. Publish again to restore it.'
+                : '⚠ Saved as draft, but the site rebuild failed: ' + msg;
+              status.style.color = ok ? '#22c55e' : '#ef4444';
               unlock();
             });
             return;
