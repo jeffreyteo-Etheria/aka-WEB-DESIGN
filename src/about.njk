@@ -238,19 +238,34 @@ description: AKA Digital is Vietnam's exclusive representative for leading globa
     <p class="eyebrow mb-4">Our Team</p>
     <h2 class="text-headline-md font-display text-on-surface mb-12">Meet the People Behind AKA Digital</h2>
 
+    {# Headshots were never committed and are gone from the server — until they
+       are re-supplied, cards feature event/activity cover photos (git-tracked
+       under /images/hero/ so they survive deploys), all linking to Insights. #}
+    {% set eventCovers = [
+      "/images/hero/dss-2024.jpg",
+      "/images/hero/home-summit.jpeg",
+      "/images/hero/summit-hcm.jpeg",
+      "/images/hero/solutions-summit.jpg",
+      "/images/hero/workshop-cdp.jpeg"
+    ] %}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       {% for person in team %}
         <div class="card flex flex-col gap-5 p-8">
 
+          <!-- Event cover photo → Insights -->
+          <a href="/insights" class="block rounded-xl overflow-hidden aspect-[16/9] group" aria-label="AKA Digital events and activities — see Insights">
+            <img
+              src="{{ eventCovers[loop.index0 % eventCovers.length] }}"
+              alt="AKA Digital events & activities"
+              loading="lazy"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </a>
+
           <!-- Avatar + name -->
           <div class="flex items-center gap-4">
             <div class="w-16 h-16 rounded-full overflow-hidden bg-primary/10 shrink-0 flex items-center justify-center">
-              <img
-                src="{{ person.photo }}"
-                alt="{{ person.name }}"
-                class="w-full h-full object-cover"
-                onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'font-display font-extrabold text-headline-sm text-primary\'>{{ person.name | truncate(2, true, "") }}</span>'"
-              />
+              <span class="font-display font-extrabold text-headline-sm text-primary">{{ person.name | truncate(2, true, "") }}</span>
             </div>
             <div>
               <p class="font-display font-bold text-headline-sm text-on-surface">{{ person.name }}</p>
