@@ -435,11 +435,23 @@
     var budget = document.getElementById('quiz-h-budget').value || '—';
 
     /* CRM bridge: Google Sheets webhook (same pattern as contact-form.njk / careers.njk) */
+    /* Market routing: on the contact page the quiz sits below the market
+       selector, whose choice lands in the hidden #form-market field. Route
+       the lead to that market's country director; anything that isn't
+       VN / KR / SG falls back to Jeffrey (regional default). */
+    var DIRECTORS = {
+      vn: 'phuong.pham@akadigital.net',
+      kr: 'kw.hwang@akadigital.net',
+      sg: 'jeffrey.teo@akadigital.net'
+    };
+    var marketEl = document.getElementById('form-market');
+    var market = (marketEl && marketEl.value) || 'sg';
+    var director = DIRECTORS[market] || 'jeffrey.teo@akadigital.net';
     var payload = {
       form_type:   'lead',
       source_page: window.location.pathname,
-      market:      'SG/SEA',
-      assigned_to: 'jeffrey.teo@akadigital.net',
+      market:      market,
+      assigned_to: director,
       solution:    sol.title,
       pain_point:  pain,
       budget:      budget,
@@ -470,7 +482,7 @@
         'Phone: ' + phone
       ].join('\n');
       var subject = 'Solution Match: ' + sol.title + ' — ' + name.value;
-      window.location.href = 'mailto:jeffrey.teo@akadigital.net?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      window.location.href = 'mailto:' + director + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     }
 
     /* Show result screen */

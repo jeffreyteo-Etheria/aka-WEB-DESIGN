@@ -128,6 +128,17 @@
       republish everything (e.g. after deleting content).
     </p>
 
+    <!-- Authorised users + Google access requests (super admin only) -->
+    <section class="content-section super-only" style="display:none">
+      <div class="section-header">
+        <h2>Authorised Users — Google Sign-In</h2>
+        <a href="/admin/users-form" class="btn-sm">Manage Users</a>
+      </div>
+      <div id="authUserList" class="content-list">
+        <div class="loading">Loading…</div>
+      </div>
+    </section>
+
     <!-- Blog post list -->
     <section class="content-section">
       <div class="section-header">
@@ -323,6 +334,64 @@
           </div>
         </div>`).join('');
     });
+
+    // ── Authorised users + Google access requests (super only) ──────────
+    function loadAuthUsers() {
+      if (role !== 'super') return;
+      apiFetch('/api/users').then(users => {
+        const el = document.getElementById('authUserList');
+        users = users || [];
+        const pending  = users.filter(u => u.status === 'pending');
+        const approved = users.filter(u => u.status !== 'pending');
+        const fmtDate  = iso => iso ? new Date(iso).toLocaleDateString() : '';
+
+        const pendingHtml = pending.map(u => `
+          <div class="list-item" style="background:#fffbeb;border-left:3px solid #f59e0b;">
+            <div class="list-item-info">
+              <span class="list-item-title">${u.email}</span>
+              <span class="list-item-meta">${u.name || 'Unknown name'} · requested ${fmtDate(u.requestedAt)} · <strong style="color:#b45309">Awaiting approval</strong></span>
+            </div>
+            <div class="list-item-actions">
+              <button class="btn-xs" style="background:#16a34a;color:#fff;border-color:#16a34a" onclick="approveUser('${u.email}','team')">Approve — Team</button>
+              <button class="btn-xs" onclick="approveUser('${u.email}','super')">Approve — Super</button>
+              <button class="btn-xs danger" onclick="rejectUser('${u.email}')">Reject</button>
+            </div>
+          </div>`).join('');
+
+        const approvedHtml = approved.map(u => `
+          <div class="list-item">
+            <div class="list-item-info">
+              <span class="list-item-title">${u.email}</span>
+              <span class="list-item-meta">${u.name || '—'} · ${u.role === 'super' ? 'Super Admin' : 'Team'} · ${u.active === false ? '<span style="color:#ef4444">Disabled</span>' : '<span style="color:#22c55e">Active</span>'}${u.approvedAt ? ' · approved ' + fmtDate(u.approvedAt) + (u.approvedBy ? ' by ' + u.approvedBy : '') : ''}</span>
+            </div>
+            <div class="list-item-actions">
+              <button class="btn-xs danger" onclick="removeAuthUser('${u.email}')">Remove</button>
+            </div>
+          </div>`).join('');
+
+        el.innerHTML = (pendingHtml + approvedHtml) ||
+          '<p class="empty">No Google users yet. When someone signs in with Google, their access request appears here for approval.</p>';
+      });
+    }
+    loadAuthUsers();
+
+    async function approveUser(email, newRole) {
+      const r = await apiFetch('/api/users/' + encodeURIComponent(email), 'PUT', { status: 'approved', role: newRole, active: true });
+      if (r.ok) loadAuthUsers();
+      else alert('Could not approve: ' + (r.error || 'unknown error'));
+    }
+    async function rejectUser(email) {
+      if (!confirm('Reject the access request from ' + email + '? They will be able to request again.')) return;
+      const r = await apiFetch('/api/users/' + encodeURIComponent(email), 'DELETE');
+      if (r.ok) loadAuthUsers();
+      else alert('Could not reject: ' + (r.error || 'unknown error'));
+    }
+    async function removeAuthUser(email) {
+      if (!confirm('Remove ' + email + '? They will lose CMS access immediately.')) return;
+      const r = await apiFetch('/api/users/' + encodeURIComponent(email), 'DELETE');
+      if (r.ok) loadAuthUsers();
+      else alert('Could not remove: ' + (r.error || 'unknown error'));
+    }
 
     // ── Delete helpers ───────────────────────────────────────────────────
     /* Deleting removes the item from the CMS immediately, then rebuilds the

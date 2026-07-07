@@ -28,7 +28,7 @@
   "footer": [
     { "label": "Privacy Policy",  "href": "/privacy" },
     { "label": "Terms of Service","href": "/terms" },
-    { "label": "LinkedIn",  "href": "https://www.linkedin.com/company/akadigital", "external": true },
+    { "label": "LinkedIn",  "href": "https://www.linkedin.com/company/aka-digital-vietnam/", "external": true },
     { "label": "YouTube",   "href": "https://www.youtube.com/@AKADIGITALVIETNAM",  "external": true }
   ]
 }
