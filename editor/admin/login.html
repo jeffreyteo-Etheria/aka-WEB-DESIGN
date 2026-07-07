@@ -12,6 +12,7 @@
     #googleSignIn:hover { border-color:#0B1F4B;box-shadow:0 2px 8px rgba(0,0,0,.08); }
     #googleSignIn img { width:20px;height:20px; }
     #googleSection { display:none; }
+    .info-msg { background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:12px; }
   </style>
 </head>
 <body class="login-body">
@@ -73,6 +74,15 @@
 
     function showError(msg) {
       const err = document.getElementById('loginError');
+      err.className = 'error-msg';
+      err.textContent = msg;
+      err.style.display = 'block';
+    }
+
+    /* Access-request responses aren't failures — show them calmly in blue. */
+    function showInfo(msg) {
+      const err = document.getElementById('loginError');
+      err.className = 'info-msg';
       err.textContent = msg;
       err.style.display = 'block';
     }
@@ -124,6 +134,7 @@
               });
               const d = await r.json();
               if (d.ok) { storeSession(d); }
+              else if (d.pending) { showInfo(d.error); }
               else { showError(d.error || 'Google sign-in failed'); }
             } catch { showError('Could not connect to server'); }
           },

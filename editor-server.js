@@ -96,7 +96,12 @@ async function saveUploadedImage(buffer, originalFilename) {
 
 const BLOG_PAGES = path.join(ROOT, 'src', 'blog');
 const CASE_STUDY_PAGES = path.join(ROOT, 'src', 'case-studies');
-const CMS_USERS  = path.join(ROOT, 'cms_users.json');
+/* Hostinger Git deploys reset the app directory to the repo state, destroying
+   untracked runtime files (proven 2026-07-06 with CMS uploads). This file holds
+   every approved Google user — losing it on deploy silently locks them all out.
+   In production set CMS_USERS_FILE to a path OUTSIDE the deploy directory
+   (e.g. /home/<user>/cms_users.json); the repo-root default is for local dev. */
+const CMS_USERS  = process.env.CMS_USERS_FILE || path.join(ROOT, 'cms_users.json');
 
 /* Answers "is this server actually running the latest code?" without needing
    SSH/hPanel access — the CMS and the site it publishes to are the same
@@ -484,13 +489,27 @@ http.createServer(async (req, res) => {
         if (info.error || !info.email) return j(res, 401, { error: 'Invalid Google token' });
         if (info.email_verified !== 'true' && info.email_verified !== true)
           return j(res, 401, { error: 'Google email not verified' });
+        const email = String(info.email).toLowerCase().trim();
         const users = readUsers();
-        const user  = users.find(u => u.email === info.email && u.active !== false);
-        if (!user) return j(res, 403, { error: 'Access not granted. Ask your administrator to add your Gmail address.' });
+        const user  = users.find(u => u.email === email);
+        if (!user) {
+          /* Unknown Google account → record an access request instead of a
+             dead-end rejection. Pending entries never grant a session; a
+             super admin approves or rejects them from the Dashboard. */
+          users.push({ email, name: info.name || '', status: 'pending', requestedAt: new Date().toISOString() });
+          writeUsers(users);
+          appendAuditLog('google_access_requested', { email, clientIp });
+          return j(res, 403, { pending: true, error: 'Access request sent. A super admin must approve your account before you can sign in.' });
+        }
+        if (user.status === 'pending')
+          return j(res, 403, { pending: true, error: 'Your access request is still awaiting admin approval.' });
+        if (user.active === false)
+          return j(res, 403, { error: 'Your account has been disabled. Contact your administrator.' });
         const t = mkToken();
-        SESSIONS.set(t, { username: info.email, role: user.role || 'team', display: user.name || info.name || info.email });
+        SESSIONS.set(t, { username: email, role: user.role || 'team', display: user.name || info.name || email, createdAt: Date.now(), expiresAt: Date.now() + securityConfig.sessionTtlMs });
         persistSessions();
-        return j(res, 200, { ok: true, token: t, role: user.role || 'team', display: user.name || info.name || info.email });
+        appendAuditLog('login_succeeded', { username: email, role: user.role || 'team', clientIp, method: 'google' });
+        return j(res, 200, { ok: true, token: t, role: user.role || 'team', display: user.name || info.name || email });
       } catch (e) {
         return j(res, 500, { error: 'Could not verify with Google: ' + e.message });
       }
@@ -523,10 +542,6 @@ http.createServer(async (req, res) => {
       const blogs = readData('blogs');
       const slug = slugify(b.slug || b.title || 'untitled-' + Date.now());
 
-      if (blogs.find(x => x.slug === slug)) {
-        return j(res, 409, { error: 'A post with this slug already exists' });
-      }
-
       const post = {
         slug,
         title:        b.title        || '',
@@ -543,10 +558,16 @@ http.createServer(async (req, res) => {
         status:       b.status === 'published' ? 'published' : 'draft',
       };
 
-      blogs.unshift(post); // newest first
+      /* Upsert, not reject: writers routinely open "New Post" for an article
+         that already exists (e.g. to re-paste a body) — a 409 here left posts
+         permanently unsavable from that screen. Same-slug create now updates
+         the existing post, which is what the writer means by "Save". */
+      const existingIdx = blogs.findIndex(x => x.slug === slug);
+      if (existingIdx !== -1) blogs[existingIdx] = { ...blogs[existingIdx], ...post };
+      else blogs.unshift(post); // newest first
       writeData('blogs', blogs);
       writeBlogNjk(post.slug);
-      return j(res, 200, { ok: true, slug: post.slug });
+      return j(res, 200, { ok: true, slug: post.slug, updated: existingIdx !== -1 });
     }
 
     /* UPDATE blog post */
@@ -598,10 +619,6 @@ http.createServer(async (req, res) => {
       const events = readData('events');
       const slug   = slugify(b.slug || b.title || 'event-' + Date.now());
 
-      if (events.find(x => x.slug === slug)) {
-        return j(res, 409, { error: 'An event with this slug already exists' });
-      }
-
       const event = {
         slug,
         title:       b.title       || '',
@@ -616,9 +633,12 @@ http.createServer(async (req, res) => {
         status:      b.status === 'published' ? 'published' : 'draft',
       };
 
-      events.unshift(event);
+      /* Upsert, not reject — see /api/blogs/new for why. */
+      const existingIdx = events.findIndex(x => x.slug === slug);
+      if (existingIdx !== -1) events[existingIdx] = { ...events[existingIdx], ...event };
+      else events.unshift(event);
       writeData('events', events);
-      return j(res, 200, { ok: true, slug: event.slug });
+      return j(res, 200, { ok: true, slug: event.slug, updated: existingIdx !== -1 });
     }
 
     /* UPDATE event */
@@ -656,7 +676,6 @@ http.createServer(async (req, res) => {
       if (b === null) return;
       const cs = readData('case_studies');
       const slug = slugify(b.slug || b.title || 'case-' + Date.now());
-      if (cs.find(x => x.slug === slug)) return j(res, 409, { error: 'Slug already exists' });
       const entry = {
         slug,
         client:         b.client         || '',
@@ -683,10 +702,13 @@ http.createServer(async (req, res) => {
         tags:           Array.isArray(b.tags) ? b.tags : (b.tags || '').split(',').map(t => t.trim()).filter(Boolean),
         status:         b.status === 'published' ? 'published' : 'draft',
       };
-      cs.unshift(entry);
+      /* Upsert, not reject — see /api/blogs/new for why. */
+      const existingIdx = cs.findIndex(x => x.slug === slug);
+      if (existingIdx !== -1) cs[existingIdx] = { ...cs[existingIdx], ...entry };
+      else cs.unshift(entry);
       writeData('case_studies', cs);
-      writeCaseStudyNjk(entry.slug, entry);
-      return j(res, 200, { ok: true, slug: entry.slug });
+      writeCaseStudyNjk(entry.slug, existingIdx !== -1 ? cs[existingIdx] : entry);
+      return j(res, 200, { ok: true, slug: entry.slug, updated: existingIdx !== -1 });
     }
 
     if (p.startsWith('/api/case-studies/') && m === 'PUT') {
@@ -803,7 +825,6 @@ http.createServer(async (req, res) => {
       if (b === null) return;
       const jobs = readData('jobs');
       const slug = slugify(b.slug || b.title || 'job-' + Date.now());
-      if (jobs.find(x => x.slug === slug)) return j(res, 409, { error: 'Slug already exists' });
       const entry = {
         slug,
         title:       b.title        || '',
@@ -817,9 +838,12 @@ http.createServer(async (req, res) => {
         active:      b.active !== false,
         status:      b.status === 'published' ? 'published' : 'draft',
       };
-      jobs.push(entry);
+      /* Upsert, not reject — see /api/blogs/new for why. */
+      const existingIdx = jobs.findIndex(x => x.slug === slug);
+      if (existingIdx !== -1) jobs[existingIdx] = { ...jobs[existingIdx], ...entry };
+      else jobs.push(entry);
       writeData('jobs', jobs);
-      return j(res, 200, { ok: true, slug: entry.slug });
+      return j(res, 200, { ok: true, slug: entry.slug, updated: existingIdx !== -1 });
     }
 
     if (p.startsWith('/api/jobs/') && m === 'PUT') {
@@ -899,8 +923,9 @@ http.createServer(async (req, res) => {
       if (!email || !email.includes('@')) return j(res, 400, { error: 'Valid email required' });
       const users = readUsers();
       if (users.find(u => u.email === email)) return j(res, 409, { error: 'Email already exists' });
-      users.push({ email, name: b.name || '', role: b.role || 'team', active: true });
+      users.push({ email, name: b.name || '', role: b.role || 'team', active: true, status: 'approved', approvedAt: new Date().toISOString(), approvedBy: getSession(req)?.username || 'super' });
       writeUsers(users);
+      appendAuditLog('google_user_added', { email, role: b.role || 'team', by: getSession(req)?.username });
       return j(res, 200, { ok: true });
     }
 
@@ -912,7 +937,17 @@ http.createServer(async (req, res) => {
       if (idx === -1) return j(res, 404, { error: 'User not found' });
       const b = await readValidatedBody(req, res, 'users.update');
       if (b === null) return;
+      const wasPending = users[idx].status === 'pending';
       users[idx] = { ...users[idx], ...b, email };
+      if (b.status === 'approved' && wasPending) {
+        /* Approval is stamped server-side so the audit trail can't be forged
+           by the client — the Dashboard shows who approved whom, and when. */
+        users[idx].approvedAt = new Date().toISOString();
+        users[idx].approvedBy = getSession(req)?.username || 'super';
+        users[idx].active     = true;
+        if (!users[idx].role) users[idx].role = 'team';
+        appendAuditLog('google_user_approved', { email, role: users[idx].role, by: users[idx].approvedBy });
+      }
       writeUsers(users);
       return j(res, 200, { ok: true });
     }
@@ -920,7 +955,10 @@ http.createServer(async (req, res) => {
     if (p.startsWith('/api/users/') && m === 'DELETE') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
       const email = decodeURIComponent(p.replace('/api/users/', ''));
-      writeUsers(readUsers().filter(u => u.email !== email));
+      const before = readUsers();
+      const target = before.find(u => u.email === email);
+      writeUsers(before.filter(u => u.email !== email));
+      appendAuditLog(target?.status === 'pending' ? 'google_request_rejected' : 'google_user_removed', { email, by: getSession(req)?.username });
       return j(res, 200, { ok: true });
     }
 

@@ -16,6 +16,7 @@
     .badge-team  { background:#f1f5f9;color:#475569; }
     .badge-on    { background:#dcfce7;color:#16a34a; }
     .badge-off   { background:#fef2f2;color:#dc2626; }
+    .badge-pending { background:#fef3c7;color:#b45309; }
     .add-section { background:#fff;border:1.5px solid var(--mist);border-radius:12px;padding:24px;margin-bottom:28px; }
     .add-section h3 { font-size:15px;font-weight:700;color:var(--ink);margin-bottom:16px; }
     .form-row { display:grid;grid-template-columns:1fr 1fr auto auto;gap:12px;align-items:end; }
@@ -63,6 +64,10 @@
       Get your Client ID from <strong>Google Cloud Console → APIs &amp; Services → Credentials → Create OAuth 2.0 Client ID</strong>
       (Web application). Add <code>https://akadigital.net</code> as an Authorised JavaScript Origin.
       The master admin account (username/password) always works regardless.
+      Anyone signing in with an unknown Google account creates an <strong>access request</strong> —
+      approve or reject it here or on the Dashboard. On Hostinger also set <code>CMS_USERS_FILE</code>
+      to a path outside the app directory (e.g. <code>/home/&lt;user&gt;/cms_users.json</code>) so the
+      approved-user list survives Git deploys.
     </div>
 
     <!-- Add user form -->
@@ -152,7 +157,18 @@
           <th>Gmail Address</th><th>Name</th><th>Role</th><th>Status</th><th>Actions</th>
         </tr></thead>
         <tbody>
-        ${users.map(u => `
+        ${users.map(u => u.status === 'pending' ? `
+          <tr style="background:#fffbeb">
+            <td>${u.email}</td>
+            <td>${u.name || '—'}</td>
+            <td>—</td>
+            <td><span class="badge badge-pending">Pending</span></td>
+            <td style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="btn-xs" onclick="approvePending('${u.email}','team')">Approve — Team</button>
+              <button class="btn-xs" onclick="approvePending('${u.email}','super')">Approve — Super</button>
+              <button class="btn-xs danger" onclick="removeUser('${u.email}')">Reject</button>
+            </td>
+          </tr>` : `
           <tr>
             <td>${u.email}</td>
             <td>${u.name || '—'}</td>
@@ -180,6 +196,12 @@
       const r = await apiFetch('/api/users/new', 'POST', { email, name, role });
       if (r.ok) { showBanner('User added: ' + email); loadUsers(); document.getElementById('newEmail').value = ''; document.getElementById('newName').value = ''; }
       else       showBanner(r.error || 'Could not add user', true);
+    }
+
+    async function approvePending(email, newRole) {
+      const r = await apiFetch('/api/users/' + encodeURIComponent(email), 'PUT', { status: 'approved', role: newRole, active: true });
+      if (r.ok) { showBanner('Approved: ' + email); loadUsers(); }
+      else showBanner(r.error || 'Could not approve', true);
     }
 
     async function toggleRole(email, newRole) {
