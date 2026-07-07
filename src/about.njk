@@ -317,42 +317,38 @@ description: AKA Digital is Vietnam's exclusive representative for leading globa
     <!-- Auto-scrolling photo strip -->
     <div class="relative overflow-hidden">
       <div class="flex gap-4 photo-scroll-track" style="animation: photoScroll 30s linear infinite;">
+        {# Photos live in /images/events-strip/ — a git-tracked folder, because
+           Hostinger deploys wipe anything untracked (the old
+           /images/activities/ paths 404ed on live for exactly that reason). #}
         {% set eventPhotos = [
-          "/images/activities/MartechSummit2025/MartechSummit2025_0001.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0003.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0005.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0007.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0009.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0011.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0013.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0015.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0017.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0019.jpeg",
-          "/images/activities/2023 Martech Innovation/DSC01320_edited.jpg",
-          "/images/activities/2023 Martech Innovation/DSC08458.jpg",
-          "/images/activities/2023 Martech Innovation/IMG_3169.jpeg",
-          "/images/activities/2023 Martech Innovation/IMG_3241.jpeg",
-          "/images/activities/Look-back-Martech-Summit-2024/Martech2024-0003.jpeg",
-          "/images/activities/Look-back-Martech-Summit-2024/Martech2024-0005.jpeg",
-          "/images/activities/Look-back-Martech-Summit-2024/Martech2024-0009.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0021.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0023.jpeg",
-          "/images/activities/MartechSummit2025/MartechSummit2025_0025.jpeg"
+          "/images/events-strip/summit-hn-2023-01.jpg",
+          "/images/events-strip/summit-hcm-01.jpeg",
+          "/images/events-strip/martech-innovation-2023-01.jpeg",
+          "/images/events-strip/summit-hn-2023-02.jpg",
+          "/images/events-strip/summit-hcm-02.jpeg",
+          "/images/events-strip/martech-innovation-2023-02.jpg",
+          "/images/events-strip/summit-hn-2023-03.jpg",
+          "/images/events-strip/summit-hcm-03.jpeg",
+          "/images/events-strip/martech-innovation-2023-03.jpeg",
+          "/images/events-strip/summit-hn-2023-04.jpg",
+          "/images/events-strip/summit-hcm-04.jpeg",
+          "/images/events-strip/summit-hn-2023-05.jpg"
         ] %}
         {% for photo in eventPhotos %}
-          <div class="shrink-0 w-64 h-40 overflow-hidden rounded-2xl bg-surface-container">
+          <a href="/insights" class="shrink-0 w-64 h-40 overflow-hidden rounded-2xl bg-surface-container block"
+             aria-label="AKA Digital events — see Insights">
             <img src="{{ photo }}" alt="AKA Digital event"
               class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               loading="lazy" />
-          </div>
+          </a>
         {% endfor %}
         <!-- Duplicate for seamless loop -->
         {% for photo in eventPhotos %}
-          <div class="shrink-0 w-64 h-40 overflow-hidden rounded-2xl bg-surface-container" aria-hidden="true">
+          <a href="/insights" class="shrink-0 w-64 h-40 overflow-hidden rounded-2xl bg-surface-container block" aria-hidden="true" tabindex="-1">
             <img src="{{ photo }}" alt=""
               class="w-full h-full object-cover"
               loading="lazy" />
-          </div>
+          </a>
         {% endfor %}
       </div>
     </div>
