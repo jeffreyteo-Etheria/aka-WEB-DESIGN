@@ -1,10 +1,11 @@
 /**
  * AKA Digital — Lead & Career Webhook (Google Apps Script)
  *
- * Receives POSTs from the website's contact form (src/contact.njk) and the
- * careers application form (src/careers.njk). Logs each submission to a tab
- * in the bound Google Sheet and emails a notification:
- *   - Leads   → the assigned market contact, cc'd to Hello@akadigital.net
+ * Receives POSTs from every website lead form (contact page, solution-match
+ * quiz, CRM Maturity Audit) and the careers application form. Logs each
+ * submission to a tab in the bound Google Sheet and emails a notification:
+ *   - Leads   → ALWAYS jeffrey.teo@ + phuong.pham@ (NOTIFY_DEFAULTS), plus
+ *               the assigned market contact if different, cc Hello@
  *   - Careers → Hello@akadigital.net directly
  *
  * SETUP
@@ -31,6 +32,9 @@ var SHEET_LEADS          = 'Leads';    // tab name for contact form + CTA quiz l
 var SHEET_CAREERS        = 'Careers';  // tab name for job applications
 var CC_ADDRESS           = 'Hello@akadigital.net';
 var DEFAULT_LEAD_CONTACT = 'jeffrey.teo@akadigital.net';
+// Every lead notification goes to these two regardless of market routing —
+// the assigned market contact is added on top, never instead.
+var NOTIFY_DEFAULTS = ['jeffrey.teo@akadigital.net', 'phuong.pham@akadigital.net'];
 
 function doPost(e) {
   try {
@@ -127,7 +131,12 @@ function logCareer(data) {
 }
 
 function emailLead(data) {
-  var to = data.assigned_to || DEFAULT_LEAD_CONTACT;
+  var recipients = NOTIFY_DEFAULTS.slice();
+  var assigned = (data.assigned_to || '').toLowerCase();
+  if (assigned && recipients.map(function (r) { return r.toLowerCase(); }).indexOf(assigned) === -1) {
+    recipients.push(data.assigned_to);
+  }
+  var to = recipients.join(',');
   var interest = data.inquiry_type || data.service || data.solution || 'General';
   var subject = 'New Website Enquiry — ' + interest + ' — ' + (data.name || 'Unknown');
   var body = [

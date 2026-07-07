@@ -359,11 +359,7 @@ solutionSlug: crm-automation
 
       <!-- Form card -->
       <div class="bg-surface-off-white border border-outline-variant/20 rounded-3xl p-8 md:p-12 shadow-[0_4px_40px_rgba(0,0,0,0.06)]">
-        <form class="grid md:grid-cols-2 gap-x-8 gap-y-6" name="crm-audit" action="https://formsubmit.co/phuong.pham@akadigital.net" method="POST">
-          <input type="hidden" name="_subject" value="CRM Maturity Audit Request — AKA Digital">
-          <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="_captcha" value="false">
-          <input type="hidden" name="_next" value="https://akadigital.net/solutions/crm-automation/?submitted=true">
+        <form class="grid md:grid-cols-2 gap-x-8 gap-y-6" name="crm-audit" id="crm-audit-form">
           <div class="flex flex-col gap-2">
             <label class="text-label-md text-on-surface-variant uppercase tracking-wider">Full Name <span class="text-error">*</span></label>
             <input type="text" name="name" placeholder="Your full name" required class="input-field" />
@@ -410,10 +406,13 @@ solutionSlug: crm-automation
             <textarea name="challenge" placeholder="Tell us what's holding you back — data silos, low personalisation, high churn, or something else..." rows="3" class="input-field resize-none"></textarea>
           </div>
           <div class="md:col-span-2 text-center mt-2">
-            <button type="submit" class="btn-primary w-full md:w-auto px-12 py-4 text-base">
+            <button type="submit" id="crm-audit-submit" class="btn-primary w-full md:w-auto px-12 py-4 text-base">
               Submit Audit Request
               <span class="material-symbols-outlined">arrow_forward</span>
             </button>
+            <p id="crm-audit-success" class="hidden text-body-md text-primary font-bold py-2">
+              ✓ Audit request received! We'll deliver your report within 2 business days.
+            </p>
             <p class="mt-4 text-label-md text-on-surface-variant">Usually delivered within 2 business days. Zero spam — just value.</p>
           </div>
         </form>
@@ -421,6 +420,60 @@ solutionSlug: crm-automation
     </div>
   </div>
 </section>
+
+<!-- CRM Audit → Google Sheets webhook (same lead pipeline as the contact page:
+     the Apps Script logs to the Leads tab and emails the notification list). -->
+<script>
+(function () {
+  var form = document.getElementById('crm-audit-form');
+  if (!form) return;
+  var WEBHOOK_URL = '{{ cms_settings.webhook_url }}';
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = {};
+    new FormData(form).forEach(function (v, k) { f[k] = v; });
+    var payload = {
+      form_type:    'lead',
+      source_page:  window.location.pathname,
+      market:       'SG/SEA',
+      assigned_to:  'phuong.pham@akadigital.net',
+      name:         f.name || '',
+      company:      f.company || '',
+      email:        f.email || '',
+      phone:        f.phone || '',
+      inquiry_type: 'CRM Maturity Audit',
+      solution:     f.stack || '',
+      pain_point:   f.challenge || '',
+      message:      'MAU range: ' + (f.user_count || '—')
+    };
+
+    var btn = document.getElementById('crm-audit-submit');
+    btn.disabled = true;
+    function done() {
+      btn.classList.add('hidden');
+      document.getElementById('crm-audit-success').classList.remove('hidden');
+      form.reset();
+    }
+
+    if (WEBHOOK_URL && WEBHOOK_URL.indexOf('REPLACE') === -1) {
+      fetch(WEBHOOK_URL, {
+        method: 'POST',
+        mode:   'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(function () {}).finally(done);
+    } else {
+      /* Webhook not configured yet — mailto fallback so no lead is lost */
+      var body = Object.keys(payload).map(function (k) { return k + ': ' + payload[k]; }).join('\n');
+      window.location.href = 'mailto:phuong.pham@akadigital.net?cc=jeffrey.teo@akadigital.net'
+        + '&subject=' + encodeURIComponent('CRM Maturity Audit Request — ' + (f.name || ''))
+        + '&body=' + encodeURIComponent(body);
+      done();
+    }
+  });
+})();
+</script>
 
 
 <!-- ============================================================

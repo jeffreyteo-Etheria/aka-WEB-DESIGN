@@ -1,25 +1,19 @@
 <!-- ============================================================
      Lead Gen / Contact Form
-     1. Email delivery  : FormSubmit.co → jeffrey.teo@akadigital.net
-     2. CRM bridge      : Google Sheets webhook (Phase 2)
-        → Set WEBHOOK_URL below to your Google Apps Script URL.
-        → In Make.com, watch the "New Lead" rows to trigger sequences:
-            Status = "New Lead"              → immediate welcome email
-            Status = "No Response - 3 Days"  → 3-day follow-up (set by Make.com)
-            Status = "10-Day Follow-Up"       → 10-day nurture (set by Make.com)
-            Status = "Retargeting - 30 Days"  → retargeting reminder
+     Single pipeline: Google Sheets webhook (cms_settings.webhook_url).
+     The Apps Script logs the lead to the sheet AND emails the
+     notification list (jeffrey.teo + phuong.pham + assigned market
+     contact, cc Hello@) in one call — no FormSubmit involved.
+     In Make.com, watch the "New Lead" rows to trigger sequences:
+         Status = "New Lead"              → immediate welcome email
+         Status = "No Response - 3 Days"  → 3-day follow-up (set by Make.com)
+         Status = "10-Day Follow-Up"       → 10-day nurture (set by Make.com)
+         Status = "Retargeting - 30 Days"  → retargeting reminder
      ============================================================ -->
 <form
   id="contact-form"
-  action="https://formsubmit.co/jeffrey.teo@akadigital.net"
-  method="POST"
   class="space-y-5"
 >
-  <!-- FormSubmit config -->
-  <input type="hidden" name="_subject" value="New Enquiry — AKA Digital Website">
-  <input type="hidden" name="_template" value="table">
-  <input type="hidden" name="_captcha" value="false">
-  <input type="hidden" name="_next" value="https://akadigital.net/contact/?submitted=true">
 
   <div>
     <label for="form-name" class="block text-label-md text-on-surface-variant mb-1" data-i18n="form.name">
@@ -134,9 +128,10 @@
   var WEBHOOK_URL = '{{ cms_settings.webhook_url }}';
 
   var form = document.getElementById('contact-form');
-  if (!form || !WEBHOOK_URL || WEBHOOK_URL.indexOf('REPLACE') !== -1) return;
+  if (!form) return;
 
   form.addEventListener('submit', function(e) {
+    e.preventDefault();
     /* Phase 3: CRM payload structure for Make.com automation sequences */
     var payload = {
       form_type:   'lead',
@@ -170,12 +165,29 @@
        */
     };
 
-    fetch(WEBHOOK_URL, {
-      method: 'POST',
-      mode:   'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    }).catch(function() { /* silent fail — FormSubmit.co handles primary delivery */ });
+    var submitBtn = document.getElementById('form-submit');
+    submitBtn.disabled = true;
+    function showSuccess() {
+      document.getElementById('form-success').classList.remove('hidden');
+      form.reset();
+      submitBtn.disabled = false;
+    }
+
+    if (WEBHOOK_URL && WEBHOOK_URL.indexOf('REPLACE') === -1) {
+      fetch(WEBHOOK_URL, {
+        method: 'POST',
+        mode:   'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }).catch(function() {}).finally(showSuccess);
+    } else {
+      /* Webhook not configured yet — mailto fallback so no lead is lost */
+      var body = Object.keys(payload).map(function(k) { return k + ': ' + payload[k]; }).join('\n');
+      window.location.href = 'mailto:jeffrey.teo@akadigital.net?cc=phuong.pham@akadigital.net'
+        + '&subject=' + encodeURIComponent('New Enquiry — AKA Digital Website')
+        + '&body=' + encodeURIComponent(body);
+      showSuccess();
+    }
   });
 })();
 </script>
