@@ -38,6 +38,8 @@ jobs:
           local-dir: ./dist/
           server-dir: ${{ secrets.FTP_REMOTE_ROOT || '/public_html/' }}
           exclude: |
+            reach/**
+            **/reach/**
             **/.DS_Store
             **/Thumbs.db
             **/node_modules/**
