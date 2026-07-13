@@ -1,0 +1,4 @@
+# Scoped to /reach only — permanently redirect to the dashboard's new home.
+# This folder contains nothing else; the main site is untouched.
+RewriteEngine On
+RewriteRule ^(.*)$ https://reach.akadigital.net/$1 [R=301,L]
