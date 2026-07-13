@@ -408,6 +408,12 @@ http.createServer(async (req, res) => {
 
   if (m === 'OPTIONS') return reply(res, 200, '', 'text/plain');
 
+  /* ── 0. AKA REACH dashboard lives on its own subdomain ───────────────── */
+  if (p === '/reach' || p.startsWith('/reach/')) {
+    res.writeHead(301, { Location: 'https://reach.akadigital.net' + (p === '/reach' ? '/' : p.slice('/reach'.length)) + u.search });
+    return res.end();
+  }
+
   /* ── 1. Admin UI pages (/admin and /admin/*) ─────────────────────────── */
   if (p === '/admin' || p === '/admin/' || p.startsWith('/admin/')) {
     const subpath = p === '/admin' || p === '/admin/' ? '/login.html' : p.replace('/admin', '');
