@@ -1,0 +1,68 @@
+name: Deploy reach redirect (manual)
+
+# One-off manual deploy: puts a folder-scoped 301 redirect into
+# public_html/reach/ so the old akadigital.net/reach URL forwards to
+# the canonical https://reach.akadigital.net. Uploads exactly two
+# files with explicit `put` commands — never syncs, never deletes.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create redirect files
+        run: |
+          mkdir -p out
+          cat > out/.htaccess <<'EOF'
+          # Scoped to /reach only — permanently redirect to the dashboard's new home.
+          # This folder contains nothing else; the main site is untouched.
+          RewriteEngine On
+          RewriteRule ^(.*)$ https://reach.akadigital.net/$1 [R=301,L]
+          EOF
+          cat > out/index.html <<'EOF'
+          <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+          <title>AKA REACH has moved</title>
+          <meta http-equiv="refresh" content="0;url=https://reach.akadigital.net/">
+          <link rel="canonical" href="https://reach.akadigital.net/">
+          <script>location.replace("https://reach.akadigital.net/"+location.search)</script>
+          </head><body style="font-family:sans-serif;padding:40px;text-align:center">
+          <p>AKA REACH has moved to <a href="https://reach.akadigital.net/">reach.akadigital.net</a> &mdash; redirecting&hellip;</p>
+          </body></html>
+          EOF
+          ls -la out
+
+      - name: Upload via FTPS
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_REMOTE_ROOT: ${{ secrets.FTP_REMOTE_ROOT }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          ROOT="${FTP_REMOTE_ROOT:-/public_html/}"
+          lftp <<LFTP
+          set ftp:ssl-force true
+          set ssl:verify-certificate yes
+          set net:max-retries 2
+          open -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$FTP_HOST"
+          set cmd:fail-exit no
+          mkdir -p "${ROOT}reach"
+          set cmd:fail-exit yes
+          cd "${ROOT}reach"
+          put out/.htaccess -o .htaccess
+          put out/index.html -o index.html
+          cls -la
+          bye
+          LFTP
+
+      - name: Verify redirect is live
+        run: |
+          sleep 5
+          code=$(curl -s -o /dev/null -w '%{http_code}' https://akadigital.net/reach/)
+          loc=$(curl -s -o /dev/null -w '%{redirect_url}' https://akadigital.net/reach/)
+          echo "akadigital.net/reach/ -> $code $loc"
+          test "$code" = "301"
+          echo "$loc" | grep -q '^https://reach.akadigital.net/'
