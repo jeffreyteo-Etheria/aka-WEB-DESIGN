@@ -1,9 +1,13 @@
 name: Deploy reach redirect (manual)
 
-# One-off manual deploy: puts a folder-scoped 301 redirect into the live
-# docroot's reach/ folder so the old akadigital.net/reach URL forwards to
-# the canonical https://reach.akadigital.net. Uploads exactly two files
-# with explicit `put` commands — never syncs, never touches other files.
+# One-off manual deploy of a single .htaccess into the live docroot's
+# reach/ folder. IMPORTANT: reach.akadigital.net's docroot IS
+# /domains/akadigital.net/public_html/reach (confirmed 13 Jul 2026 —
+# subdomain PHP endpoints created reach_data/ and assets/ in it), so the
+# redirect MUST be host-conditioned or the subdomain loops onto itself,
+# and no index.html may be uploaded (it would overwrite the dashboard).
+# Uploads exactly one file with an explicit `put` — never syncs, never
+# deletes, never touches other files.
 
 on:
   workflow_dispatch:
@@ -22,24 +26,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Create redirect files
+      - name: Create redirect .htaccess
         run: |
           mkdir -p out
           cat > out/.htaccess <<'EOF'
-          # Scoped to /reach only — permanently redirect to the dashboard's new home.
-          # This folder contains nothing else; the main site is untouched.
+          # Scoped to the shared /reach docroot. This same folder serves BOTH
+          # reach.akadigital.net (canonical) and akadigital.net/reach (legacy),
+          # so only redirect requests that arrive via the legacy hostnames.
           RewriteEngine On
+          RewriteCond %{HTTP_HOST} !^reach\.akadigital\.net$ [NC]
           RewriteRule ^(.*)$ https://reach.akadigital.net/$1 [R=301,L]
-          EOF
-          cat > out/index.html <<'EOF'
-          <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
-          <title>AKA REACH has moved</title>
-          <meta http-equiv="refresh" content="0;url=https://reach.akadigital.net/">
-          <link rel="canonical" href="https://reach.akadigital.net/">
-          <script>location.replace("https://reach.akadigital.net/"+location.search)</script>
-          </head><body style="font-family:sans-serif;padding:40px;text-align:center">
-          <p>AKA REACH has moved to <a href="https://reach.akadigital.net/">reach.akadigital.net</a> &mdash; redirecting&hellip;</p>
-          </body></html>
           EOF
           ls -la out
 
@@ -97,7 +93,6 @@ jobs:
           set cmd:fail-exit yes
           cd "$TARGET_DIR"
           put out/.htaccess -o .htaccess
-          put out/index.html -o index.html
           cls -la
           bye
           LFTP
@@ -110,5 +105,9 @@ jobs:
           code=$(curl -s -o /dev/null -w '%{http_code}' https://akadigital.net/reach/)
           loc=$(curl -s -o /dev/null -w '%{redirect_url}' https://akadigital.net/reach/)
           echo "akadigital.net/reach/ -> $code $loc"
+          # canonical subdomain must still serve the dashboard, NOT redirect
+          sub=$(curl -s -o /dev/null -w '%{http_code} %{size_download}' https://reach.akadigital.net/)
+          echo "reach.akadigital.net/ -> $sub"
           test "$code" = "301"
           echo "$loc" | grep -q '^https://reach.akadigital.net/'
+          echo "$sub" | grep -q '^200 '
