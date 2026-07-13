@@ -1,12 +1,22 @@
 name: Deploy reach redirect (manual)
 
-# One-off manual deploy: puts a folder-scoped 301 redirect into
-# public_html/reach/ so the old akadigital.net/reach URL forwards to
-# the canonical https://reach.akadigital.net. Uploads exactly two
-# files with explicit `put` commands — never syncs, never deletes.
+# One-off manual deploy: puts a folder-scoped 301 redirect into the live
+# docroot's reach/ folder so the old akadigital.net/reach URL forwards to
+# the canonical https://reach.akadigital.net. Uploads exactly two files
+# with explicit `put` commands — never syncs, never touches other files.
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "inspect = read-only listings; deploy = upload the two redirect files"
+        type: choice
+        options: [inspect, deploy]
+        default: inspect
+      remote_dir:
+        description: "Absolute FTP path of the /reach folder inside the LIVE docroot (deploy mode)"
+        required: false
+        default: "/domains/akadigital.net/public_html/reach"
 
 jobs:
   deploy:
@@ -39,10 +49,10 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_PORT: ${{ secrets.FTP_PORT }}
-          FTP_REMOTE_ROOT: ${{ secrets.FTP_REMOTE_ROOT }}
+          TARGET_DIR: ${{ inputs.remote_dir || '/domains/akadigital.net/public_html/reach' }}
+          MODE: ${{ inputs.mode || 'inspect' }}
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq lftp
-          ROOT="${FTP_REMOTE_ROOT:-/public_html/}"
           # FTP_HOST is Hostinger's raw server IP, but the FTPS certificate is
           # the CA-signed wildcard *.hstgr.io — an IP can never match it. Alias
           # a hstgr.io name to the IP so full TLS verification (chain + host)
@@ -57,22 +67,44 @@ jobs:
             echo "$IP $CONNECT_HOST" | sudo tee -a /etc/hosts >/dev/null
             echo "Aliased $CONNECT_HOST to the resolved server IP for cert-valid FTPS"
           fi
-          lftp <<LFTP
+          if [ "$MODE" = "inspect" ]; then
+            # Read-only: list the account layout so the true docroot can be
+            # confirmed before anything is uploaded. No writes of any kind.
+            lftp <<LFTP
           set ftp:ssl-force true
           set ssl:verify-certificate yes
           set net:max-retries 2
           open -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$CONNECT_HOST"
           set cmd:fail-exit no
-          mkdir -p "${ROOT}reach"
+          echo === /
+          cls -la /
+          echo === /domains/
+          cls -la /domains/
+          echo === /domains/akadigital.net/public_html/
+          cls -la /domains/akadigital.net/public_html/
+          echo === /domains/akadigital.net/public_html/reach/
+          cls -la /domains/akadigital.net/public_html/reach/
+          echo === /public_html/
+          cls -la /public_html/
+          bye
+          LFTP
+          else
+            lftp <<LFTP
+          set ftp:ssl-force true
+          set ssl:verify-certificate yes
+          set net:max-retries 2
+          open -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$CONNECT_HOST"
           set cmd:fail-exit yes
-          cd "${ROOT}reach"
+          cd "$TARGET_DIR"
           put out/.htaccess -o .htaccess
           put out/index.html -o index.html
           cls -la
           bye
           LFTP
+          fi
 
       - name: Verify redirect is live
+        if: ${{ inputs.mode == 'deploy' }}
         run: |
           sleep 5
           code=$(curl -s -o /dev/null -w '%{http_code}' https://akadigital.net/reach/)
