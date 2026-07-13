@@ -43,11 +43,20 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq lftp
           ROOT="${FTP_REMOTE_ROOT:-/public_html/}"
+          # FTP_HOST is Hostinger's raw server IP, but the FTPS certificate is
+          # the CA-signed wildcard *.hstgr.io — an IP can never match it. Alias
+          # a hstgr.io name to the IP so full TLS verification (chain + host)
+          # stays enabled and validates against Hostinger's real certificate.
+          CONNECT_HOST="$FTP_HOST"
+          if [[ "$FTP_HOST" =~ ^[0-9.]+$ ]]; then
+            CONNECT_HOST="ftp.hstgr.io"
+            echo "$FTP_HOST $CONNECT_HOST" | sudo tee -a /etc/hosts
+          fi
           lftp <<LFTP
           set ftp:ssl-force true
           set ssl:verify-certificate yes
           set net:max-retries 2
-          open -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$FTP_HOST"
+          open -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$CONNECT_HOST"
           set cmd:fail-exit no
           mkdir -p "${ROOT}reach"
           set cmd:fail-exit yes
