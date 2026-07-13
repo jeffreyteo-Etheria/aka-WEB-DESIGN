@@ -1,0 +1,32 @@
+<!-- ============================================================
+     Partner Logo Tile — homepage and /tech-partners
+     Variables: partner (object from partners.json)
+     ============================================================ -->
+<div class="card flex flex-col items-center justify-center gap-4 p-6 text-center group">
+
+  <!-- Logo image — hidden on error, initials shown instead -->
+  <div class="w-16 h-16 rounded-2xl bg-primary/8 border border-outline-variant/20 flex items-center justify-center overflow-hidden group-hover:bg-primary/15 transition-colors relative">
+    <img
+      src="{{ partner.logo }}"
+      alt="{{ partner.name }}"
+      class="max-w-[44px] max-h-[44px] object-contain grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300 partner-img"
+      loading="lazy"
+      onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')"
+    />
+    <!-- Initials fallback -->
+    <span class="hidden font-display font-extrabold text-headline-sm text-primary" translate="no">
+      {{ partner.name | truncate(2, true, "") }}
+    </span>
+  </div>
+
+  <!-- Name + category -->
+  <div>
+    <p class="font-display font-bold text-body-md text-on-surface group-hover:text-primary transition-colors" translate="no">
+      {{ partner.name }}
+    </p>
+    {% if partner.category %}
+      <span class="text-label-md text-on-surface-variant uppercase tracking-wider" translate="no">{{ partner.category }}</span>
+    {% endif %}
+  </div>
+
+</div>

@@ -1,0 +1,40 @@
+node_modules/
+dist/
+public/css/
+exports/
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.env
+.env.local
+
+# Large binary assets — keep locally, do not push to GitHub
+ASSETS/
+
+# CMS image uploads are TRACKED on purpose: Hostinger deploys reset the app
+# directory to the repo state, so any upload not in git is destroyed on the
+# next deploy (this killed every cover image uploaded before 2026-07-06).
+
+# Editor runtime state
+src/_data/_edits.json
+.sessions.json
+# Google-authorised CMS users (personal emails — keep out of the repo).
+# Hostinger deploys wipe untracked files, so in production CMS_USERS_FILE
+# must point OUTSIDE the app directory (e.g. /home/<user>/cms_users.json).
+cms_users.json
+
+# Temp / OS files
+*.tmp
+*.bak
+~$*
+
+# Media the site references MUST be tracked — Hostinger deploys reset the
+# tree to the repo, deleting anything untracked (this is what broke the About
+# gallery, the team photos, and the case-study videos on the live site).
+# activities/ and videos/ hold large archives, so only the files templates
+# actually reference are force-added (git add -f <file>); the rest stays
+# local-only. team/ is not ignored: drop the three team photos in there and
+# commit them to heal the About page.
+public/images/activities/
+public/videos/

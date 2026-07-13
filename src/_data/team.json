@@ -1,0 +1,41 @@
+[
+  {
+    "name":         "Jeffrey Teo",
+    "title":        "Country Director",
+    "role_label":   "Country Director, Regional Markets (SG · MY · ID)",
+    "markets":      ["SG", "MY", "ID"],
+    "email":        "jeffrey.teo@akadigital.net",
+    "phone":        "+65 8699 9719",
+    "country":      "Singapore · Malaysia · Indonesia",
+    "country_code": "SG",
+    "photo":        "/images/team/jeffrey-teo.jpg",
+    "linkedin":     "https://www.linkedin.com/in/jeffreyteo/",
+    "bio":          "Jeffrey leads AKA Digital's regional strategy and partnerships across Southeast Asia and Korea. With over a decade in B2B MarTech, he has helped 150+ enterprise brands unlock growth through data-driven marketing technology."
+  },
+  {
+    "name":         "Ms. Phuong Pham (Masie)",
+    "title":        "Country Director",
+    "role_label":   "Country Director, Vietnam",
+    "markets":      ["VN"],
+    "email":        "phuong.pham@akadigital.net",
+    "phone":        "+84 90 3045 373",
+    "country":      "Vietnam",
+    "country_code": "VN",
+    "photo":        "/images/team/phuong-pham.jpg",
+    "linkedin":     "",
+    "bio":          "Masie leads business development and client partnerships across Vietnam, managing AKA Digital's exclusive platform relationships and enterprise client portfolio."
+  },
+  {
+    "name":         "Mr. KS Hwang",
+    "title":        "Country Director",
+    "role_label":   "Country Director, South Korea",
+    "markets":      ["KR"],
+    "email":        "kw.hwang@akadigital.net",
+    "phone":        "+82 10 2335 3076",
+    "country":      "South Korea",
+    "country_code": "KR",
+    "photo":        "/images/team/ks-hwang.jpg",
+    "linkedin":     "",
+    "bio":          "KS leads AKA Digital's Korea operations, bridging Korean enterprise brands with SEA market entry and MarTech implementation."
+  }
+]

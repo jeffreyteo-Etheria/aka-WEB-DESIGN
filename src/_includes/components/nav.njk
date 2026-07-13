@@ -1,0 +1,194 @@
+<!-- ============================================================
+     Navigation — Desktop + Mobile Drawer + Bottom Bar
+     Data: src/_data/navigation.json
+     ============================================================ -->
+
+<!-- Top Header -->
+<header
+  class="fixed top-0 left-0 w-full z-50 bg-background/95 backdrop-blur-md border-b border-outline-variant/20 transition-shadow duration-300"
+  id="site-header"
+>
+  <!-- Row 1: Logo bar -->
+  <div class="section-container h-16 flex items-center justify-between border-b border-outline-variant/10">
+    <a href="/" class="inline-flex items-center shrink-0" aria-label="{{ settings.name }} — Home">
+      <img
+        src="/images/logos/aka-logo-rec.png"
+        alt="{{ settings.name }}"
+        class="block h-11 w-auto"
+        style="mix-blend-mode:multiply"
+      />
+    </a>
+    <!-- Mobile hamburger (row 1) -->
+    <button
+      class="md:hidden p-2 text-primary transition-transform active:scale-90"
+      id="menu-toggle"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="drawer"
+    >
+      <span class="material-symbols-outlined text-2xl" id="menu-icon">menu</span>
+    </button>
+  </div>
+
+  <!-- Row 2: Desktop nav bar -->
+  <div class="hidden md:block bg-background/98">
+    <div class="section-container h-11 flex items-center justify-end">
+    <!-- Desktop Nav -->
+    <nav class="flex items-center gap-6 shrink-0" aria-label="Main navigation">
+      {% for item in navigation.main %}
+        {% if item.children %}
+          <div class="relative group">
+            <button
+              class="flex items-center gap-1 text-body-md text-on-surface-variant hover:text-primary transition-colors py-2"
+              aria-haspopup="true"
+            >
+              {{ item.label }}
+              <span class="material-symbols-outlined text-base leading-none">expand_more</span>
+            </button>
+            <!-- Dropdown -->
+            <div class="absolute top-full left-0 mt-2 w-60 bg-background border border-outline-variant/20 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              {% for child in item.children %}
+                <a
+                  href="{{ child.href }}"
+                  class="block px-4 py-3 text-body-md text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all first:rounded-t-xl last:rounded-b-xl"
+                >
+                  {{ child.label }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          {% if item.platform %}
+            <a
+              href="{{ item.href }}"
+              target="_blank" rel="noopener"
+              class="inline-flex items-center gap-1.5 text-label-md font-bold px-3 py-1.5 rounded-lg border border-primary/30 text-primary hover:bg-primary hover:text-on-primary transition-all duration-200"
+            >
+              <span class="material-symbols-outlined text-sm leading-none">bolt</span>
+              {{ item.label }}
+            </a>
+          {% else %}
+          <a
+            href="{{ item.href }}"
+            {% if item.external %}target="_blank" rel="noopener"{% endif %}
+            class="text-body-md text-on-surface-variant hover:text-primary transition-colors"
+          >
+            {{ item.label }}
+          </a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      <!-- Language switcher (desktop) -->
+      <div class="flex items-center gap-1 ml-2 border border-outline-variant/20 rounded-full px-2 py-1 text-label-md">
+        <button class="lang-btn px-2 py-0.5 rounded-full hover:text-primary transition-colors" data-lang="en">EN</button>
+        <span class="text-outline-variant/30">·</span>
+        <button class="lang-btn px-2 py-0.5 rounded-full hover:text-primary transition-colors" data-lang="vi">VI</button>
+        <span class="text-outline-variant/30">·</span>
+        <button class="lang-btn px-2 py-0.5 rounded-full hover:text-primary transition-colors" data-lang="ko">한국어</button>
+        <span class="text-outline-variant/30">·</span>
+        <button class="lang-btn px-2 py-0.5 rounded-full hover:text-primary transition-colors" data-lang="zh">中文</button>
+      </div>
+
+      <a href="/contact" class="btn-primary py-2 px-5 text-sm ml-2" data-i18n="cta.getInTouch">
+        Get In Touch
+      </a>
+    </nav>
+    </div><!-- end section-container row 2 -->
+  </div><!-- end desktop nav bar -->
+
+</header>
+
+<!-- Mobile Drawer Backdrop -->
+<div
+  class="fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-[55] hidden opacity-0 transition-opacity duration-300"
+  id="drawer-backdrop"
+  aria-hidden="true"
+></div>
+
+<!-- Mobile Side Drawer -->
+<aside
+  class="fixed inset-y-0 left-0 w-80 max-w-[85vw] z-[60] bg-surface flex flex-col shadow-[var(--shadow-drawer)] -translate-x-full transition-transform duration-300 ease-in-out"
+  id="drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Navigation menu"
+>
+  <!-- Drawer header -->
+  <div class="px-6 py-5 border-b border-outline-variant/10 flex items-center justify-between shrink-0">
+    <span class="text-headline-sm font-display font-extrabold text-on-surface uppercase tracking-tight">
+      AKA DIGITAL
+    </span>
+    <button
+      class="p-1 text-on-surface-variant hover:text-on-surface transition-colors"
+      id="drawer-close"
+      aria-label="Close menu"
+    >
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <!-- Drawer nav links -->
+  <nav class="flex flex-col overflow-y-auto flex-1 py-2">
+    {% for item in navigation.main %}
+      {% if item.children %}
+        <div>
+          <p class="px-6 pt-5 pb-1 text-label-md text-on-surface-variant uppercase tracking-widest">
+            {{ item.label }}
+          </p>
+          {% for child in item.children %}
+            <a
+              href="{{ child.href }}"
+              class="flex items-center py-3 pl-8 pr-6 text-body-md text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all"
+            >
+              {{ child.label }}
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <a
+          href="{{ item.href }}"
+          class="flex items-center gap-4 py-4 px-6 text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all"
+        >
+          {% if item.icon %}
+            <span class="material-symbols-outlined text-xl text-on-surface-variant/60">{{ item.icon }}</span>
+          {% endif %}
+          {{ item.label }}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </nav>
+
+  <!-- Language switcher (mobile drawer) -->
+  <div class="px-6 pb-4 border-t border-outline-variant/10 pt-4 shrink-0">
+    <p class="text-label-md text-on-surface-variant uppercase tracking-widest mb-3">Language</p>
+    <div class="flex gap-2">
+      <button class="lang-btn flex-1 py-2 rounded-lg border border-outline-variant/20 text-label-md font-bold text-on-surface-variant hover:text-primary hover:border-primary transition-colors" data-lang="en">EN</button>
+      <button class="lang-btn flex-1 py-2 rounded-lg border border-outline-variant/20 text-label-md font-bold text-on-surface-variant hover:text-primary hover:border-primary transition-colors" data-lang="vi">VI</button>
+      <button class="lang-btn flex-1 py-2 rounded-lg border border-outline-variant/20 text-label-md font-bold text-on-surface-variant hover:text-primary hover:border-primary transition-colors" data-lang="ko">한국어</button>
+      <button class="lang-btn flex-1 py-2 rounded-lg border border-outline-variant/20 text-label-md font-bold text-on-surface-variant hover:text-primary hover:border-primary transition-colors" data-lang="zh">中文</button>
+    </div>
+  </div>
+
+  <!-- Drawer CTA -->
+  <div class="px-6 py-6 border-t border-outline-variant/10 shrink-0">
+    <a href="/contact" class="btn-primary w-full" data-i18n="cta.getInTouch">Get In Touch</a>
+  </div>
+</aside>
+
+<!-- Mobile Bottom Navigation Bar -->
+<nav
+  class="fixed bottom-0 left-0 w-full z-50 md:hidden bg-surface-container-lowest border-t border-outline-variant/20 h-[68px] px-2 flex justify-around items-center shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-2xl"
+  aria-label="Mobile bottom navigation"
+>
+  {% for item in navigation.mobile %}
+    <a
+      href="{{ item.href }}"
+      class="mobile-nav-item flex flex-col items-center justify-center gap-0.5 text-on-surface-variant hover:text-primary transition-colors px-3 py-1"
+      data-path="{{ item.href }}"
+    >
+      <span class="material-symbols-outlined" style="font-size:22px">{{ item.icon }}</span>
+      <span class="font-bold" style="font-size:10px;letter-spacing:0.04em">{{ item.label }}</span>
+    </a>
+  {% endfor %}
+</nav>

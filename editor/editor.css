@@ -1,0 +1,344 @@
+/*
+ * AKA Digital Visual Editor — Overlay Styles
+ * All classes prefixed  aka-ed-  to avoid collisions with the site's Tailwind CSS.
+ * Injected by editor-server.js at runtime — never shipped to production.
+ */
+
+/* ── Reset / isolation ─────────────────────────────────────────────── */
+#aka-ed-toolbar,
+#aka-ed-panel,
+#aka-ed-login,
+#aka-ed-status,
+.aka-ed-link-modal,
+.aka-ed-fab {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  box-sizing: border-box !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+*, *::before, *::after { box-sizing: inherit; }
+
+/* ── Variables ─────────────────────────────────────────────────────── */
+:root {
+  --ed-primary:    #253bc2;
+  --ed-yellow:     #F5D100;
+  --ed-green:      #16a34a;
+  --ed-red:        #dc2626;
+  --ed-surface:    #1e2030;
+  --ed-surface2:   #272a3f;
+  --ed-border:     rgba(255,255,255,0.1);
+  --ed-text:       #f1f1f5;
+  --ed-muted:      rgba(241,241,245,0.5);
+  --ed-radius:     8px;
+  --ed-z:          2147483600;
+}
+
+/* ── Launch FAB ─────────────────────────────────────────────────────── */
+.aka-ed-fab {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: var(--ed-z) !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  background: var(--ed-primary) !important;
+  color: #fff !important;
+  font-size: 22px !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 20px rgba(37,59,194,0.5) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+.aka-ed-fab:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 8px 28px rgba(37,59,194,0.7) !important;
+}
+
+/* ── Login overlay ──────────────────────────────────────────────────── */
+.aka-ed-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: var(--ed-z) !important;
+  background: rgba(10,12,28,0.85) !important;
+  backdrop-filter: blur(6px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+}
+.aka-ed-modal {
+  background: var(--ed-surface) !important;
+  border: 1px solid var(--ed-border) !important;
+  border-radius: 16px !important;
+  padding: 40px !important;
+  width: 100% !important;
+  max-width: 400px !important;
+  text-align: center !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6) !important;
+}
+.aka-ed-modal-logo { font-size: 40px !important; margin-bottom: 12px !important; }
+.aka-ed-modal-title {
+  color: var(--ed-text) !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  margin: 0 0 8px !important;
+}
+.aka-ed-modal-sub  { color: var(--ed-muted) !important; margin: 0 0 24px !important; font-size: 13px !important; }
+
+/* ── Toolbar ────────────────────────────────────────────────────────── */
+#aka-ed-toolbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: var(--ed-z) !important;
+  height: 52px !important;
+  background: var(--ed-surface) !important;
+  border-bottom: 1px solid var(--ed-border) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 16px !important;
+  gap: 12px !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.4) !important;
+}
+.aka-ed-toolbar-left, .aka-ed-toolbar-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+.aka-ed-logo    { color: var(--ed-text) !important; font-weight: 700 !important; font-size: 14px !important; white-space: nowrap !important; }
+.aka-ed-page-url { color: var(--ed-muted) !important; font-size: 12px !important; }
+.aka-ed-count   {
+  background: var(--ed-primary) !important;
+  color: #fff !important;
+  padding: 2px 10px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+/* ── Toolbar buttons ────────────────────────────────────────────────── */
+.aka-ed-toolbar button,
+.aka-ed-btn-primary,
+.aka-ed-btn-save,
+.aka-ed-btn-approve,
+.aka-ed-btn-build,
+.aka-ed-btn-toggle,
+.aka-ed-btn-exit,
+.aka-ed-btn-panel,
+.aka-ed-btn-ghost {
+  border: none !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 5px 12px !important;
+  white-space: nowrap !important;
+  transition: opacity 0.15s, transform 0.1s !important;
+}
+.aka-ed-toolbar button:active { transform: scale(0.96) !important; }
+
+.aka-ed-btn-toggle  { background: var(--ed-surface2) !important; color: var(--ed-muted) !important; border: 1px solid var(--ed-border) !important; }
+.aka-ed-btn-toggle.active { background: rgba(37,59,194,0.25) !important; color: #8fa0ff !important; border-color: rgba(37,59,194,0.5) !important; }
+.aka-ed-btn-save    { background: rgba(37,59,194,0.15) !important; color: #8fa0ff !important; border: 1px solid rgba(37,59,194,0.3) !important; }
+.aka-ed-btn-approve { background: var(--ed-green) !important; color: #fff !important; }
+.aka-ed-btn-build   { background: rgba(245,209,0,0.12) !important; color: var(--ed-yellow) !important; border: 1px solid rgba(245,209,0,0.25) !important; }
+.aka-ed-btn-exit    { background: transparent !important; color: var(--ed-muted) !important; padding: 5px 8px !important; }
+.aka-ed-btn-exit:hover { color: var(--ed-text) !important; }
+.aka-ed-btn-panel   { background: var(--ed-surface2) !important; color: var(--ed-text) !important; }
+.aka-ed-btn-primary { background: var(--ed-primary) !important; color: #fff !important; padding: 10px 24px !important; font-size: 14px !important; border-radius: 8px !important; width: 100% !important; margin-top: 4px !important; }
+.aka-ed-btn-primary:hover { opacity: 0.9 !important; }
+.aka-ed-btn-ghost   { background: transparent !important; color: var(--ed-muted) !important; border: 1px solid var(--ed-border) !important; }
+.aka-ed-btn-ghost:hover { color: var(--ed-text) !important; }
+
+/* ── Input ──────────────────────────────────────────────────────────── */
+.aka-ed-input {
+  width: 100% !important;
+  padding: 10px 14px !important;
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid var(--ed-border) !important;
+  border-radius: var(--ed-radius) !important;
+  color: var(--ed-text) !important;
+  font-size: 14px !important;
+  outline: none !important;
+  margin-bottom: 12px !important;
+  transition: border-color 0.2s !important;
+}
+.aka-ed-input:focus { border-color: var(--ed-primary) !important; }
+.aka-ed-err  { color: #f87171 !important; font-size: 12px !important; margin: -4px 0 8px !important; }
+.aka-ed-hint { color: var(--ed-muted) !important; font-size: 11px !important; margin-top: 12px !important; }
+
+/* ── Changes panel ──────────────────────────────────────────────────── */
+#aka-ed-panel {
+  position: fixed !important;
+  top: 52px !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: calc(var(--ed-z) - 1) !important;
+  width: 340px !important;
+  background: var(--ed-surface) !important;
+  border-left: 1px solid var(--ed-border) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-shadow: -8px 0 32px rgba(0,0,0,0.4) !important;
+  overflow: hidden !important;
+}
+.aka-ed-panel-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 16px !important;
+  border-bottom: 1px solid var(--ed-border) !important;
+}
+.aka-ed-panel-header h3 { color: var(--ed-text) !important; font-size: 14px !important; font-weight: 700 !important; margin: 0 !important; }
+.aka-ed-panel-close     { background: transparent !important; border: none !important; color: var(--ed-muted) !important; font-size: 20px !important; cursor: pointer !important; padding: 0 4px !important; }
+.aka-ed-panel-list      { flex: 1 !important; overflow-y: auto !important; padding: 12px !important; }
+.aka-ed-panel-empty     { color: var(--ed-muted) !important; font-size: 12px !important; text-align: center !important; padding: 24px 12px !important; }
+.aka-ed-panel-row {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  padding: 10px 12px !important;
+  border-radius: var(--ed-radius) !important;
+  background: var(--ed-surface2) !important;
+  margin-bottom: 6px !important;
+}
+.aka-ed-panel-icon  { font-size: 16px !important; shrink: 0 !important; }
+.aka-ed-panel-info  { flex: 1 !important; min-width: 0 !important; }
+.aka-ed-panel-info strong { display: block !important; color: var(--ed-text) !important; font-size: 12px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+.aka-ed-panel-info code   { display: block !important; color: var(--ed-muted) !important; font-size: 10px !important; font-family: monospace !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+.aka-ed-panel-revert  { background: transparent !important; border: 1px solid var(--ed-border) !important; color: var(--ed-muted) !important; font-size: 14px !important; cursor: pointer !important; border-radius: 4px !important; padding: 1px 6px !important; shrink: 0 !important; }
+.aka-ed-panel-revert:hover { color: var(--ed-text) !important; }
+
+/* ── Link editor modal ──────────────────────────────────────────────── */
+.aka-ed-link-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: var(--ed-z) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(10,12,28,0.7) !important;
+  backdrop-filter: blur(4px) !important;
+}
+.aka-ed-link-inner {
+  background: var(--ed-surface) !important;
+  border: 1px solid var(--ed-border) !important;
+  border-radius: 12px !important;
+  padding: 24px !important;
+  width: 420px !important;
+  max-width: 90vw !important;
+}
+.aka-ed-link-inner h4 { color: var(--ed-text) !important; font-size: 15px !important; font-weight: 700 !important; margin: 0 0 6px !important; }
+.aka-ed-link-actions { display: flex !important; gap: 8px !important; margin-top: 4px !important; }
+.aka-ed-link-actions button { flex: 1 !important; }
+
+/* ── Status toast ───────────────────────────────────────────────────── */
+#aka-ed-status {
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: var(--ed-z) !important;
+  padding: 10px 20px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  background: var(--ed-surface) !important;
+  border: 1px solid var(--ed-border) !important;
+  color: var(--ed-text) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+}
+#aka-ed-status.success { background: #14532d !important; border-color: #16a34a !important; }
+#aka-ed-status.error   { background: #450a0a !important; border-color: #dc2626 !important; }
+#aka-ed-status.info    { background: var(--ed-surface) !important; }
+
+/* ── Edit mode — page-level indicators ─────────────────────────────── */
+body.aka-ed-active .aka-ed-editable {
+  outline: 1px dashed rgba(37,59,194,0.35) !important;
+  cursor: text !important;
+}
+body.aka-ed-active .aka-ed-editable:hover {
+  outline: 2px solid var(--ed-primary) !important;
+  background: rgba(37,59,194,0.04) !important;
+}
+body.aka-ed-active [contenteditable="true"] {
+  outline: 2px solid var(--ed-primary) !important;
+  background: rgba(37,59,194,0.07) !important;
+  min-height: 1em !important;
+  border-radius: 3px !important;
+}
+.aka-ed-editing { caret-color: var(--ed-primary) !important; }
+
+/* ── Section controls ───────────────────────────────────────────────── */
+.aka-ed-section { position: relative !important; }
+.aka-ed-section-controls {
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  z-index: 1000 !important;
+  display: none !important;
+  gap: 6px !important;
+  align-items: center !important;
+}
+body.aka-ed-active .aka-ed-section:hover > .aka-ed-section-controls { display: flex !important; }
+body.aka-ed-active .aka-ed-section:hover { outline: 2px dashed rgba(37,59,194,0.3) !important; }
+.aka-ed-section-del {
+  background: rgba(220,38,38,0.9) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  backdrop-filter: blur(4px) !important;
+}
+.aka-ed-section-del:hover { background: #dc2626 !important; }
+.aka-ed-section-id {
+  background: rgba(30,32,48,0.85) !important;
+  color: rgba(255,255,255,0.5) !important;
+  border: 1px solid var(--ed-border) !important;
+  border-radius: 4px !important;
+  padding: 3px 8px !important;
+  font-family: monospace !important;
+  font-size: 10px !important;
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+/* ── Image wrapper ──────────────────────────────────────────────────── */
+.aka-ed-img-wrap { position: relative !important; display: inline-block !important; }
+.aka-ed-img-replace {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(10,12,28,0.6) !important;
+  border: none !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  display: none !important;
+  align-items: center !important;
+  justify-content: center !important;
+  backdrop-filter: blur(2px) !important;
+  z-index: 10 !important;
+  border-radius: inherit !important;
+}
+body.aka-ed-active .aka-ed-img-wrap:hover .aka-ed-img-replace { display: flex !important; }
+body.aka-ed-active .aka-ed-img-wrap { outline: 2px dashed rgba(37,59,194,0.4) !important; }
+
+/* ── Scrollbar (panel) ──────────────────────────────────────────────── */
+.aka-ed-panel-list::-webkit-scrollbar { width: 4px; }
+.aka-ed-panel-list::-webkit-scrollbar-track { background: transparent; }
+.aka-ed-panel-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }

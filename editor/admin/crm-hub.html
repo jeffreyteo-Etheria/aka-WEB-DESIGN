@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRM & Automation Hub — AKA Digital CMS</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+  <style>
+    .hub-tabs { display:flex; gap:8px; border-bottom:2px solid var(--border); margin-bottom:28px; }
+    .hub-tab  { padding:10px 20px; font-size:13px; font-weight:700; color:var(--text-muted);
+                border-bottom:3px solid transparent; margin-bottom:-2px; cursor:pointer;
+                transition: color .2s, border-color .2s; text-transform:uppercase; letter-spacing:.04em; }
+    .hub-tab.active { color:var(--aka-yellow); border-bottom-color:var(--aka-yellow); }
+    .hub-panel { display:none; }
+    .hub-panel.active { display:block; }
+    .hub-card { background:var(--surface-alt); border:1px solid var(--border); border-radius:14px; padding:24px 28px; margin-bottom:20px; }
+    .hub-card-title { font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--text-main); margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+    .hub-card-desc  { font-size:13px; color:var(--text-muted); margin-bottom:16px; line-height:1.6; }
+    .url-copy-row   { display:flex; align-items:center; gap:8px; }
+    .url-display    { flex:1; font-size:12px; font-family:monospace; background:var(--surface); border:1px solid var(--border);
+                      border-radius:8px; padding:10px 12px; color:var(--text-main); word-break:break-all; }
+    .copy-btn       { padding:8px 14px; background:var(--aka-navy); color:#fff; border:none; border-radius:8px;
+                      font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; transition: background .2s; }
+    .copy-btn:hover { background:#1a3a7a; }
+    .status-dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+    .dot-green  { background:#22c55e; }
+    .dot-yellow { background:#eab308; }
+    .dot-red    { background:#ef4444; }
+    .status-row { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-muted); margin-top:10px; }
+    .action-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+    .action-link  { display:inline-flex; align-items:center; gap:6px; padding:9px 16px;
+                    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+                    font-size:12px; font-weight:700; color:var(--text-main); text-decoration:none;
+                    transition: border-color .2s, color .2s; }
+    .action-link:hover { border-color:var(--aka-yellow); color:var(--aka-yellow); }
+    .settings-form .form-row { margin-bottom:16px; }
+    .save-row { display:flex; align-items:center; gap:12px; margin-top:20px; }
+    .platform-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media(max-width:600px) { .platform-grid { grid-template-columns:1fr; } }
+    .platform-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; }
+    .platform-card-name { font-weight:800; font-size:13px; margin-bottom:6px; }
+    .contacts-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .contacts-table th { text-align:left; padding:8px 12px; background:var(--surface); font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); border-bottom:1px solid var(--border); }
+    .contacts-table td { padding:10px 12px; border-bottom:1px solid var(--border); color:var(--text-main); }
+    .contacts-table tr:hover td { background:var(--surface-alt); }
+    .contacts-empty { text-align:center; padding:40px; color:var(--text-muted); font-size:13px; }
+  </style>
+</head>
+<body class="cms-body">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/logos/aka-logo-rec.png" alt="AKA Digital" style="height:34px;width:auto;border-radius:8px;background:#fff;padding:3px 7px;" />
+      <div>
+        <div class="logo-name">AKA Digital</div>
+        <div class="logo-sub">CMS Dashboard</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Content</div>
+      <a href="/admin/dashboard" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a>
+      <a href="/admin/blog-form" class="nav-item"><span class="nav-icon">✎</span> Blog Post</a>
+      <a href="/admin/case-study-form" class="nav-item"><span class="nav-icon">◆</span> Case Study</a>
+      <a href="/admin/events-form" class="nav-item"><span class="nav-icon">◷</span> Event</a>
+      <a href="/admin/job-form" class="nav-item"><span class="nav-icon">◎</span> Job / Career</a>
+      <div class="nav-section">CRM & Automation</div>
+      <a href="/admin/crm-hub" class="nav-item active"><span class="nav-icon">⬡</span> CRM Hub</a>
+      <div class="nav-section super-only" style="display:none">Site Data</div>
+      <a href="/admin/site-settings" class="nav-item super-only" style="display:none"><span class="nav-icon">⚡</span> CTA &amp; Popup Settings</a>
+      <div class="nav-section">Tools</div>
+      <a href="#" class="nav-item" id="buildBtn"><span class="nav-icon">⚙</span> Build Site</a>
+      <a href="#" class="nav-item" id="exportBtn"><span class="nav-icon">⬇</span> Export ZIP</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-badge" id="userBadge">—</div>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">CRM & Automation Hub</h1>
+        <p class="page-sub">Manage your CRM bridge, Make.com automation, and social publishing — all in one place.</p>
+      </div>
+    </header>
+
+    <div id="buildLog" class="build-log" style="display:none">
+      <div class="build-log-header">Output</div>
+      <div id="buildLogText" class="build-log-text"></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="hub-tabs">
+      <div class="hub-tab active" data-tab="crm">📊 CRM</div>
+      <div class="hub-tab" data-tab="automation">⚡ Make.com Automation</div>
+      <div class="hub-tab" data-tab="social">📡 Social Publishing</div>
+      <div class="hub-tab super-only" data-tab="settings" style="display:none">⚙ Settings</div>
+    </div>
+
+    <!-- ─── CRM TAB ─────────────────────────────────────────────── -->
+    <div class="hub-panel active" id="panel-crm">
+
+      <div class="hub-card">
+        <div class="hub-card-title">📊 Google Sheets CRM</div>
+        <div class="hub-card-desc">
+          All contact form leads are sent to your Google Sheet via the webhook. Open the sheet below to view, manage, and update lead statuses.
+          Each row has a <strong>lead_status</strong> column — changing it triggers the next Make.com automation sequence.
+        </div>
+        <div class="url-copy-row">
+          <div class="url-display" id="sheetUrl">Not configured — add your Google Sheet URL in Settings</div>
+          <button class="copy-btn" onclick="copyText('sheetUrl')">Copy</button>
+          <a href="#" id="openSheetBtn" target="_blank" class="copy-btn" style="background:var(--aka-yellow);color:#000;text-decoration:none">Open Sheet ↗</a>
+        </div>
+        <div class="status-row">
+          <span class="status-dot" id="webhookDot"></span>
+          <span id="webhookStatus">Checking webhook status…</span>
+        </div>
+        <div class="action-links">
+          <a href="https://sheets.google.com" target="_blank" class="action-link">↗ Open Google Sheets</a>
+          <a href="https://script.google.com" target="_blank" class="action-link">↗ Google Apps Script</a>
+        </div>
+      </div>
+
+      <div class="hub-card">
+        <div class="hub-card-title">📋 Lead Status Guide</div>
+        <div class="hub-card-desc">Update the <code>lead_status</code> column in your Google Sheet to trigger Make.com automation sequences.</div>
+        <table class="contacts-table">
+          <thead>
+            <tr>
+              <th>Status Value</th>
+              <th>When to Use</th>
+              <th>Triggers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>New Lead</strong></td><td>Set automatically on form submit</td><td>Welcome email via Make.com</td></tr>
+            <tr><td><strong>Contacted</strong></td><td>After first outreach</td><td>—</td></tr>
+            <tr><td><strong>No Response - 3 Days</strong></td><td>Set by Make.com after 72h silence</td><td>Follow-up email + WhatsApp</td></tr>
+            <tr><td><strong>10-Day Follow-Up</strong></td><td>Set by Make.com after 10 days</td><td>Case study email + consultation offer</td></tr>
+            <tr><td><strong>Qualified</strong></td><td>After discovery call</td><td>—</td></tr>
+            <tr><td><strong>Proposal Sent</strong></td><td>Proposal delivered</td><td>—</td></tr>
+            <tr><td><strong>Retargeting - 30 Days</strong></td><td>Set by Make.com after 30 days</td><td>Facebook Custom Audience</td></tr>
+            <tr><td><strong>Won</strong></td><td>Deal closed ✓</td><td>—</td></tr>
+            <tr><td><strong>Lost</strong></td><td>Deal not progressed</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ─── AUTOMATION TAB ───────────────────────────────────────── -->
+    <div class="hub-panel" id="panel-automation">
+
+      <div class="hub-card">
+        <div class="hub-card-title">⚡ Make.com Webhook</div>
+        <div class="hub-card-desc">
+          Your contact form fires this webhook with the full lead payload. In Make.com, watch for rows where <code>lead_status</code> changes to trigger the correct automation sequence.
+        </div>
+        <div class="url-copy-row">
+          <div class="url-display" id="makeWebhookUrl">Not configured — add your Make.com webhook URL in Settings</div>
+          <button class="copy-btn" onclick="copyText('makeWebhookUrl')">Copy URL</button>
+        </div>
+        <div class="action-links">
+          <a href="https://www.make.com/en/login" target="_blank" class="action-link">↗ Open Make.com Dashboard</a>
+          <a href="https://www.make.com/en/help/app/webhooks" target="_blank" class="action-link">↗ Make.com Webhook Guide</a>
+        </div>
+      </div>
+
+      <div class="hub-card">
+        <div class="hub-card-title">📌 Automation Sequences</div>
+        <div class="hub-card-desc">These are the 4 sequences configured in your Make.com account. Each watches the Google Sheet for status changes.</div>
+        <table class="contacts-table">
+          <thead>
+            <tr><th>Sequence</th><th>Trigger</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Welcome</strong></td>
+              <td>New row with status = "New Lead"</td>
+              <td>Send personalised welcome email · Add to contact list</td>
+            </tr>
+            <tr>
+              <td><strong>2. 3-Day Follow-Up</strong></td>
+              <td>Status = "New Lead" after 72 hours with no reply</td>
+              <td>Follow-up email + WhatsApp message</td>
+            </tr>
+            <tr>
+              <td><strong>3. 10-Day Nurture</strong></td>
+              <td>Status = "New Lead" after 10 days</td>
+              <td>Case study PDF + consultation offer email</td>
+            </tr>
+            <tr>
+              <td><strong>4. 30-Day Retargeting</strong></td>
+              <td>Status = "No Response" after 30 days</td>
+              <td>Add to Facebook Custom Audience retargeting list</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="hub-card">
+        <div class="hub-card-title">🔧 Webhook Payload</div>
+        <div class="hub-card-desc">Every form submission sends this JSON payload to the webhook URL:</div>
+        <div class="url-display" style="font-family:monospace;font-size:11px;line-height:1.7;white-space:pre">{
+  "timestamp":   "2025-06-25T10:30:00Z",
+  "source_page": "/contact",
+  "lead_status": "New Lead",
+  "name":        "John Smith",
+  "company":     "Acme Corp",
+  "email":       "john@acme.com",
+  "phone":       "+65 9123 4567",
+  "service":     "crm-automation",
+  "message":     "We need help with our CDP setup…"
+}</div>
+      </div>
+
+    </div>
+
+    <!-- ─── SOCIAL PUBLISHING TAB ────────────────────────────────── -->
+    <div class="hub-panel" id="panel-social">
+
+      <div class="hub-card">
+        <div class="hub-card-title">📡 RSS Feed — Social Auto-Publish</div>
+        <div class="hub-card-desc">
+          Your RSS feed automatically updates every time you publish a new blog post. Connect it to Buffer, Zapier, or Make.com to auto-post to LinkedIn, Facebook, and other channels.
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">RSS FEED URL</div>
+          <div class="url-copy-row">
+            <div class="url-display" id="rssFeedUrl">https://akadigital.net/feed.xml</div>
+            <button class="copy-btn" onclick="copyText('rssFeedUrl')">Copy</button>
+            <a href="/feed.xml" target="_blank" class="copy-btn" style="text-decoration:none">View ↗</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">JSON API ENDPOINT</div>
+          <div class="url-copy-row">
+            <div class="url-display" id="apiUrl">https://akadigital.net/api/latest-posts.json</div>
+            <button class="copy-btn" onclick="copyText('apiUrl')">Copy</button>
+            <a href="/api/latest-posts.json" target="_blank" class="copy-btn" style="text-decoration:none">View ↗</a>
+          </div>
+        </div>
+        <div class="action-links" style="margin-top:16px">
+          <a href="https://buffer.com/integrations/rss" target="_blank" class="action-link">↗ Connect to Buffer</a>
+          <a href="https://rss.app" target="_blank" class="action-link">↗ RSS.app Automation</a>
+          <a href="https://zapier.com/apps/rss" target="_blank" class="action-link">↗ Zapier RSS Trigger</a>
+          <a href="https://www.make.com" target="_blank" class="action-link">↗ Make.com RSS Module</a>
+        </div>
+      </div>
+
+      <div class="hub-card">
+        <div class="hub-card-title">📋 How to Connect Buffer (Recommended — Free)</div>
+        <div class="hub-card-desc">Buffer's RSS integration automatically posts new blog articles to your social channels:</div>
+        <ol style="font-size:13px;color:var(--text-muted);line-height:1.9;padding-left:20px;margin:0">
+          <li>Go to <strong>buffer.com → Integrations → RSS</strong></li>
+          <li>Paste your RSS feed URL: <code style="background:var(--surface);padding:1px 6px;border-radius:4px">https://akadigital.net/feed.xml</code></li>
+          <li>Select which social channels to publish to (LinkedIn, Facebook, etc.)</li>
+          <li>Set the schedule — e.g. "post immediately when new item appears"</li>
+          <li>Save. Every new blog post will auto-post to your social channels.</li>
+        </ol>
+      </div>
+
+      <div class="hub-card">
+        <div class="hub-card-title">📋 Latest Posts Preview</div>
+        <div class="hub-card-desc">The 10 most recent posts available via the JSON API:</div>
+        <div id="postsPreview" class="contacts-empty">Loading…</div>
+      </div>
+
+    </div>
+
+    <!-- ─── SETTINGS TAB (super admin only) ─────────────────────── -->
+    <div class="hub-panel super-only" id="panel-settings" style="display:none">
+
+      <div class="hub-card">
+        <div class="hub-card-title">⚙ Webhook & Integration Settings</div>
+        <div class="hub-card-desc">These URLs are used by the contact form webhook and CRM hub. Only Super Admin can edit these.</div>
+
+        <div class="settings-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Google Apps Script Webhook URL</label>
+              <input type="text" id="s_webhook_url" class="form-input"
+                     placeholder="https://script.google.com/macros/s/YOURSCRIPT/exec" />
+              <p class="form-hint">Paste the URL after deploying your Google Apps Script as a web app.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Google Sheet URL</label>
+              <input type="text" id="s_google_sheet_url" class="form-input"
+                     placeholder="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" />
+              <p class="form-hint">Direct link to your CRM Google Sheet for the "Open Sheet" button above.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Make.com Webhook URL (optional)</label>
+              <input type="text" id="s_make_webhook_url" class="form-input"
+                     placeholder="https://hook.make.com/yourwebhookid" />
+              <p class="form-hint">If you set up a separate Make.com webhook — paste it here for reference.</p>
+            </div>
+          </div>
+
+          <div class="form-section-title" style="margin-top:24px">AKA Ads Platform URLs</div>
+          <div class="platform-grid">
+            <div class="platform-card">
+              <div class="platform-card-name">AKA Ads Platform (main)</div>
+              <input type="text" id="s_ads_platform_url" class="form-input" style="margin-top:8px" placeholder="https://ads.akadigital.net" />
+            </div>
+            <div class="platform-card">
+              <div class="platform-card-name">SocialMind</div>
+              <input type="text" id="s_socialmind_url" class="form-input" style="margin-top:8px" placeholder="https://socialmind.akadigital.net" />
+            </div>
+            <div class="platform-card">
+              <div class="platform-card-name">GeoMind</div>
+              <input type="text" id="s_geomind_url" class="form-input" style="margin-top:8px" placeholder="https://geomind.akadigital.net" />
+            </div>
+            <div class="platform-card">
+              <div class="platform-card-name">AdsMind</div>
+              <input type="text" id="s_adsmind_url" class="form-input" style="margin-top:8px" placeholder="https://adsmind.akadigital.net" />
+            </div>
+            <div class="platform-card">
+              <div class="platform-card-name">CRMMind</div>
+              <input type="text" id="s_crmmind_url" class="form-input" style="margin-top:8px" placeholder="https://crmmind.akadigital.net" />
+            </div>
+          </div>
+
+          <div class="save-row" style="margin-top:24px">
+            <button class="btn-primary" id="saveSettingsBtn" onclick="saveSettings()">Save Settings</button>
+            <span id="settingsStatus" class="save-status"></span>
+          </div>
+
+          <div class="hub-card" style="margin-top:28px; border-color:#F5C400/20; background:rgba(245,196,0,0.04)">
+            <div class="hub-card-title">🚀 Save &amp; publish this webhook URL</div>
+            <div class="hub-card-desc">
+              Saves the URL above and rebuilds the site in one step — every form (contact, careers,
+              the lead quiz) starts sending to it as soon as the build finishes. No code editing, ever.
+            </div>
+            <button class="btn-primary" id="patchWebhookBtn" style="margin-top:10px">Save &amp; Build</button>
+            <div id="patchLog" class="build-log" style="display:none;margin-top:10px">
+              <div id="patchLogText" class="build-log-text"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="/admin/admin.js"></script>
+  <script>
+    requireAuth();
+    const role = localStorage.getItem('aka_cms_role');
+    document.getElementById('userBadge').textContent = localStorage.getItem('aka_cms_user') + ' (' + role + ')';
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // Show super-only elements
+    if (role === 'super') {
+      document.querySelectorAll('.super-only').forEach(el => el.style.display = '');
+    }
+
+    // Tabs
+    document.querySelectorAll('.hub-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.hub-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.hub-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const panel = document.getElementById('panel-' + tab.dataset.tab);
+        if (panel) panel.classList.add('active');
+      });
+    });
+
+    // Copy helper
+    function copyText(id) {
+      const txt = document.getElementById(id).textContent.trim();
+      navigator.clipboard.writeText(txt).then(() => {
+        const btn = event.target; const orig = btn.textContent;
+        btn.textContent = '✓ Copied!'; btn.style.background = '#22c55e';
+        setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1800);
+      });
+    }
+
+    // Load settings
+    let settings = {};
+    if (role === 'super') {
+      apiFetch('/api/settings').then(s => {
+        settings = s || {};
+        // Populate CRM tab
+        const sheetEl = document.getElementById('sheetUrl');
+        if (s.google_sheet_url) {
+          sheetEl.textContent = s.google_sheet_url;
+          document.getElementById('openSheetBtn').href = s.google_sheet_url;
+        }
+        // Webhook status
+        const dot = document.getElementById('webhookDot');
+        const statusEl = document.getElementById('webhookStatus');
+        if (s.webhook_url && s.webhook_url.indexOf('REPLACE') === -1) {
+          dot.className = 'status-dot dot-green';
+          statusEl.textContent = 'Webhook configured: ' + s.webhook_url.slice(0, 60) + '…';
+        } else {
+          dot.className = 'status-dot dot-red';
+          statusEl.textContent = 'Webhook not configured — go to Settings tab to add your Google Apps Script URL';
+        }
+        // Make.com webhook
+        const makeEl = document.getElementById('makeWebhookUrl');
+        if (s.make_webhook_url) makeEl.textContent = s.make_webhook_url;
+        // Settings tab fields
+        const sf = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+        sf('s_webhook_url', s.webhook_url && s.webhook_url.indexOf('REPLACE') === -1 ? s.webhook_url : '');
+        sf('s_google_sheet_url', s.google_sheet_url);
+        sf('s_make_webhook_url', s.make_webhook_url);
+        sf('s_ads_platform_url', s.ads_platform_url);
+        sf('s_socialmind_url', s.socialmind_url);
+        sf('s_geomind_url', s.geomind_url);
+        sf('s_adsmind_url', s.adsmind_url);
+        sf('s_crmmind_url', s.crmmind_url);
+      });
+    } else {
+      // Non-super: check CRM status without exposing the URL
+      document.getElementById('webhookDot').className = 'status-dot dot-yellow';
+      document.getElementById('webhookStatus').textContent = 'Ask your Super Admin to configure the webhook.';
+    }
+
+    // Load posts preview
+    apiFetch('/api/blogs').then(blogs => {
+      const el = document.getElementById('postsPreview');
+      if (!blogs || !blogs.length) { el.innerHTML = '<p>No posts found.</p>'; return; }
+      el.innerHTML = '<table class="contacts-table"><thead><tr><th>Title</th><th>Date</th><th>Category</th></tr></thead><tbody>' +
+        blogs.slice(0,8).map(b => `<tr><td><strong>${b.title}</strong></td><td>${b.date}</td><td>${b.category}</td></tr>`).join('') +
+        '</tbody></table>';
+    });
+
+    // Save settings. Pass { silent: true } to skip touching the Save
+    // Settings button/status (used by the webhook Save & Build action,
+    // which has its own status area) — returns { ok, error } either way.
+    async function saveSettings(opts) {
+      opts = opts || {};
+      const btn = document.getElementById('saveSettingsBtn');
+      const status = document.getElementById('settingsStatus');
+      if (!opts.silent) { btn.disabled = true; btn.textContent = 'Saving…'; }
+      const gv = id => document.getElementById(id).value.trim();
+      const payload = {
+        webhook_url:      gv('s_webhook_url'),
+        google_sheet_url: gv('s_google_sheet_url'),
+        make_webhook_url: gv('s_make_webhook_url'),
+        ads_platform_url: gv('s_ads_platform_url'),
+        socialmind_url:   gv('s_socialmind_url'),
+        geomind_url:      gv('s_geomind_url'),
+        adsmind_url:      gv('s_adsmind_url'),
+        crmmind_url:      gv('s_crmmind_url'),
+      };
+      const r = await apiFetch('/api/settings', 'PUT', payload);
+      if (!opts.silent) {
+        if (r.ok) {
+          status.textContent = '✓ Saved! Rebuild the site to apply platform URL changes.';
+          status.style.color = '#22c55e';
+        } else {
+          status.textContent = '✗ ' + (r.error || 'Failed');
+          status.style.color = '#ef4444';
+        }
+        btn.disabled = false; btn.textContent = 'Save Settings';
+      }
+      return { ok: !!r.ok, error: r.error };
+    }
+
+    // Save the webhook URL (and every other setting on this tab) and
+    // immediately rebuild — every lead form reads this field live, so no
+    // source-code editing is ever needed.
+    document.getElementById('patchWebhookBtn').addEventListener('click', async () => {
+      const url = document.getElementById('s_webhook_url').value.trim();
+      if (!url || url.indexOf('REPLACE') !== -1) {
+        alert('Paste your Google Apps Script web app URL into the field above first.');
+        return;
+      }
+      const btn = document.getElementById('patchWebhookBtn');
+      const log = document.getElementById('patchLog');
+      const txt = document.getElementById('patchLogText');
+      btn.disabled = true;
+      log.style.display = 'block';
+      txt.textContent = 'Saving settings…\n';
+
+      const saved = await saveSettings({ silent: true });
+      if (!saved.ok) {
+        txt.textContent += '✗ ' + (saved.error || 'Save failed') + '\n';
+        btn.disabled = false;
+        return;
+      }
+      txt.textContent += '✓ Saved. Rebuilding the site…\n';
+      buildAndReport(txt, (ok, msg) => {
+        txt.textContent += (ok ? '✓ ' : '✗ ') + msg + '\n';
+        if (ok) txt.textContent += '\nDone — the contact form, careers page, and lead quiz are now sending to this webhook.\n';
+        btn.disabled = false;
+      });
+    });
+
+    // Build / Export
+    document.getElementById('buildBtn').addEventListener('click', async e => {
+      e.preventDefault();
+      const log = document.getElementById('buildLog');
+      const txt = document.getElementById('buildLogText');
+      log.style.display = 'block'; txt.textContent = 'Building…\n';
+      let finished = false;
+      const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
+      es.onmessage = ev => {
+        const d = JSON.parse(ev.data); txt.textContent += d.msg + '\n';
+        if (d.status === 'done' || d.status === 'error') { finished = true; es.close(); }
+      };
+      es.onerror = () => {
+        if (!finished) txt.textContent += '⚠ Build connection lost — check server logs.\n';
+        es.close();
+      };
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', async e => {
+      e.preventDefault();
+      const log = document.getElementById('buildLog');
+      const txt = document.getElementById('buildLogText');
+      log.style.display = 'block'; txt.textContent = 'Packaging…\n';
+      let exportFinished = false;
+      const es = new EventSource('/api/export?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
+      es.onmessage = ev => {
+        const d = JSON.parse(ev.data); txt.textContent += d.msg + '\n';
+        if (d.status === 'done' || d.status === 'error') { exportFinished = true; es.close(); }
+      };
+      es.onerror = () => {
+        if (!exportFinished) txt.textContent += '⚠ Export connection lost — check server logs.\n';
+        es.close();
+      };
+    });
+  </script>
+</body>
+</html>

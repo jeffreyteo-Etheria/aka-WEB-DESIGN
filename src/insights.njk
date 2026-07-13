@@ -1,0 +1,386 @@
+---
+layout: layouts/base.njk
+title: Insights | AKA Digital
+description: MarTech insights, event recaps, media coverage and industry analysis from AKA Digital's team across Southeast Asia.
+---
+
+<!-- Hero -->
+<section class="py-24 bg-on-surface text-inverse-on-surface overflow-hidden relative">
+  <div class="absolute inset-0 z-0">
+    <img src="/images/hero/home-summit.jpeg" alt="" role="presentation"
+         class="w-full h-full object-cover opacity-15" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-r from-on-surface via-on-surface/85 to-on-surface/50"></div>
+  </div>
+  <div class="relative z-10 section-container">
+    <p class="eyebrow text-primary-fixed mb-4">Knowledge Hub</p>
+    <h1 class="text-headline-lg font-display text-inverse-on-surface mb-6 max-w-2xl text-balance">
+      MarTech Insights for Southeast Asia
+    </h1>
+    <p class="text-body-lg text-inverse-on-surface/70 max-w-xl">
+      Event recaps, media coverage, platform guides, and thought leadership from our team and partner ecosystem.
+    </p>
+    <div class="flex gap-4 mt-8">
+      <a href="#activities" class="btn-primary">Activities &amp; Events</a>
+      <a href="#media" class="btn-ghost border-white/30 text-white/80 hover:text-white hover:border-white/60">Media Coverage</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 1: ACTIVITIES & EVENTS
+     ============================================================ -->
+<section class="py-16 md:py-24" id="activities">
+  <div class="section-container">
+
+    <div class="flex items-center gap-4 mb-12">
+      <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-on-primary text-xl">event</span>
+      </div>
+      <div>
+        <p class="eyebrow mb-0.5">On the Ground</p>
+        <h2 class="text-headline-md font-display text-on-surface">Activities &amp; Events</h2>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for activity in events | publishedOnly | sort(true, false, 'date') %}
+        <article class="card group flex flex-col gap-4 hover:border-primary/30 hover:shadow-[0_8px_32px_rgba(37,59,194,0.08)] transition-all duration-300">
+          <div class="relative aspect-[16/9] overflow-hidden rounded-lg bg-surface-container">
+            <img
+              src="{{ activity.image }}"
+              alt="{{ activity.title }}"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <span class="absolute top-3 left-3 bg-primary text-on-primary text-label-md px-2 py-0.5 rounded-full font-semibold">
+              {{ activity.type }}
+            </span>
+          </div>
+          <div class="flex-1 flex flex-col gap-2">
+            <p class="text-label-md text-on-surface-variant">{{ activity | eventDateDisplay }}</p>
+            <h3 class="text-headline-sm font-display text-on-surface group-hover:text-primary transition-colors">
+              {{ activity.title }}
+            </h3>
+            <p class="text-body-md text-on-surface-variant leading-relaxed flex-1">{{ activity.description }}</p>
+            <a href="{{ activity.href }}" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all mt-2">
+              <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+              Read more
+              <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </a>
+          </div>
+        </article>
+      {% endfor %}
+
+      <!-- Coming soon placeholder -->
+      <div class="card border-dashed flex flex-col items-center justify-center gap-3 text-center py-12 opacity-40">
+        <span class="material-symbols-outlined text-4xl text-on-surface-variant">edit_note</span>
+        <p class="text-body-md text-on-surface-variant">More events coming soon</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 2: MEDIA COVERAGE
+     ============================================================ -->
+<section class="py-16 md:py-24 bg-surface-off-white" id="media">
+  <div class="section-container">
+
+    <div class="flex items-center gap-4 mb-12">
+      <div class="w-10 h-10 rounded-xl bg-action-yellow flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-on-secondary-fixed text-xl">newspaper</span>
+      </div>
+      <div>
+        <p class="eyebrow mb-0.5">Press &amp; Publications</p>
+        <h2 class="text-headline-md font-display text-on-surface">Media Coverage</h2>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- BrandsVietnam — MarTech Summit 2023 -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">BrandsVietnam</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">MarTech Customer Data Solutions Summit: Enabling Better Marketing Decisions</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Coverage of AKA Digital's annual summit bringing together Vietnam's top marketing technology leaders.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- CafeBiz — Marketing Automation -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">CafeBiz</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">Growing Demand for Marketing Automation in Vietnam's E-commerce Sector</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">How Vietnam's fast-growing e-commerce businesses are adopting scalable personalisation tools.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- VNEconomy — 80% software unused -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">VnEconomy</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2024</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">80% of Enterprises Invest in Software but Only Use 20% of Features</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">AKA Digital tackles the implementation gap head-on at the Data Solution Summit 2024.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- BaoDauTu — define objectives -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">Bao Dau Tu</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">Define Business Objectives Before Choosing Your MarTech Technology</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Strategy-first thinking in MarTech investment — why tool selection should follow objectives, not the other way around.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- NhipCauDauTu — new partners -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">Nhip Cau Dau Tu</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">AKA Digital Announces New Partnerships with 6 Global MarTech Platforms</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Expanding Vietnam's access to world-class marketing technology through exclusive and preferred partnerships.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- AdvertisingVietnam — MarTech 2023 -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">Advertising Vietnam</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">Martech 2023: Customer Data Solutions — From Insights to Revenue</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">In-depth summit coverage exploring CDP adoption, first-party data strategy, and personalisation at scale.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- CafeF — 80% companies -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">CafeF</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">80% of Companies Invest in MarTech But Only Use 20% of Capabilities</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Why the implementation gap — not the tool gap — is the real challenge for enterprise marketing teams.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- VNEconomy — customer experience -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">VnEconomy</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2024</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">Improving Customer Experience and Brand Values Through Technology</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">How leading Vietnam brands align customer lifecycle technology with long-term brand equity.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- Dautuonline — MarTech is a must -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">Dau Tu Online</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">MarTech Is a Must-Have for Enterprises Navigating Vietnam's Digital Era</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Digital transformation in Vietnam accelerates as enterprises shift from manual to data-driven operations.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- DNVN — technology doesn't guarantee sales -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">DNVN</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">Technology Alone Doesn't Guarantee Sales — Strategy and Execution Do</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">AKA Digital's perspective on why tool selection without implementation expertise leads to wasted investment.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- AdvertisingVietnam — GPI Indonesia -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">Advertising Vietnam</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">GPI Indonesia &amp; Lava Digital Announce Strategic Loyalty Programme Partnership</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Expanding AKA Digital's regional footprint into Indonesia through loyalty and CRM technology partnerships.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- NhipCauDauTu — Disruptiv Exchange -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">Nhip Cau Dau Tu</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2023</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">Disruptiv Exchange Enters Vietnam Market via AKA Digital Partnership</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">New programmatic exchange brings advanced digital advertising capabilities to Vietnam's growing digital economy.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- VNEconomy — B2B e-commerce $18.97T -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">VnEconomy</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2024</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">Global B2B E-commerce Market Worth $18.97 Trillion — Vietnam's Opportunity</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">How Vietnamese enterprises can capture a share of the world's fastest-growing commerce segment through digital platforms.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- VNEconomy — Avetti B2B -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">VnEconomy</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2024</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">B2B E-commerce Solutions for Vietnam Enterprises: Avetti Commerce Arrives</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">AKA Digital brings Avetti Commerce's multi-vendor B2B platform to Vietnam's enterprise market.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- CafeF — 80B USD Vietnam B2B -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">CafeF</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2024</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">Vietnam's B2B Market Valued at 80 Billion USD — Digital Commerce Leads Next Wave</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Enterprise buyers shift online as Vietnam's B2B e-commerce infrastructure matures rapidly.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- NhipCauDauTu — Avetti strategic partnership -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">Nhip Cau Dau Tu</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2024</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">AKA Digital &amp; Avetti: Strategic Partnership for Vietnam's Digital Commerce Transformation</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Exclusive partnership to accelerate B2B digital commerce adoption among Vietnam's leading manufacturers and distributors.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- VietnamNet — B2B e-commerce transforms -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">VietnamNet</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2024</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">B2B E-commerce Transforms Traditional Distribution in Vietnam</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Digital platforms are disrupting traditional wholesale and distribution channels — and AKA Digital is at the forefront.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- SGTiepThi — Canadian partner B2B -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">SG Tiep Thi</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2024</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">Canadian B2B E-commerce Partner Enters Southeast Asian Market Through AKA Digital</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Avetti Commerce's APAC expansion builds on AKA Digital's regional network across 6 SEA markets.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- BrandsVietnam — $14.8B Avetti alliance -->
+      <div class="card flex flex-col gap-4 p-6 hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(37,59,194,0.07)] transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <span class="text-label-md font-bold text-primary uppercase tracking-wider">BrandsVietnam</span>
+          <span class="text-label-md text-on-surface-variant bg-surface-container-low rounded-full px-3 py-0.5">2024</span>
+        </div>
+        <p class="font-display font-bold text-on-surface text-body-lg leading-snug flex-1">$14.8B Strategic Alliance: AKA Digital &amp; Avetti Target APAC B2B E-commerce</p>
+        <p class="text-body-md text-on-surface-variant text-sm leading-relaxed">Landmark partnership positions both companies to capture significant share of the APAC digital commerce market.</p>
+        <a href="/contact" class="inline-flex items-center gap-1.5 text-primary font-bold text-label-md hover:gap-2.5 transition-all">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Read article <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- Newsletter CTA -->
+<section class="py-20 bg-on-surface text-inverse-on-surface text-center">
+  <div class="section-container">
+    <p class="eyebrow text-primary-fixed mb-3">Stay Informed</p>
+    <h2 class="text-headline-md font-display mb-4">Get MarTech Insights in Your Inbox</h2>
+    <p class="text-body-lg text-inverse-on-surface/70 mb-8 max-w-md mx-auto">
+      Monthly roundups, event invites, and platform updates for B2B marketers in Southeast Asia.
+    </p>
+    <a href="/contact" class="btn-primary">Subscribe via Contact Form</a>
+  </div>
+</section>

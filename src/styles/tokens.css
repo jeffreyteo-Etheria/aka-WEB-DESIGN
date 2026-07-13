@@ -1,0 +1,76 @@
+/* ============================================================
+   AKA Digital — Design Tokens  (updated: Brand Identity 2025)
+   CSS custom properties mirroring tailwind.config.js
+   Use these directly in any CSS that sits outside Tailwind.
+   ============================================================ */
+
+:root {
+  /* --- Brand 2025 palette (AKA-Digital-Brand-Identity-2025.pptx) --- */
+  --color-action-yellow:   #F5C400;  /* Signal Yellow — CTAs, labels */
+  --color-ink-deep:        #060F24;  /* Deepest dark — hero BG */
+  --color-navy-core:       #0B1F4B;  /* Page surface */
+  --color-navy-mid:        #132B5E;  /* Card / elevated surface */
+  --color-slate:           #8C9BB8;  /* Body text, captions */
+  --color-mist:            #C4CCDC;  /* Dividers, metadata */
+  --color-yellow-tint:     #FEF3BF;  /* Decorative overlays on dark */
+  --color-brand-green:     #00C896;  /* Success / positive states */
+
+  /* --- Core interactive --- */
+  --color-primary:           #1B3A7A;
+  --color-primary-container: #132B5E;
+  --color-on-primary:        #ffffff;
+  --color-inverse-surface:   #060F24; /* Ink Deep */
+
+  /* --- Surface system --- */
+  --color-background:        #fbf8ff;
+  --color-surface:           #fbf8ff;
+  --color-surface-off-white: #F6F9F5;
+  --color-surface-low:       #f4f2fe;
+  --color-surface-container: #eeecf8;
+  --color-surface-high:      #e9e7f2;
+  --color-surface-highest:   #e3e1ed;
+
+  /* --- Text colours --- */
+  --color-on-surface:          #1a1b23;
+  --color-on-surface-variant:  #454654;
+  --color-inverse-on-surface:  #f1effb;
+  --color-secondary:           #5e5e5e;
+  --color-muted-gray:          #8C9BB8; /* Slate */
+
+  /* --- Outline --- */
+  --color-outline:         #8C9BB8;  /* Slate */
+  --color-outline-variant: #C4CCDC;  /* Mist */
+
+  /* --- Typography (Brand 2025) --- */
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-body:    "Inter", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", "Courier New", monospace; /* Data labels */
+
+  /* --- Scale --- */
+  --text-headline-xl:  clamp(40px, 5vw, 64px);
+  --text-headline-lg:  clamp(30px, 4vw, 48px);
+  --text-headline-md:  clamp(24px, 3vw, 32px);
+  --text-headline-sm:  24px;
+  --text-body-lg:      18px;
+  --text-body-md:      16px;
+  --text-label-md:     14px;
+
+  /* --- Spacing --- */
+  --container-max:     1280px;
+  --gutter:            24px;
+  --margin-mobile:     16px;
+  --section-padding:   120px;
+  --stack-gap:         32px;
+
+  /* --- Border radius --- */
+  --radius-sm:   0.125rem;
+  --radius:      0.25rem;
+  --radius-md:   0.375rem;
+  --radius-lg:   0.5rem;
+  --radius-xl:   0.75rem;
+  --radius-full: 9999px;
+
+  /* --- Shadows --- */
+  --shadow-card:   0 8px 32px rgba(66, 86, 219, 0.08);
+  --shadow-drawer: 0 0 40px rgba(0, 0, 0, 0.15);
+}

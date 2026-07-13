@@ -1,0 +1,802 @@
+---
+layout: layouts/base.njk
+title: AKA Digital | Award-Winning B2B MarTech Agency — Southeast Asia
+description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam's exclusive representative for Mixpanel, Salesforce, Oracle, CleverTap, MoEngage and more. Offices in Singapore, Vietnam, Indonesia & Korea.
+---
+
+<!-- ============================================================
+     HERO — Dark cinematic with event photo
+     ============================================================ -->
+<section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#060F24]" id="hero">
+
+  <!-- Background: real event photo -->
+  <div class="absolute inset-0 z-0">
+    <img
+      src="/images/hero/home-summit.jpeg"
+      alt="AKA Digital Martech Summit"
+      class="w-full h-full object-cover opacity-45"
+      loading="eager"
+    />
+    <div class="absolute inset-0" style="background:rgba(8,12,24,0.55)"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[#060F24] via-transparent to-transparent"></div>
+  </div>
+
+  <!-- Subtle grid -->
+  <div class="absolute inset-0 z-0 opacity-[0.04]"
+       style="background-image: linear-gradient(rgba(188,195,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(188,195,255,1) 1px, transparent 1px); background-size: 80px 80px;">
+  </div>
+
+  <!-- Glowing orbs -->
+  <div class="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-primary/20 blur-[120px] opacity-50 pointer-events-none"></div>
+  <div class="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full bg-action-yellow/10 blur-[100px] opacity-40 pointer-events-none"></div>
+
+  <!-- Language switcher -->
+  <div class="absolute top-24 right-4 md:right-8 z-20 flex items-center gap-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-3 py-2">
+    <button class="lang-btn text-label-md font-bold text-action-yellow px-2 py-0.5 rounded-full" data-lang="en">EN</button>
+    <span class="text-white/20 text-xs">|</span>
+    <button class="lang-btn text-label-md text-white/60 hover:text-white px-2 py-0.5 rounded-full transition-colors" data-lang="vi">VI</button>
+    <span class="text-white/20 text-xs">|</span>
+    <button class="lang-btn text-label-md text-white/60 hover:text-white px-2 py-0.5 rounded-full transition-colors" data-lang="ko">한국어</button>
+    <span class="text-white/20 text-xs">|</span>
+    <button class="lang-btn text-label-md text-white/60 hover:text-white px-2 py-0.5 rounded-full transition-colors" data-lang="zh">中文</button>
+  </div>
+
+  <div class="relative z-10 section-container py-32">
+    <div class="grid lg:grid-cols-12 gap-12 items-center">
+
+      <!-- Left: headline + CTAs -->
+      <div class="lg:col-span-7 reveal-up">
+
+        <!-- Award badge -->
+        <div class="inline-flex items-center gap-2 bg-action-yellow text-on-secondary-fixed px-4 py-2 rounded-full text-label-md font-extrabold uppercase tracking-widest mb-8 shadow-[0_0_30px_rgba(245,209,0,0.3)]">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">emoji_events</span>
+          MMA Smarties Silver Winner 2022
+        </div>
+
+        <!-- Headline -->
+        <h1 class="text-[48px] md:text-[64px] lg:text-[72px] font-display font-extrabold leading-[1.05] tracking-[-0.02em] text-white mb-6 text-balance">
+          MarTech That<br/>
+          <span class="bg-gradient-to-r from-action-yellow via-[#FFE566] to-action-yellow bg-clip-text text-transparent">Actually Works.</span><br/>
+          <span class="text-white/80">In Southeast Asia.</span>
+        </h1>
+
+        <!-- Subheadline -->
+        <p class="text-[18px] md:text-[20px] text-white/65 mb-10 leading-relaxed max-w-2xl">
+          We operate across Southeast Asia as a licensed MarTech partner and Vietnam's exclusive representative for global platforms — powering 150+ enterprise brands to turn data into revenue.
+        </p>
+
+        <!-- CTA row -->
+        <div class="flex flex-col sm:flex-row gap-4 mb-12">
+          <a href="/contact" class="inline-flex items-center justify-center gap-2 bg-action-yellow text-on-secondary-fixed px-8 py-4 rounded-xl text-label-md font-extrabold uppercase tracking-wider shadow-[0_8px_32px_rgba(245,209,0,0.35)] hover:shadow-[0_12px_40px_rgba(245,209,0,0.5)] hover:translate-y-[-2px] transition-all duration-300">
+            <span data-i18n="cta.getInTouch">Get a Free Consultation</span>
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          </a>
+          <a href="/case-studies" class="inline-flex items-center justify-center gap-2 bg-white/8 backdrop-blur-sm border border-white/20 text-white px-8 py-4 rounded-xl text-label-md font-bold hover:bg-white/15 transition-all duration-300">
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">play_circle</span>
+            View Case Studies
+          </a>
+        </div>
+
+        <!-- Social proof -->
+        <div class="flex items-center gap-6 pt-8 border-t border-white/10">
+          <div class="flex -space-x-2">
+            {% for person in team %}
+              <div class="w-10 h-10 rounded-full bg-primary/30 border-2 border-[#060F24] flex items-center justify-center text-white font-bold text-label-md overflow-hidden">
+                <img src="{{ person.photo }}" alt="{{ person.name }}"
+                  class="w-full h-full object-cover"
+                  onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'text-sm font-bold text-white\'>{{ person.name | truncate(1, true, \'\') }}</span>'" />
+              </div>
+            {% endfor %}
+            <div class="w-10 h-10 rounded-full bg-action-yellow/20 border-2 border-[#060F24] flex items-center justify-center text-action-yellow font-bold text-label-md">+47</div>
+          </div>
+          <div>
+            <p class="text-white font-bold text-body-md">150+ Enterprise Brands Trust Us</p>
+            <p class="text-white/50 text-label-md">Across Singapore · Vietnam · Indonesia · Korea</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: live metrics card -->
+      <div class="lg:col-span-5 reveal-up" style="animation-delay:0.15s">
+        <div class="relative">
+
+          <!-- Main card -->
+          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-[0_32px_80px_rgba(0,0,0,0.4)]">
+
+            <!-- Card header -->
+            <div class="flex items-center gap-3 mb-6 pb-5 border-b border-white/10">
+              <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-xl">insights</span>
+              </div>
+              <div>
+                <p class="text-label-md text-white/50 uppercase tracking-wider">Live Campaign Analytics</p>
+                <p class="font-display font-bold text-white">Real-Time Performance</p>
+              </div>
+              <div class="ml-auto flex items-center gap-1.5">
+                <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                <span class="text-label-md text-white/50">Live</span>
+              </div>
+            </div>
+
+            <!-- Metric bars -->
+            <div class="space-y-4 mb-6">
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="text-label-md text-white/60">Conversion Rate</span>
+                  <span class="text-label-md font-bold text-action-yellow notranslate" translate="no">+34%</span>
+                </div>
+                <div class="h-1.5 bg-white/10 rounded-full"><div class="h-1.5 bg-action-yellow rounded-full animate-[grow_1.5s_ease-out_0.5s_both]" style="width:76%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="text-label-md text-white/60">User Retention</span>
+                  <span class="text-label-md font-bold text-primary-fixed notranslate" translate="no">+52%</span>
+                </div>
+                <div class="h-1.5 bg-white/10 rounded-full"><div class="h-1.5 bg-primary rounded-full animate-[grow_1.5s_ease-out_0.7s_both]" style="width:88%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="text-label-md text-white/60">Revenue Growth</span>
+                  <span class="text-label-md font-bold text-green-400 notranslate" translate="no">+127%</span>
+                </div>
+                <div class="h-1.5 bg-white/10 rounded-full"><div class="h-1.5 bg-green-400 rounded-full animate-[grow_1.5s_ease-out_0.9s_both]" style="width:93%"></div></div>
+              </div>
+            </div>
+
+            <!-- Mini stat grid -->
+            <div class="grid grid-cols-3 gap-3 pt-5 border-t border-white/10">
+              <div class="text-center">
+                <span class="block text-[28px] font-display font-extrabold text-action-yellow counter notranslate" data-target="150" data-suffix="+" translate="no">0</span>
+                <span class="text-label-md text-white/40">Enterprise Clients</span>
+              </div>
+              <div class="text-center border-x border-white/10">
+                <span class="block text-[28px] font-display font-extrabold text-primary-fixed counter notranslate" data-target="15" translate="no">0</span>
+                <span class="text-label-md text-white/40">Tech Partners</span>
+              </div>
+              <div class="text-center">
+                <span class="block text-[28px] font-display font-extrabold text-green-400 counter notranslate" data-target="10" translate="no">0</span>
+                <span class="text-label-md text-white/40">Yrs Exp</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating award badge -->
+          <div class="absolute -bottom-5 -right-5 bg-action-yellow text-on-secondary-fixed rounded-2xl px-4 py-3 shadow-xl z-20 text-center">
+            <span class="block font-display font-extrabold text-[24px] leading-tight">2022</span>
+            <span class="text-label-md font-bold opacity-80">MMA Award</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-40">
+    <span class="text-white text-label-md uppercase tracking-widest">Scroll</span>
+    <div class="w-px h-10 bg-gradient-to-b from-white/60 to-transparent animate-[scrollLine_2s_ease-in-out_infinite]"></div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     CLIENT LOGO MARQUEE — single-row auto-scroll (all screens)
+     ============================================================ -->
+<section class="py-8 md:py-12 bg-[#060F24] border-t border-white/5 overflow-hidden">
+  <h2 class="text-center text-headline-md md:text-headline-lg font-display font-bold leading-tight tracking-[-0.01em] text-white/70 mb-8 px-4 text-balance">Trusted by 150+ Enterprise Brands Across Southeast Asia</h2>
+
+  <div class="marquee-outer overflow-hidden w-full">
+    <div class="marquee-track flex flex-nowrap gap-16 md:gap-24 items-center px-8" style="animation: marquee 60s linear infinite; width: max-content;">
+      {% for client in sitedata.clients %}
+        <div class="shrink-0 flex items-center justify-center h-20 opacity-60 hover:opacity-100 transition-opacity duration-300" style="min-width: max-content;">
+          <img src="{{ client.logo }}" alt="{{ client.name }}"
+            class="block h-full w-auto object-contain brightness-0 invert"
+            style="max-height: 80px;"
+            onerror="this.parentElement.innerHTML='<span class=\'font-display font-semibold text-white/60 text-base whitespace-nowrap tracking-wide\'>{{ client.name }}</span>'" />
+        </div>
+      {% endfor %}
+      <!-- Duplicate for seamless loop -->
+      {% for client in sitedata.clients %}
+        <div class="shrink-0 flex items-center justify-center h-20 opacity-60 hover:opacity-100 transition-opacity duration-300" style="min-width: max-content;">
+          <img src="{{ client.logo }}" alt="{{ client.name }}"
+            class="block h-full w-auto object-contain brightness-0 invert"
+            style="max-height: 80px;"
+            onerror="this.parentElement.innerHTML='<span class=\'font-display font-semibold text-white/60 text-base whitespace-nowrap tracking-wide\'>{{ client.name }}</span>'" />
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     VALUE PROPOSITION — Dark to light transition
+     ============================================================ -->
+<section class="py-20 md:py-32 bg-gradient-to-b from-[#060F24] to-background">
+  <div class="section-container">
+    <div class="grid md:grid-cols-2 gap-16 items-center">
+
+      <div class="reveal-up">
+        <div class="w-12 h-1 bg-action-yellow mb-6"></div>
+        <h2 class="text-headline-md md:text-headline-lg font-display text-white mb-6 text-balance leading-tight">
+          The MarTech Partner<br/><span class="text-action-yellow">Southeast Asia Trusts</span>
+        </h2>
+        <p class="text-body-lg text-white/70 leading-relaxed mb-6">
+          AKA Digital bridges the gap between world-class marketing technology and real business outcomes. As a premier regional agency representing over 15 global MarTech platforms, we are licensed to operate across Southeast Asia and South Korea and serve as the exclusive partner for Vietnam's emerging market.
+        </p>
+        <p class="text-body-lg text-white/70 leading-relaxed mb-10">
+          We don't just implement software. We design the strategies, train the teams, and deliver the measurable outcomes that make MarTech investments pay off.
+        </p>
+        <a href="/about" class="btn-primary inline-flex items-center gap-2">
+          Our Story <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- Stats grid -->
+      <div class="grid grid-cols-2 gap-4 reveal-up" style="animation-delay:0.1s">
+        {% for stat in sitedata.value_proposition.stats %}
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-action-yellow/30 hover:bg-white/8 transition-all duration-300">
+            <span class="block text-[52px] font-display font-extrabold text-action-yellow leading-none mb-2 counter notranslate" data-target="{{ stat.value | replace('+','') | replace('x','') }}" translate="no">{{ stat.value }}</span>
+            <span class="text-label-md text-white/50 uppercase tracking-wider">{{ stat.label }}</span>
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SOLUTION PILLARS — Full-width cards with problem/solution framing
+     ============================================================ -->
+<section class="py-20 md:py-32 bg-surface-off-white">
+  <div class="section-container">
+    <div class="text-center mb-16 reveal-up">
+      <p class="eyebrow mb-3">What We Solve</p>
+      <h2 class="text-headline-md md:text-headline-lg font-display text-on-surface text-balance">
+        Four Pillars of MarTech Excellence
+      </h2>
+      <p class="text-body-lg text-on-surface-variant mt-4 max-w-2xl mx-auto">
+        Every solution is built around a real marketer pain point — and a measurable outcome.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+
+      <!-- CRM & Automation -->
+      <a href="/solutions/crm-automation" class="group card p-8 hover:border-primary/40 hover:shadow-[0_20px_60px_rgba(37,59,194,0.10)] transition-all duration-300 reveal-up">
+        <div class="flex items-start gap-4 mb-6">
+          <div class="w-14 h-14 rounded-2xl bg-primary text-on-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <span class="material-symbols-outlined text-2xl">autorenew</span>
+          </div>
+          <div>
+            <p class="text-label-md text-primary font-bold uppercase tracking-wider mb-1">CRM & Marketing Automation</p>
+            <h3 class="text-headline-sm font-display text-on-surface">Stop Losing Revenue to Disconnected Data</h3>
+          </div>
+        </div>
+        <p class="text-body-md text-on-surface-variant mb-5 leading-relaxed">Most brands lose up to 40% of marketing ROI from siloed tech. We unify your customer data, automate lifecycle journeys across email, SMS, push, and WhatsApp — and deploy AI-driven personalisation that converts at scale.</p>
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-primary text-base mt-0.5" style="font-variation-settings:'FILL' 1">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Unified CDP implementation</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-primary text-base mt-0.5" style="font-variation-settings:'FILL' 1">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Omnichannel orchestration</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-primary text-base mt-0.5" style="font-variation-settings:'FILL' 1">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Real-time personalisation</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-primary text-base mt-0.5" style="font-variation-settings:'FILL' 1">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Lifecycle automation</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-primary font-bold text-label-md group-hover:gap-3 transition-all">
+          Explore CRM Solutions <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </div>
+      </a>
+
+      <!-- Digital & Programmatic -->
+      <a href="/solutions/digital-programmatic" class="group card p-8 hover:border-action-yellow/40 hover:shadow-[0_20px_60px_rgba(245,209,0,0.08)] transition-all duration-300 reveal-up" style="animation-delay:0.1s">
+        <div class="flex items-start gap-4 mb-6">
+          <div class="w-14 h-14 rounded-2xl bg-action-yellow text-on-secondary-fixed flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <span class="material-symbols-outlined text-2xl">ads_click</span>
+          </div>
+          <div>
+            <p class="text-label-md font-bold uppercase tracking-wider mb-1" style="color:#8B7200">Digital Marketing & Programmatic</p>
+            <h3 class="text-headline-sm font-display text-on-surface">Precision Ads That Actually Hit</h3>
+          </div>
+        </div>
+        <p class="text-body-md text-on-surface-variant mb-5 leading-relaxed">Stop wasting budget on spray-and-pray media buying. We run data-first programmatic campaigns across DV360, Meta, LinkedIn, Spotify, TikTok, and Programmatic DOOH — with real-time attribution so every dollar is accountable.</p>
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-base mt-0.5" style="font-variation-settings:'FILL' 1;color:#8B7200">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Google DV360 managed</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-base mt-0.5" style="font-variation-settings:'FILL' 1;color:#8B7200">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Meta & LinkedIn ads</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-base mt-0.5" style="font-variation-settings:'FILL' 1;color:#8B7200">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Programmatic DOOH</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-base mt-0.5" style="font-variation-settings:'FILL' 1;color:#8B7200">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Full attribution reporting</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 font-bold text-label-md group-hover:gap-3 transition-all" style="color:#8B7200">
+          Explore Programmatic <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </div>
+      </a>
+
+      <!-- GEO / AI / SEO -->
+      <a href="/solutions/geo-ai-seo" class="group card p-8 hover:border-primary/40 hover:shadow-[0_20px_60px_rgba(37,59,194,0.10)] transition-all duration-300 reveal-up" style="animation-delay:0.2s">
+        <div class="flex items-start gap-4 mb-6">
+          <div class="w-14 h-14 rounded-2xl bg-[#0d1117] text-white flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/50 to-action-yellow/20"></div>
+            <span class="material-symbols-outlined text-2xl relative z-10">travel_explore</span>
+          </div>
+          <div>
+            <p class="text-label-md text-primary font-bold uppercase tracking-wider mb-1">AI Search — GEO / AEO / SEO</p>
+            <h3 class="text-headline-sm font-display text-on-surface">Win in the Age of AI Search</h3>
+          </div>
+        </div>
+        <p class="text-body-md text-on-surface-variant mb-5 leading-relaxed">Google AI Overviews, ChatGPT Search, Perplexity AI — the search landscape has changed forever. We help brands appear in AI-generated answers and the next generation of search. Partner: <strong>Hashmeta.ai</strong> for GEO audits.</p>
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-primary text-base mt-0.5" style="font-variation-settings:'FILL' 1">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">GEO & AEO optimisation</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-primary text-base mt-0.5" style="font-variation-settings:'FILL' 1">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">AI content structuring</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-primary text-base mt-0.5" style="font-variation-settings:'FILL' 1">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Schema.org & rich results</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-primary text-base mt-0.5" style="font-variation-settings:'FILL' 1">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Free GEO Audit tool</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-primary font-bold text-label-md group-hover:gap-3 transition-all">
+          Try a GEO Audit <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </div>
+      </a>
+
+      <!-- Social Media -->
+      <a href="/solutions/social-media" class="group card p-8 hover:border-primary/40 hover:shadow-[0_20px_60px_rgba(37,59,194,0.10)] transition-all duration-300 reveal-up" style="animation-delay:0.3s">
+        <div class="flex items-start gap-4 mb-6">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#833AB4] to-[#FD1D1D] text-white flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <span class="material-symbols-outlined text-2xl">share</span>
+          </div>
+          <div>
+            <p class="text-label-md font-bold uppercase tracking-wider mb-1" style="color:#833AB4">Social Media Marketing</p>
+            <h3 class="text-headline-sm font-display text-on-surface">AI-Driven Social That Sells</h3>
+          </div>
+        </div>
+        <p class="text-body-md text-on-surface-variant mb-5 leading-relaxed">Organic reach is dead without strategy. We build data-driven social campaigns across TikTok, Instagram, Facebook, and LinkedIn — with KOL/influencer partnerships powered by SocialMind that drive real conversions, not just likes.</p>
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-base mt-0.5" style="font-variation-settings:'FILL' 1;color:#833AB4">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">TikTok & Instagram content</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-base mt-0.5" style="font-variation-settings:'FILL' 1;color:#833AB4">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">KOL & influencer mgmt</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-base mt-0.5" style="font-variation-settings:'FILL' 1;color:#833AB4">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">LinkedIn B2B programmes</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-base mt-0.5" style="font-variation-settings:'FILL' 1;color:#833AB4">check_circle</span>
+            <span class="text-label-md text-on-surface-variant">Paid social management</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 font-bold text-label-md group-hover:gap-3 transition-all" style="color:#833AB4">
+          Explore Social Media <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     TECH PARTNER ECOSYSTEM — Text-only partner names on dark bg
+     ============================================================ -->
+<section class="py-20 bg-[#060F24] overflow-hidden">
+  <div class="section-container">
+    <div class="text-center mb-14 reveal-up">
+      <p class="eyebrow text-primary-fixed mb-3">Our Partner Ecosystem</p>
+      <h2 class="text-headline-md font-display text-white text-balance">Operational Expertise Across 15+ World-Class Platforms</h2>
+      <p class="text-body-md text-white/50 mt-3 max-w-xl mx-auto">Vietnam's exclusive representative for the world's best MarTech — licensed across Southeast Asia.</p>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 reveal-up" style="animation-delay:0.1s">
+      {% for partner in partners %}
+        <a href="/tech-partners#{{ partner.slug }}"
+           class="group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
+          <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">{{ partner.name }}</span>
+          <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors" translate="no">{{ partner.category }}</span>
+        </a>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-12">
+      <a href="/tech-partners" class="inline-flex items-center gap-2 text-white/50 hover:text-white font-bold text-label-md transition-colors uppercase tracking-wider">
+        View all platforms <span class="material-symbols-outlined text-base">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     MEDIA MENTIONS — Scrolling dark band
+     ============================================================ -->
+<section class="py-16 bg-inverse-surface overflow-hidden">
+  <div class="section-container mb-8">
+    <div class="w-10 h-1 bg-primary-fixed mb-4"></div>
+    <h2 class="text-headline-sm md:text-headline-md font-display text-inverse-on-surface">Global Recognition</h2>
+    <p class="text-body-md text-inverse-on-surface/50 mt-2">Featured by leading industry publications across Southeast Asia.</p>
+  </div>
+  <div class="flex overflow-x-auto gap-4 px-4 hide-scrollbar snap-x pb-2">
+    {% for mention in sitedata.media_mentions %}
+      <div class="min-w-[300px] max-w-[320px] snap-center bg-white/5 border border-white/8 rounded-2xl p-6 space-y-3 shrink-0 hover:border-primary/30 transition-colors duration-300">
+        <span class="text-label-md font-bold text-primary-fixed uppercase tracking-wider">{{ mention.publication }}</span>
+        <p class="text-body-md text-inverse-on-surface/70 leading-relaxed italic">"{{ mention.quote }}"</p>
+        <div class="flex items-center justify-between pt-2 border-t border-white/5">
+          <span class="text-label-md text-inverse-on-surface/30">{{ mention.year }}</span>
+          <span class="text-label-md text-primary-fixed/60 uppercase tracking-wider">{{ mention.category }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+
+<!-- ============================================================
+     CASE STUDY VIDEO SPOTLIGHT — grouped by category, 4 columns
+     ============================================================ -->
+<section class="py-20 md:py-32 bg-background">
+  <div class="section-container">
+    <div class="text-center mb-16 reveal-up">
+      <p class="eyebrow mb-3">Proven Results</p>
+      <h2 class="text-headline-md md:text-headline-lg font-display text-on-surface">Award-winning Campaigns</h2>
+      <p class="text-body-lg text-on-surface-variant mt-4 max-w-xl mx-auto">Real campaigns, real brands, real Southeast Asia results.</p>
+    </div>
+
+    {% set categories = [
+      { slug: "crm-automation",   label: "CRM & Automation",          icon: "hub" },
+      { slug: "programmatic-audio", label: "Programmatic & Audio",    icon: "campaign" },
+      { slug: "social-influencer",  label: "Social Media & Influencer", icon: "groups" }
+    ] %}
+
+    {% for cat in categories %}
+      <div class="mb-14 reveal-up">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings:'FILL' 1">{{ cat.icon }}</span>
+          <span class="text-label-md font-bold text-on-surface-variant uppercase tracking-widest">{{ cat.label }}</span>
+          <div class="flex-1 h-px bg-outline-variant/20 ml-1"></div>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          {% for cs in case_studies | publishedOnly %}
+            {% if cs.category == cat.slug and cs.featured_home %}
+              <a href="/case-studies/{{ cs.slug }}" class="group card overflow-hidden hover:shadow-[0_20px_60px_rgba(37,59,194,0.12)] hover:-translate-y-1 transition-all duration-300">
+                <div class="relative aspect-video overflow-hidden bg-on-surface">
+                  {% if cs.video_cover %}
+                    <video
+                      src="{{ cs.video_cover }}"
+                      poster="{{ cs.video_thumbnail }}"
+                      autoplay muted loop playsinline
+                      class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                    ></video>
+                  {% else %}
+                    <img src="{{ cs.video_thumbnail }}"
+                      alt="{{ cs.client }} case study"
+                      class="w-full h-full object-cover opacity-70 group-hover:opacity-85 group-hover:scale-105 transition-all duration-500"
+                      loading="lazy"
+                      onerror="this.src='{{ cs.cover_image }}'"
+                    />
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <div class="w-10 h-10 bg-action-yellow rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(245,209,0,0.4)] group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-symbols-outlined text-on-secondary-fixed text-lg" style="font-variation-settings:'FILL' 1">play_arrow</span>
+                      </div>
+                    </div>
+                  {% endif %}
+                  {% if cs.award %}
+                    <div class="absolute top-2 left-2">
+                      <span class="bg-action-yellow text-on-secondary-fixed font-bold px-2 py-0.5 rounded-full text-[10px]">{{ cs.award }}</span>
+                    </div>
+                  {% endif %}
+                  <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                    <p class="text-white font-bold text-xs">{{ cs.client }}</p>
+                    <p class="text-white/60 text-[10px]">{{ cs.industry }} · {{ cs.country }}</p>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h3 class="text-body-md font-display font-bold text-on-surface mb-3 leading-snug group-hover:text-primary transition-colors line-clamp-2">{{ cs.title }}</h3>
+                  <div class="flex flex-wrap gap-1.5 mb-3">
+                    {% for r in cs.results %}
+                      {% if loop.index <= 2 %}
+                        <div class="bg-primary/8 rounded-lg px-2 py-1 text-center">
+                          <span class="block text-primary font-display font-extrabold text-sm leading-none">{{ r.value }}</span>
+                          <span class="text-[9px] text-on-surface-variant uppercase tracking-wider">{{ r.metric }}</span>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <div class="flex items-center gap-1 text-primary font-bold text-xs group-hover:gap-2 transition-all">
+                    Read case study <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                  </div>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="text-center mt-6">
+      <a href="/case-studies" class="btn-secondary">View all case studies</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     ACTIVITIES — Horizontal scroll
+     ============================================================ -->
+<section class="py-20 md:py-32 bg-surface-off-white">
+  <div class="section-container">
+    <div class="flex justify-between items-end mb-10 reveal-up">
+      <div>
+        <p class="eyebrow mb-2">Events & Knowledge</p>
+        <h2 class="text-headline-sm md:text-headline-md font-display text-on-surface">Our Activities</h2>
+        <p class="text-body-md text-on-surface-variant mt-1">Bringing SEA's MarTech community together.</p>
+      </div>
+      <a href="/insights" class="hidden md:flex items-center gap-1 text-label-md font-bold text-primary hover:gap-2 transition-all">
+        View all <span class="material-symbols-outlined text-base">arrow_forward</span>
+      </a>
+    </div>
+    <div class="flex overflow-x-auto gap-6 hide-scrollbar snap-x pb-4 md:grid md:grid-cols-4 md:gap-6">
+      {% for activity in events | publishedOnly | sort(true, false, 'date') %}
+        <div class="min-w-[280px] md:min-w-0 snap-center group reveal-up" style="animation-delay:{{ loop.index0 * 0.1 }}s">
+          <a href="{{ activity.href }}">
+            <div class="relative aspect-[4/3] mb-4 overflow-hidden rounded-2xl bg-surface-container">
+              <img src="{{ activity.image }}" alt="{{ activity.title }}"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+              <div class="absolute bottom-3 left-3 flex items-center gap-2">
+                <span class="bg-primary text-on-primary text-label-md px-2 py-0.5 rounded-full text-xs font-bold">{{ activity.type }}</span>
+                <span class="text-white/70 text-label-md text-xs">{{ activity | eventDateDisplay }}</span>
+              </div>
+            </div>
+            <h3 class="text-headline-sm font-display text-on-surface mb-1 group-hover:text-primary transition-colors">{{ activity.title }}</h3>
+            <p class="text-body-md text-on-surface-variant line-clamp-2 text-sm">{{ activity.description }}</p>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     AKA ADS PLATFORM — External platform showcase
+     ============================================================ -->
+<section class="py-20 md:py-32 bg-[#060F24] relative overflow-hidden">
+
+  <!-- Subtle grid overlay -->
+  <div class="absolute inset-0 opacity-[0.04]"
+       style="background-image: linear-gradient(rgba(188,195,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(188,195,255,1) 1px, transparent 1px); background-size: 60px 60px;"></div>
+  <!-- Glow -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full opacity-10"
+       style="background: radial-gradient(circle, #F5C400 0%, transparent 70%); filter: blur(80px);"></div>
+
+  <div class="relative section-container">
+    <!-- Header -->
+    <div class="text-center mb-14 reveal-up">
+      <p class="eyebrow text-primary mb-3">AKA MARTECH Management Platform</p>
+      <h2 class="text-headline-md md:text-display-sm font-display text-white mb-4 text-balance">
+        One Platform. Four Intelligence Engines.
+      </h2>
+      <p class="text-body-lg text-white/60 max-w-2xl mx-auto">
+        Our proprietary MarTech platform gives you centralised access to AI-powered social, search, ads, and CRM intelligence — built for SEA's fastest-growing brands.
+      </p>
+    </div>
+
+    <!-- 4 platform cards (coming soon — not yet live) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
+
+      <!-- SocialMind -->
+      <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0s">
+        <div class="absolute top-3 right-3">
+          <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
+        </div>
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+             style="background: linear-gradient(135deg, #F5C400 0%, #e6b800 100%);">
+          <span class="material-symbols-outlined text-[#060F24] text-xl">people</span>
+        </div>
+        <h3 class="text-headline-sm font-display text-white mb-2">SocialMind</h3>
+        <p class="text-body-sm text-white/50 leading-relaxed">AI-powered social media intelligence. Plan, publish, and measure campaigns across all channels from a single dashboard.</p>
+      </div>
+
+      <!-- GeoMind -->
+      <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0.1s">
+        <div class="absolute top-3 right-3">
+          <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
+        </div>
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+             style="background: linear-gradient(135deg, #0B1F4B 0%, #1a3a7a 100%); border: 1px solid rgba(245,196,0,0.3);">
+          <span class="material-symbols-outlined text-primary text-xl">travel_explore</span>
+        </div>
+        <h3 class="text-headline-sm font-display text-white mb-2">GeoMind</h3>
+        <p class="text-body-sm text-white/50 leading-relaxed">AI-driven SEO, AEO, and GEO strategy engine. Optimise your brand's visibility across traditional search and AI-generated answers — from Google to ChatGPT and Perplexity.</p>
+      </div>
+
+      <!-- AdsMind -->
+      <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0.2s">
+        <div class="absolute top-3 right-3">
+          <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
+        </div>
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+             style="background: linear-gradient(135deg, #F5C400 0%, #e6b800 100%);">
+          <span class="material-symbols-outlined text-[#060F24] text-xl">ads_click</span>
+        </div>
+        <h3 class="text-headline-sm font-display text-white mb-2">AdsMind</h3>
+        <p class="text-body-sm text-white/50 leading-relaxed">Unified ads management across Meta, Google, TikTok, and programmatic networks. AI-optimised bidding and creative performance tracking.</p>
+      </div>
+
+      <!-- CRMMind -->
+      <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0.3s">
+        <div class="absolute top-3 right-3">
+          <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
+        </div>
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+             style="background: linear-gradient(135deg, #0B1F4B 0%, #1a3a7a 100%); border: 1px solid rgba(245,196,0,0.3);">
+          <span class="material-symbols-outlined text-primary text-xl">hub</span>
+        </div>
+        <h3 class="text-headline-sm font-display text-white mb-2">CRMMind</h3>
+        <p class="text-body-sm text-white/50 leading-relaxed">Intelligent CRM and customer lifecycle automation. Unify customer data, trigger smart sequences, and drive retention at scale.</p>
+      </div>
+
+    </div>
+
+    <!-- Platform CTA — non-clickable (platform not yet built) -->
+    <div class="text-center reveal-up" style="animation-delay:0.4s">
+      <span class="inline-flex items-center gap-2 bg-action-yellow/60 text-on-secondary-fixed/70 px-8 py-4 rounded-xl text-label-md font-extrabold uppercase tracking-wider cursor-not-allowed select-none">
+        <span class="material-symbols-outlined text-base">construction</span>
+        Access AKA Martech Service Platform
+      </span>
+      <p class="text-body-sm text-white/30 mt-4">Platform in development · Available to clients soon</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     LEAD GENERATION — Full CTA + Form
+     ============================================================ -->
+<section class="py-20 md:py-32 bg-[#060F24] relative overflow-hidden">
+
+  <!-- Background glow -->
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
+
+  <div class="relative z-10 section-container">
+    <div class="grid md:grid-cols-2 gap-16 items-start">
+
+      <!-- Left: pitch -->
+      <div class="reveal-up">
+        <div class="w-10 h-1 bg-action-yellow mb-6"></div>
+        <h2 class="text-headline-md md:text-headline-lg font-display text-white mb-4 text-balance">
+          Ready to Make Your<br/><span class="text-action-yellow">MarTech Work?</span>
+        </h2>
+        <p class="text-body-lg text-white/60 mb-8 leading-relaxed">
+          Talk to our experts. We'll audit your current stack, identify the gaps, and design a roadmap that drives measurable results within 90 days.
+        </p>
+
+        <!-- What you get -->
+        <div class="space-y-4 mb-10">
+          {% set perks = [
+            ["Free 45-minute strategy session", "calendar_today"],
+            ["MarTech stack audit report", "assessment"],
+            ["Custom implementation roadmap", "route"],
+            ["No lock-in — cancel any time", "lock_open"]
+          ] %}
+          {% for perk in perks %}
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-action-yellow/15 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-action-yellow text-base">{{ perk[1] }}</span>
+              </div>
+              <span class="text-white/80 text-body-md">{{ perk[0] }}</span>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Team contacts -->
+        <div class="space-y-5 pt-8 border-t border-white/10">
+          {% for person in team %}
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-primary/30 border-2 border-white/10 overflow-hidden shrink-0">
+                <img src="{{ person.photo }}" alt="{{ person.name }}"
+                  class="w-full h-full object-cover"
+                  onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-white font-bold text-sm flex items-center justify-center h-full\'>{{ person.name | truncate(1, true, "") }}</span>'" />
+              </div>
+              <div>
+                <p class="font-bold text-white">{{ person.name }}</p>
+                <p class="text-label-md text-white/50">{{ person.role_label }}</p>
+                <a href="mailto:{{ person.email }}" class="text-action-yellow text-label-md hover:underline">{{ person.email }}</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Office addresses -->
+        <div class="mt-10 pt-8 border-t border-white/10">
+          <p class="text-label-md text-white/40 uppercase tracking-widest mb-5">Our Offices</p>
+          <div class="grid grid-cols-2 gap-3">
+
+            <!-- Singapore -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">🇸🇬</span>
+                <span class="font-bold text-white text-body-md">Singapore</span>
+              </div>
+              <p class="text-label-md text-white/40 uppercase tracking-wider mb-2">Regional HQ</p>
+              <p class="text-label-md text-white/60 leading-relaxed">1 Paya Lebar Link, #04-01<br/>Paya Lebar Quarter, 408533</p>
+            </div>
+
+            <!-- Vietnam -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">🇻🇳</span>
+                <span class="font-bold text-white text-body-md">Vietnam</span>
+              </div>
+              <p class="text-label-md text-white/40 uppercase tracking-wider mb-2">Ho Chi Minh City</p>
+              <p class="text-label-md text-white/60 leading-relaxed">236/26/8 Dien Bien Phu<br/>Gia Dinh Ward, HCMC</p>
+            </div>
+
+            <!-- South Korea -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">🇰🇷</span>
+                <span class="font-bold text-white text-body-md">South Korea</span>
+              </div>
+              <p class="text-label-md text-white/40 uppercase tracking-wider mb-2">Seoul</p>
+              <p class="text-label-md text-white/60 leading-relaxed">Seoul Office<br/>
+                <a href="mailto:kw.hwang@akadigital.net" class="text-action-yellow hover:underline">kw.hwang@akadigital.net</a>
+              </p>
+            </div>
+
+            <!-- Indonesia -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">🇮🇩</span>
+                <span class="font-bold text-white text-body-md">Indonesia</span>
+              </div>
+              <p class="text-label-md text-white/40 uppercase tracking-wider mb-2">Jakarta</p>
+              <p class="text-label-md text-white/60 leading-relaxed">EightyEight Tower A, 35F<br/>Kota Kasablanka, Jakarta</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: lead quiz -->
+      <div class="reveal-up" style="animation-delay:0.15s">
+        {% include "components/lead-quiz.njk" %}
+      </div>
+
+    </div>
+  </div>
+</section>

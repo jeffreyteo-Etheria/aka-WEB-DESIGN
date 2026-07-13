@@ -1,0 +1,103 @@
+{
+  "hero": {
+    "eyebrow": "Award-Winning MarTech Agency — Southeast Asia",
+    "headline": "MarTech That Actually Works.",
+    "headline_accent": "In Southeast Asia.",
+    "subheadline": "AKA Digital is the region's leading B2B marketing technology agency. Vietnam's exclusive representative for Mixpanel, Salesforce, Oracle, CleverTap, MoEngage, and more — licensed to operate across Southeast Asia.",
+    "cta_primary":        "Get a Free Consultation",
+    "cta_primary_href":   "/contact",
+    "cta_secondary":      "View Case Studies",
+    "cta_secondary_href": "/case-studies",
+    "background_image":   "/images/hero/home-summit.jpeg"
+  },
+  "value_proposition": {
+    "headline": "The MarTech Partner Southeast Asia Trusts",
+    "body": "AKA Digital bridges the gap between world-class marketing technology and real business outcomes. As Vietnam's exclusive representative for leading global MarTech platforms — and a licensed operator across Southeast Asia — we implement, manage, and optimise the tools that turn data into measurable revenue.",
+    "stats": [
+      { "value": "10+",  "label": "Years in MarTech" },
+      { "value": "150+", "label": "Enterprise Clients" },
+      { "value": "6+",   "label": "SEA Markets + S.Korea" },
+      { "value": "15+",  "label": "Platform Partners" }
+    ]
+  },
+  "media_mentions": [
+    {
+      "publication": "Brands Vietnam",
+      "logo": "/images/media/brandsvietnam.png",
+      "quote": "Data Solution Summit 2024: 80% of enterprises invest in software but only use 20% of functions — AKA Digital tackles this gap head-on.",
+      "href": "https://www.brandsvietnam.com",
+      "category": "Summit Coverage",
+      "year": 2024
+    },
+    {
+      "publication": "CafeBiz",
+      "logo": "/images/media/cafebiz.png",
+      "quote": "Growing demand for marketing automation solutions as e-commerce businesses in Vietnam seek scalable personalisation.",
+      "href": "https://cafebiz.vn",
+      "category": "Industry Report",
+      "year": 2024
+    },
+    {
+      "publication": "VnEconomy",
+      "logo": "/images/media/vneconomy.png",
+      "quote": "Improve customer experience: how brands in Vietnam are aligning technology with customer lifecycle strategy.",
+      "href": "https://vneconomy.vn",
+      "category": "Featured Article",
+      "year": 2024
+    },
+    {
+      "publication": "Bao Dau Tu",
+      "logo": "/images/media/baodautu.png",
+      "quote": "Vietnam's digital marketing sector sees surge in enterprise demand for first-party data strategies.",
+      "href": "https://baodautu.vn",
+      "category": "Investment News",
+      "year": 2023
+    },
+    {
+      "publication": "Nhip Cau Dau Tu",
+      "logo": "/images/media/nhipcaudautu.png",
+      "quote": "AKA Digital positions Vietnam as a regional hub for marketing technology adoption in Southeast Asia.",
+      "href": "https://nhipcaudautu.vn",
+      "category": "Business Feature",
+      "year": 2023
+    },
+    {
+      "publication": "Advertising Vietnam",
+      "logo": "/images/media/advertisingvietnam.png",
+      "quote": "MMA Smarties Silver 2022: AKA Digital's FE Credit campaign earns top honour for mobile marketing excellence.",
+      "href": "https://advertisingvietnam.com",
+      "category": "Awards Coverage",
+      "year": 2022
+    },
+    {
+      "publication": "CafeF",
+      "logo": "/images/media/cafef.png",
+      "quote": "Data-driven marketing is no longer optional — businesses that invest now will own the customer relationship.",
+      "href": "https://cafef.vn",
+      "category": "Finance & Tech",
+      "year": 2023
+    },
+    {
+      "publication": "VnEconomy.vn",
+      "logo": "/images/media/vneconomy.png",
+      "quote": "CDP adoption in Vietnam accelerates as brands seek to reduce reliance on third-party cookies.",
+      "href": "https://vneconomy.vn",
+      "category": "Digital Economy",
+      "year": 2024
+    }
+  ],
+  "clients": [
+    { "name": "FE Credit",     "logo": "/images/clients/fe-credit.png",    "industry": "Financial Services" },
+    { "name": "Vietjet Air",   "logo": "/images/clients/vietjet.png",      "industry": "Aviation" },
+    { "name": "CareerBuilder", "logo": "/images/clients/careerbuilder.png","industry": "HR Technology" },
+    { "name": "Prudential",    "logo": "/images/clients/prudential.png",   "industry": "Insurance" },
+    { "name": "Manulife",      "logo": "/images/clients/manulife.png",     "industry": "Insurance" },
+    { "name": "Sacombank",     "logo": "/images/clients/sacombank.png",    "industry": "Banking" },
+    { "name": "OCB Bank",      "logo": "/images/clients/ocb.png",          "industry": "Banking" },
+    { "name": "VIB Bank",      "logo": "/images/clients/vib.png",          "industry": "Banking" },
+    { "name": "MSB Bank",      "logo": "/images/clients/msb.png",          "industry": "Banking" },
+    { "name": "Sony",          "logo": "/images/clients/sony.png",         "industry": "Electronics" },
+    { "name": "Ajinomoto",     "logo": "/images/clients/ajinomoto.png",    "industry": "FMCG" },
+    { "name": "VTVcab",        "logo": "/images/clients/vtvCab.png",       "industry": "Media" }
+  ]
+}

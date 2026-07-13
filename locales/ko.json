@@ -1,0 +1,30 @@
+{
+  "cta.whatsapp":       "도움이 필요하세요?",
+  "cta.getInTouch":     "문의하기",
+  "cta.consultation":   "무료 상담 받기",
+  "cta.viewCases":      "사례 연구 보기",
+
+  "nav.home":           "홈",
+  "nav.solutions":      "솔루션",
+  "nav.partners":       "기술 파트너",
+  "nav.cases":          "사례 연구",
+  "nav.insights":       "인사이트",
+  "nav.careers":        "채용",
+
+  "clients.heading":    "주요 고객사",
+
+  "contact.eyebrow":    "문의하기",
+  "contact.headline":   "전문가에게 문의하세요",
+  "contact.subline":    "디지털 전환 로드맵에 대해 상담해 드립니다.",
+
+  "form.name":          "성함",
+  "form.company":       "회사명",
+  "form.email":         "이메일 주소",
+  "form.phone":         "전화번호 (선택)",
+  "form.service":       "관심 서비스",
+  "form.message":       "메시지 (선택)",
+  "form.submit":        "문의 보내기",
+
+  "footer.solutions":   "솔루션",
+  "footer.company":     "회사 소개"
+}

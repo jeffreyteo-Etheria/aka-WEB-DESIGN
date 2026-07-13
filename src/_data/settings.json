@@ -1,0 +1,98 @@
+{
+  "name": "AKA Digital",
+  "tagline": "MarTech That Actually Works. In Southeast Asia.",
+  "description": "AKA Digital is a leading B2B MarTech and digital marketing agency with offices in Singapore, Vietnam, Indonesia, and Korea. We implement, manage, and optimise the marketing technology that turns data into revenue across Southeast Asia and Northeast Asia.",
+  "siteUrl": "https://akadigital.net",
+  "region": "Southeast Asia & Korea",
+  "foundedYear": 2014,
+  "google_form_id": "YOUR_GOOGLE_FORM_ID",
+  "google_form_entries": {
+    "name":             "entry.REPLACE_NAME_ID",
+    "company":          "entry.REPLACE_COMPANY_ID",
+    "email":            "entry.REPLACE_EMAIL_ID",
+    "phone":            "entry.REPLACE_PHONE_ID",
+    "service":          "entry.REPLACE_SERVICE_ID",
+    "message":          "entry.REPLACE_MESSAGE_ID",
+    "q1_challenge":     "entry.REPLACE_Q1_ID",
+    "q2_interest":      "entry.REPLACE_Q2_ID",
+    "q3_budget":        "entry.REPLACE_Q3_ID",
+    "matched_solution": "entry.REPLACE_MATCHED_ID"
+  },
+  "offices": [
+    {
+      "city": "Singapore",
+      "role": "Headquarters",
+      "address": "1 Paya Lebar Link, #04-01, Paya Lebar Quarter, Singapore 408533",
+      "country": "Singapore",
+      "country_code": "SG",
+      "flag": "🇸🇬",
+      "contact": "Jeffrey Teo",
+      "email": "jeffrey.teo@akadigital.net",
+      "phone": "+65 8699 9719"
+    },
+    {
+      "city": "Ho Chi Minh City",
+      "role": "Vietnam Office",
+      "address": "236/26/8 Dien Bien Phu Street, Gia Dinh Ward, Ho Chi Minh City",
+      "country": "Vietnam",
+      "country_code": "VN",
+      "flag": "🇻🇳",
+      "contact": "Phuong Pham (Maisie)",
+      "email": "phuong.pham@akadigital.net",
+      "phone": "+84 90 3045 373"
+    },
+    {
+      "city": "Jakarta",
+      "role": "Indonesia Office",
+      "address": "EightyEight Tower A, 35th Floor, Kota Kasablanka 12870, South Jakarta",
+      "country": "Indonesia",
+      "country_code": "ID",
+      "flag": "🇮🇩",
+      "contact": "Jeffrey Teo",
+      "email": "jeffrey.teo@akadigital.net",
+      "phone": "+65 8699 9719"
+    },
+    {
+      "city": "Seoul",
+      "role": "Korea Office",
+      "address": "Seoul, South Korea",
+      "country": "South Korea",
+      "country_code": "KR",
+      "flag": "🇰🇷",
+      "contact": "KS Hwang",
+      "email": "kw.hwang@akadigital.net",
+      "phone": "+82 10 2335 3076"
+    }
+  ],
+  "social": {
+    "linkedin":    "https://www.linkedin.com/company/aka-digital-vietnam/",
+    "youtube":     "https://www.youtube.com/@AKADIGITALVIETNAM",
+    "facebook_sg": "https://www.facebook.com/akadigitalsg/",
+    "facebook_vn": "https://www.facebook.com/akadigital.net/",
+    "whatsapp":    "https://wa.me/6586999719"
+  },
+  "schema": {
+    "legalName": "AKA Digital Pte. Ltd.",
+    "type": "MarketingAgency",
+    "areaServed": ["SG", "VN", "ID", "TH", "PH", "MY", "KR"]
+  },
+  "cta": {
+    "solution_plan_text": "Get My Custom Solution Plan",
+    "solution_plan_url": "/contact",
+    "book_session_text": "Book Free Session",
+    "book_session_url": "/contact",
+    "get_started_text": "Get Started",
+    "get_started_url": "/contact?market=sg"
+  },
+  "popup": {
+    "title": "Get Your Free Digital Growth Strategy Session",
+    "subtitle": "30-minute video call with our team — no commitment, no pitch deck. Just a genuine conversation about your goals.",
+    "bullets": [
+      "Discover which MarTech & digital tools fit your stack (CRM, automation, performance ads, social growth, AI GEO/AEO)",
+      "Benchmark your data maturity against SEA leaders (Understand where you stand in marketing technology adoption)",
+      "Receive a priority roadmap for 90-day quick wins (Actionable steps to accelerate campaigns and growth)"
+    ],
+    "button_text": "Book Free Session",
+    "button_url": "/contact"
+  }
+}

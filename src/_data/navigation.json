@@ -1,0 +1,34 @@
+{
+  "main": [
+    { "label": "Home",          "href": "/",             "icon": "home" },
+    {
+      "label": "Solutions",
+      "href":  "/solutions",
+      "icon":  "bolt",
+      "children": [
+        { "label": "CRM & Marketing Automation",     "href": "/solutions/crm-automation" },
+        { "label": "Digital Marketing & Programmatic","href": "/solutions/digital-programmatic" },
+        { "label": "AI Search — GEO / AEO / SEO",    "href": "/solutions/geo-ai-seo" },
+        { "label": "Social Media Marketing",          "href": "/solutions/social-media" }
+      ]
+    },
+    { "label": "Tech Partners",  "href": "/tech-partners", "icon": "handshake" },
+    { "label": "Case Studies",   "href": "/case-studies",  "icon": "analytics" },
+    { "label": "Blog",          "href": "/blog",          "icon": "edit_note" },
+    { "label": "Insights",       "href": "/insights",      "icon": "article" },
+    { "label": "Careers",        "href": "/careers",       "icon": "work" },
+    { "label": "LOG IN", "href": "/os", "icon": "login", "external": false, "platform": true }
+  ],
+  "mobile": [
+    { "label": "Home",      "href": "/",             "icon": "home" },
+    { "label": "Solutions", "href": "/solutions",    "icon": "bolt" },
+    { "label": "Cases",     "href": "/case-studies", "icon": "analytics" },
+    { "label": "Enquire",   "href": "/contact",      "icon": "mail" }
+  ],
+  "footer": [
+    { "label": "Privacy Policy",  "href": "/privacy" },
+    { "label": "Terms of Service","href": "/terms" },
+    { "label": "LinkedIn",  "href": "https://www.linkedin.com/company/aka-digital-vietnam/", "external": true },
+    { "label": "YouTube",   "href": "https://www.youtube.com/@AKADIGITALVIETNAM",  "external": true }
+  ]
+}

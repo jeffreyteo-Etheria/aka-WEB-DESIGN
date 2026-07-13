@@ -1,0 +1,1224 @@
+#!/usr/bin/env node
+/**
+ * AKA Digital — CMS + Visual Editor Server  v2.0
+ *
+ * Run:  node editor-server.js
+ * CMS:  http://localhost:3001/admin
+ *
+ * Two roles:
+ *   super  →  full access (all data files, settings, build, export)
+ *   team   →  blogs and events only
+ *
+ * Credentials are set below — change before sharing with your team.
+ */
+
+const http   = require('http');
+const fs     = require('fs');
+const path   = require('path');
+const crypto = require('crypto');
+const { exec, execSync } = require('child_process');
+const heicConvert = require('heic-convert');
+const {
+  validatePayload,
+  getClientIp,
+  createRateLimiter,
+  appendAuditLog,
+  appendSecurityLog,
+  getSecurityHeaders,
+} = require('./scripts/security-helpers');
+const securityConfig = require('./config/security.config');
+const { renderCaseStudyPreview, renderBlogPreview, renderEventPreview, renderJobPreview } = require('./scripts/preview-renderer');
+const { generateBlogDraft, describeAiError } = require('./scripts/ai-writer');
+
+/* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
+   with a PATH that doesn't include the directory npm actually lives in, even
+   though node itself starts fine — causing "npm: command not found" when we
+   shell out to run the site build. Force the running node's own bin
+   directory onto PATH for any child process we spawn. */
+const EXEC_ENV = {
+  ...process.env,
+  PATH: path.dirname(process.execPath) + path.delimiter + (process.env.PATH || ''),
+};
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CONFIG — change passwords before sharing
+   ───────────────────────────────────────────────────────────────────────── */
+
+const PORT = process.env.PORT || 3001;
+
+const USERS = [
+  {
+    username: process.env.ADMIN_USER || 'admin',
+    password: process.env.ADMIN_PASS || 'change-me',
+    role:     'super',
+    display:  'Super Admin',
+  },
+  {
+    username: process.env.TEAM_USER || 'team',
+    password: process.env.TEAM_PASS || 'change-me',
+    role:     'team',
+    display:  'Team Member',
+  },
+];
+const loginLimiter = createRateLimiter(securityConfig.rateLimits.login);
+const apiLimiter = createRateLimiter(securityConfig.rateLimits.api);
+
+/* ─────────────────────────────────────────────────────────────────────────
+   PATHS
+   ───────────────────────────────────────────────────────────────────────── */
+
+const ROOT       = __dirname;
+const DIST       = path.join(ROOT, 'dist');
+const DATA       = path.join(ROOT, 'src', '_data');
+const PUBLIC     = path.join(ROOT, 'public');
+const EDITOR     = path.join(ROOT, 'editor');
+const ADMIN      = path.join(ROOT, 'editor', 'admin');
+const EDITS      = path.join(DATA,   '_edits.json');
+const UPLOADS    = path.join(PUBLIC, 'images', 'uploads');
+
+/* iPhones (and many Android phones) save camera photos as HEIC/HEIF by
+   default. Virtually no browser except Safari can decode HEIC pixel data —
+   saved as-is, every one of these uploads renders as a broken image on the
+   live site for almost every visitor and in the CMS's own preview. Convert
+   to JPEG server-side so it doesn't matter what format the source phone used. */
+async function saveUploadedImage(buffer, originalFilename) {
+  const ext = (path.extname(originalFilename) || '.jpg').toLowerCase();
+  let data = buffer;
+  let outExt = ext;
+  if (ext === '.heic' || ext === '.heif') {
+    data = Buffer.from(await heicConvert({ buffer, format: 'JPEG', quality: 0.9 }));
+    outExt = '.jpg';
+  }
+  const name = `upload-${Date.now()}${outExt}`;
+  fs.writeFileSync(path.join(UPLOADS, name), data);
+  return `/images/uploads/${name}`;
+}
+
+const BLOG_PAGES = path.join(ROOT, 'src', 'blog');
+const CASE_STUDY_PAGES = path.join(ROOT, 'src', 'case-studies');
+/* Hostinger Git deploys reset the app directory to the repo state, destroying
+   untracked runtime files (proven 2026-07-06 with CMS uploads). This file holds
+   every approved Google user — losing it on deploy silently locks them all out.
+   In production set CMS_USERS_FILE to a path OUTSIDE the deploy directory
+   (e.g. /home/<user>/cms_users.json); the repo-root default is for local dev. */
+const CMS_USERS  = process.env.CMS_USERS_FILE || path.join(ROOT, 'cms_users.json');
+
+/* Answers "is this server actually running the latest code?" without needing
+   SSH/hPanel access — the CMS and the site it publishes to are the same
+   process, but a stale deploy (git pulled, npm install/build/restart never
+   run) looks identical to a real bug from the browser. Surfaced on the
+   Dashboard. */
+const SERVER_STARTED_AT = new Date().toISOString();
+let GIT_COMMIT = 'unknown';
+try { GIT_COMMIT = execSync('git rev-parse --short HEAD', { cwd: ROOT }).toString().trim(); } catch {}
+const SESSIONS_FILE = path.join(ROOT, '.sessions.json');
+
+[UPLOADS, ADMIN, BLOG_PAGES].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
+
+/* ── Google-authorized CMS users (stored outside Eleventy data dir) ──────── */
+function readUsers() {
+  try { return JSON.parse(fs.readFileSync(CMS_USERS, 'utf8')); } catch { return []; }
+}
+function writeUsers(data) {
+  fs.writeFileSync(CMS_USERS, JSON.stringify(data, null, 2));
+}
+
+/* Write / delete the Eleventy .njk wrapper that gives a blog post its URL */
+function writeBlogNjk(slug) {
+  const content = `---\nlayout: layouts/blog-post.njk\npermalink: /blog/${slug}/index.html\npostSlug: ${slug}\n---\n`;
+  fs.writeFileSync(path.join(BLOG_PAGES, `${slug}.njk`), content);
+}
+function deleteBlogNjk(slug) {
+  const fp = path.join(BLOG_PAGES, `${slug}.njk`);
+  if (fs.existsSync(fp)) fs.unlinkSync(fp);
+}
+
+/* Quote a string for safe use as a YAML frontmatter scalar — user-entered
+   text can contain ":", quotes, or newlines that would otherwise corrupt
+   the frontmatter block. */
+function yamlQuote(str) {
+  return '"' + String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, ' ') + '"';
+}
+
+/* Write / delete the Eleventy .njk wrapper that gives a case study its URL.
+   Without this file, a case study only exists in case_studies.json — it shows
+   up in listings but /case-studies/<slug>/ 404s because Eleventy never
+   builds a page for it. */
+function writeCaseStudyNjk(slug, entry) {
+  // Draft pages still get a real file (so the URL exists and a build doesn't
+  // need re-running the moment it's published), but the page's own <title>/
+  // meta description come from this frontmatter unconditionally — the actual
+  // body content is correctly gated by studySlug's published check, but the
+  // meta tags aren't, so a draft's real title/summary must not appear here.
+  const published = entry.status === 'published';
+  const title = published
+    ? `${entry.client ? entry.client + ' — ' : ''}${entry.title || slug} | AKA Digital Case Study`
+    : 'Coming Soon | AKA Digital Case Study';
+  const description = published
+    ? (entry.summary || '').replace(/\s+/g, ' ').trim().slice(0, 300)
+    : 'This case study is not published yet.';
+  const content = `---\nlayout: layouts/base.njk\ntitle: ${yamlQuote(title)}\ndescription: ${yamlQuote(description)}\npermalink: /case-studies/${slug}/index.html\nstudySlug: ${slug}\n---\n{% include "case-studies/template.njk" %}\n`;
+  fs.writeFileSync(path.join(CASE_STUDY_PAGES, `${slug}.njk`), content);
+}
+function deleteCaseStudyNjk(slug) {
+  const fp = path.join(CASE_STUDY_PAGES, `${slug}.njk`);
+  if (fs.existsSync(fp)) fs.unlinkSync(fp);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SESSION STORE  { token → { username, role, display } }
+   Persisted to disk so logins survive a process restart (Hostinger restarts
+   this app on every redeploy — without persistence, that silently logs out
+   every user with a bare "Unauthorized" and no explanation).
+   ───────────────────────────────────────────────────────────────────────── */
+
+function loadSessions() {
+  try {
+    const raw = JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8'));
+    const now = Date.now();
+    return new Map(Object.entries(raw).filter(([, s]) => !s.expiresAt || s.expiresAt > now));
+  } catch { return new Map(); }
+}
+function persistSessions() {
+  const obj = Object.fromEntries(SESSIONS);
+  fs.writeFile(SESSIONS_FILE, JSON.stringify(obj), () => {});
+}
+
+const SESSIONS = loadSessions();
+const mkToken  = () => crypto.randomBytes(32).toString('hex');
+
+function getSession(req) {
+  /* Accept token from header (API calls) OR query string (EventSource, which can't set headers) */
+  const t = req.headers['x-editor-token']
+    || new URL(req.url, 'http://localhost').searchParams.get('token')
+    || '';
+  const session = SESSIONS.get(t);
+  if (!session) return null;
+  if (session.expiresAt && Date.now() > session.expiresAt) {
+    SESSIONS.delete(t);
+    persistSessions();
+    return null;
+  }
+  session.lastSeen = Date.now();
+  /* Sliding expiry: any activity keeps the session alive, so an editor can't
+     be logged out in the middle of writing an article. Persist at most once
+     a minute — the extension only needs to survive a restart approximately. */
+  session.expiresAt = Date.now() + securityConfig.sessionTtlMs;
+  if (!getSession._lastPersist || Date.now() - getSession._lastPersist > 60000) {
+    getSession._lastPersist = Date.now();
+    persistSessions();
+  }
+  return session;
+}
+function isSuper(req) { const s = getSession(req); return s && s.role === 'super'; }
+function isAuthed(req) { return !!getSession(req); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   MIME
+   ───────────────────────────────────────────────────────────────────────── */
+
+const MIME = {
+  '.html':'text/html','.css':'text/css','.js':'application/javascript',
+  '.json':'application/json','.png':'image/png','.jpg':'image/jpeg',
+  '.jpeg':'image/jpeg','.gif':'image/gif','.svg':'image/svg+xml',
+  '.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2',
+  '.woff':'font/woff','.ttf':'font/ttf','.mp4':'video/mp4',
+  '.pdf':'application/pdf','.xml':'application/xml',
+};
+const mime = ext => MIME[ext] || 'application/octet-stream';
+
+/* ─────────────────────────────────────────────────────────────────────────
+   HELPERS
+   ───────────────────────────────────────────────────────────────────────── */
+
+function reply(res, status, data, ct) {
+  res.writeHead(status, {
+    'Content-Type': ct || 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Editor-Token, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    ...getSecurityHeaders(),
+  });
+  if (Buffer.isBuffer(data)) {
+    res.end(data);
+  } else {
+    res.end(typeof data === 'string' ? data : JSON.stringify(data));
+  }
+}
+const j   = (res, st, d) => reply(res, st, d, 'application/json');
+const h   = (res, st, d) => reply(res, st, d, 'text/html');
+
+const TOO_LARGE = Symbol('tooLarge');
+
+function readBody(req) {
+  return new Promise((res) => {
+    let b = '';
+    let size = 0;
+    let tooLarge = false;
+    req.on('data', c => {
+      if (tooLarge) return;
+      size += Buffer.byteLength(c);
+      if (size > securityConfig.maxPayloadSizeBytes) {
+        tooLarge = true;
+        req.destroy();
+        res(TOO_LARGE); // resolve now — destroy() never fires 'end', so without
+                         // this the caller would hang waiting forever
+        return;
+      }
+      b += c;
+    });
+    req.on('end', () => { if (tooLarge) return; try { res(JSON.parse(b || '{}')); } catch { res({}); } });
+    req.on('error', () => res({}));
+  });
+}
+
+async function readValidatedBody(req, res, context) {
+  const payload = await readBody(req);
+  if (payload === TOO_LARGE) {
+    j(res, 413, { error: 'Payload too large' });
+    return null;
+  }
+  const validation = validatePayload(payload);
+  if (!validation.valid) {
+    appendSecurityLog('invalid_payload', { context, path: req.url, error: validation.error, clientIp: getClientIp(req) });
+    j(res, 400, { error: validation.error });
+    return null;
+  }
+  return validation.value;
+}
+
+function readMultipart(req, boundary, maxBytes = 15 * 1024 * 1024) {
+  return new Promise((res) => {
+    const chunks = [];
+    let size = 0;
+    let tooLarge = false;
+    req.on('data', c => {
+      if (tooLarge) return;
+      size += c.length;
+      if (size > maxBytes) {
+        tooLarge = true;
+        req.destroy();
+        res(TOO_LARGE);
+        return;
+      }
+      chunks.push(c);
+    });
+    req.on('end', () => {
+      if (tooLarge) return;
+      const buf = Buffer.concat(chunks);
+      const sep = Buffer.from('--' + boundary);
+      const files = {}, fields = {};
+      let start = buf.indexOf(sep) + sep.length + 2;
+      while (start < buf.length) {
+        const end = buf.indexOf(sep, start);
+        if (end === -1) break;
+        const part   = buf.slice(start, end - 2);
+        const hEnd   = part.indexOf('\r\n\r\n');
+        const header = part.slice(0, hEnd).toString();
+        const body   = part.slice(hEnd + 4);
+        const nameM  = header.match(/name="([^"]+)"/);
+        const fileM  = header.match(/filename="([^"]+)"/);
+        const ctM    = header.match(/Content-Type:\s*(\S+)/i);
+        if (nameM) {
+          if (fileM) files[nameM[1]] = { filename: fileM[1], data: body, ct: ctM ? ctM[1] : 'image/jpeg' };
+          else       fields[nameM[1]] = body.toString();
+        }
+        start = end + sep.length + 2;
+      }
+      res({ files, fields });
+    });
+    req.on('error', () => res({ files: {}, fields: {} }));
+  });
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   DATA FILE HELPERS
+   ───────────────────────────────────────────────────────────────────────── */
+
+function readData(file) {
+  const fp = path.join(DATA, file + '.json');
+  try { return JSON.parse(fs.readFileSync(fp, 'utf8')); } catch { return []; }
+}
+
+function writeData(file, data) {
+  fs.writeFileSync(path.join(DATA, file + '.json'), JSON.stringify(data, null, 2));
+}
+
+function slugify(str) {
+  return str.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim().replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   EDITS PERSISTENCE (visual editor)
+   ───────────────────────────────────────────────────────────────────────── */
+
+function loadEdits() {
+  try { return JSON.parse(fs.readFileSync(EDITS, 'utf8')); }
+  catch { return { pending: [], approved: [] }; }
+}
+function saveEdits(d) { fs.writeFileSync(EDITS, JSON.stringify(d, null, 2)); }
+
+const INJECT = `
+<link  rel="stylesheet" href="/__editor/editor.css"/>
+<script src="/__editor/editor.js" defer></script>`;
+
+function applyApprovedEdits(html, approved) {
+  if (!approved || !approved.length) return html;
+  const patch = `<script>(function(){
+var E=${JSON.stringify(approved)};
+function run(){E.forEach(function(e){try{
+  var el=document.querySelector(e.selector);
+  if(!el)return;
+  if(e.type==='text')   el.innerHTML=e.value;
+  if(e.type==='image')  { el.src=e.value; if(el.tagName==='DIV')el.style.backgroundImage='url('+e.value+')'; }
+  if(e.type==='href')   el.href=e.value;
+  if(e.type==='delete') el.remove();
+  if(e.type==='hide')   el.style.display='none';
+}catch(x){}})}
+document.readyState==='loading'?document.addEventListener('DOMContentLoaded',run):run();
+})();</script>`;
+  return html.replace('</body>', patch + '\n</body>');
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   STATIC FILE RESOLVER
+   ───────────────────────────────────────────────────────────────────────── */
+
+function resolveFile(pathname, dir) {
+  let p = path.join(dir, pathname === '/' ? 'index.html' : pathname);
+  if (!path.extname(p)) {
+    if (fs.existsSync(p + '/index.html')) return p + '/index.html';
+    if (fs.existsSync(p + '.html'))       return p + '.html';
+  }
+  return p;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   HTTP SERVER
+   ───────────────────────────────────────────────────────────────────────── */
+
+http.createServer(async (req, res) => {
+  const u = new URL(req.url, `http://localhost`);
+  const p = u.pathname;
+  const m = req.method;
+  const clientIp = getClientIp(req);
+
+  if (m === 'OPTIONS') return reply(res, 200, '', 'text/plain');
+
+  /* ── 1. Admin UI pages (/admin and /admin/*) ─────────────────────────── */
+  if (p === '/admin' || p === '/admin/' || p.startsWith('/admin/')) {
+    const subpath = p === '/admin' || p === '/admin/' ? '/login.html' : p.replace('/admin', '');
+    const fp = resolveFile(subpath, ADMIN);
+    if (fs.existsSync(fp) && !fs.statSync(fp).isDirectory()) {
+      return reply(res, 200, fs.readFileSync(fp), mime(path.extname(fp)));
+    }
+    return h(res, 404, '<h1>404 – Admin page not found</h1>');
+  }
+
+  /* ── 2. Editor assets ────────────────────────────────────────────────── */
+  if (p.startsWith('/__editor/')) {
+    const f = path.join(EDITOR, p.replace('/__editor/', ''));
+    if (!fs.existsSync(f)) return j(res, 404, { error: 'not found' });
+    return reply(res, 200, fs.readFileSync(f), mime(path.extname(f)));
+  }
+
+  /* ── 3. API ──────────────────────────────────────────────────────────── */
+  if (p.startsWith('/api/')) {
+    if (p === '/api/login' && m === 'POST') {
+      const limit = loginLimiter(clientIp);
+      if (!limit.allowed) {
+        appendSecurityLog('login_rate_limited', { clientIp });
+        return j(res, 429, { error: 'Too many login attempts' });
+      }
+      const b = await readValidatedBody(req, res, 'login');
+      if (b === null) return;
+      const user = USERS.find(u => u.username === b.username && u.password === b.password);
+      if (!user) {
+        appendSecurityLog('failed_login', { clientIp, username: b.username || '' });
+        return j(res, 401, { error: 'Invalid credentials' });
+      }
+      const t = mkToken();
+      SESSIONS.set(t, { username: user.username, role: user.role, display: user.display, createdAt: Date.now(), expiresAt: Date.now() + securityConfig.sessionTtlMs });
+      persistSessions();
+      appendAuditLog('login_succeeded', { username: user.username, role: user.role, clientIp });
+      return j(res, 200, { ok: true, token: t, role: user.role, display: user.display });
+    }
+
+    /* ── LOGOUT ── */
+    if (p === '/api/logout' && m === 'POST') {
+      const t = req.headers['x-editor-token'] || '';
+      SESSIONS.delete(t);
+      persistSessions();
+      appendAuditLog('logout', { clientIp, token: t ? '[redacted]' : '' });
+      return j(res, 200, { ok: true });
+    }
+
+    /* ── SESSION CHECK ── */
+    if (p === '/api/status') {
+      const s = getSession(req);
+      return j(res, 200, { ok: true, authed: !!s, role: s?.role || null, display: s?.display || null });
+    }
+
+    if (p === '/api/health') {
+      let distBuiltAt = null;
+      try { distBuiltAt = fs.statSync(path.join(DIST, 'index.html')).mtime.toISOString(); } catch {}
+      return j(res, 200, {
+        ok: true,
+        uptime: process.uptime().toFixed(2),
+        gitCommit: GIT_COMMIT,
+        serverStartedAt: SERVER_STARTED_AT,
+        distBuiltAt,
+      });
+    }
+
+    /* ── PUBLIC CONFIG (Google Client ID — safe to expose, it's a public value) ── */
+    if (p === '/api/config') {
+      return j(res, 200, { google_client_id: process.env.GOOGLE_CLIENT_ID || '' });
+    }
+
+    /* ── GOOGLE OAUTH LOGIN ── */
+    if (p === '/api/login/google' && m === 'POST') {
+      const b = await readBody(req);
+      if (!b.credential) return j(res, 400, { error: 'No credential provided' });
+      try {
+        const gRes  = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${b.credential}`);
+        const info  = await gRes.json();
+        if (info.error || !info.email) return j(res, 401, { error: 'Invalid Google token' });
+        if (info.email_verified !== 'true' && info.email_verified !== true)
+          return j(res, 401, { error: 'Google email not verified' });
+        const email = String(info.email).toLowerCase().trim();
+        const users = readUsers();
+        const user  = users.find(u => u.email === email);
+        if (!user) {
+          /* Unknown Google account → record an access request instead of a
+             dead-end rejection. Pending entries never grant a session; a
+             super admin approves or rejects them from the Dashboard. */
+          users.push({ email, name: info.name || '', status: 'pending', requestedAt: new Date().toISOString() });
+          writeUsers(users);
+          appendAuditLog('google_access_requested', { email, clientIp });
+          return j(res, 403, { pending: true, error: 'Access request sent. A super admin must approve your account before you can sign in.' });
+        }
+        if (user.status === 'pending')
+          return j(res, 403, { pending: true, error: 'Your access request is still awaiting admin approval.' });
+        if (user.active === false)
+          return j(res, 403, { error: 'Your account has been disabled. Contact your administrator.' });
+        const t = mkToken();
+        SESSIONS.set(t, { username: email, role: user.role || 'team', display: user.name || info.name || email, createdAt: Date.now(), expiresAt: Date.now() + securityConfig.sessionTtlMs });
+        persistSessions();
+        appendAuditLog('login_succeeded', { username: email, role: user.role || 'team', clientIp, method: 'google' });
+        return j(res, 200, { ok: true, token: t, role: user.role || 'team', display: user.name || info.name || email });
+      } catch (e) {
+        return j(res, 500, { error: 'Could not verify with Google: ' + e.message });
+      }
+    }
+
+    /* Auth gate for all remaining API routes */
+    if (!isAuthed(req)) return j(res, 401, { error: 'Unauthorized' });
+
+    const rateLimit = apiLimiter(clientIp);
+    if (!rateLimit.allowed) {
+      appendSecurityLog('api_rate_limited', { clientIp, path: p });
+      return j(res, 429, { error: 'Too many requests' });
+    }
+
+    const session = getSession(req);
+
+    /* ═══════════════════════════════════════════════════════════════
+       BLOGS  (available to both roles)
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* GET all blogs */
+    if (p === '/api/blogs' && m === 'GET') {
+      return j(res, 200, readData('blogs'));
+    }
+
+    /* CREATE blog post */
+    if (p === '/api/blogs/new' && m === 'POST') {
+      const b  = await readValidatedBody(req, res, 'blogs.create');
+      if (b === null) return;
+      const blogs = readData('blogs');
+      const slug = slugify(b.slug || b.title || 'untitled-' + Date.now());
+
+      const post = {
+        slug,
+        title:        b.title        || '',
+        excerpt:      b.excerpt       || '',
+        cover_image:  b.cover_image   || '',
+        date:         b.date          || new Date().toISOString().split('T')[0],
+        author:       b.author        || 'AKA Digital Team',
+        author_title: b.author_title  || 'AKA Digital',
+        category:     b.category      || 'MarTech',
+        tags:         Array.isArray(b.tags) ? b.tags : (b.tags || '').split(',').map(t => t.trim()).filter(Boolean),
+        read_time:    parseInt(b.read_time) || 5,
+        featured:     !!b.featured,
+        body_html:    b.body_html     || '',
+        status:       b.status === 'published' ? 'published' : 'draft',
+      };
+
+      /* Upsert, not reject: writers routinely open "New Post" for an article
+         that already exists (e.g. to re-paste a body) — a 409 here left posts
+         permanently unsavable from that screen. Same-slug create now updates
+         the existing post, which is what the writer means by "Save". */
+      const existingIdx = blogs.findIndex(x => x.slug === slug);
+      if (existingIdx !== -1) blogs[existingIdx] = { ...blogs[existingIdx], ...post };
+      else blogs.unshift(post); // newest first
+      writeData('blogs', blogs);
+      writeBlogNjk(post.slug);
+      return j(res, 200, { ok: true, slug: post.slug, updated: existingIdx !== -1 });
+    }
+
+    /* UPDATE blog post */
+    if (p.startsWith('/api/blogs/') && m === 'PUT') {
+      const slug  = p.replace('/api/blogs/', '');
+      const blogs = readData('blogs');
+      const idx   = blogs.findIndex(x => x.slug === slug);
+      if (idx === -1) return j(res, 404, { error: 'Post not found' });
+      const b = await readValidatedBody(req, res, 'blogs.update');
+      if (b === null) return;
+      blogs[idx] = { ...blogs[idx], ...b, slug }; // preserve slug
+      writeData('blogs', blogs);
+      /* Re-write the per-slug wrapper on every update: if it ever went
+         missing (deploy overwrite, manual cleanup), the post would save fine
+         but its /blog/<slug>/ page would 404 after the next build. */
+      writeBlogNjk(slug);
+      return j(res, 200, { ok: true, slug });
+    }
+
+    /* DELETE blog post (super admin only) */
+    if (p.startsWith('/api/blogs/') && m === 'DELETE') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      /* Slugs are always slugified at creation, so re-slugifying here both
+         matches every real item and keeps traversal characters out of the
+         filesystem paths below. */
+      const slug  = slugify(p.replace('/api/blogs/', ''));
+      const blogs = readData('blogs').filter(x => x.slug !== slug);
+      writeData('blogs', blogs);
+      deleteBlogNjk(slug);
+      /* Eleventy never removes stale output — without this, the deleted
+         article's page stays live in dist/ forever. */
+      fs.rmSync(path.join(DIST, 'blog', slug), { recursive: true, force: true });
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       EVENTS  (available to both roles)
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* GET all events */
+    if (p === '/api/events' && m === 'GET') {
+      return j(res, 200, readData('events'));
+    }
+
+    /* CREATE event */
+    if (p === '/api/events/new' && m === 'POST') {
+      const b      = await readValidatedBody(req, res, 'events.create');
+      if (b === null) return;
+      const events = readData('events');
+      const slug   = slugify(b.slug || b.title || 'event-' + Date.now());
+
+      const event = {
+        slug,
+        title:       b.title       || '',
+        description: b.description || '',
+        date:        b.date        || new Date().toISOString().split('T')[0],
+        date_label:  b.date_label  || '',
+        location:    b.location    || '',
+        type:        b.type        || 'Event',
+        image:       b.image       || '',
+        href:        b.href        || '/contact',
+        featured:    !!b.featured,
+        status:      b.status === 'published' ? 'published' : 'draft',
+      };
+
+      /* Upsert, not reject — see /api/blogs/new for why. */
+      const existingIdx = events.findIndex(x => x.slug === slug);
+      if (existingIdx !== -1) events[existingIdx] = { ...events[existingIdx], ...event };
+      else events.unshift(event);
+      writeData('events', events);
+      return j(res, 200, { ok: true, slug: event.slug, updated: existingIdx !== -1 });
+    }
+
+    /* UPDATE event */
+    if (p.startsWith('/api/events/') && m === 'PUT') {
+      const slug   = p.replace('/api/events/', '');
+      const events = readData('events');
+      const idx    = events.findIndex(x => x.slug === slug);
+      if (idx === -1) return j(res, 404, { error: 'Event not found' });
+      const b = await readValidatedBody(req, res, 'events.update');
+      if (b === null) return;
+      events[idx] = { ...events[idx], ...b, slug };
+      writeData('events', events);
+      return j(res, 200, { ok: true });
+    }
+
+    /* DELETE event (super admin only) */
+    if (p.startsWith('/api/events/') && m === 'DELETE') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const slug   = p.replace('/api/events/', '');
+      const events = readData('events').filter(x => x.slug !== slug);
+      writeData('events', events);
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CASE STUDIES  (team can create/edit; super can delete)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/case-studies' && m === 'GET') {
+      return j(res, 200, readData('case_studies'));
+    }
+
+    if (p === '/api/case-studies/new' && m === 'POST') {
+      const b  = await readValidatedBody(req, res, 'case_studies.create');
+      if (b === null) return;
+      const cs = readData('case_studies');
+      const slug = slugify(b.slug || b.title || 'case-' + Date.now());
+      const entry = {
+        slug,
+        client:         b.client         || '',
+        industry:       b.industry        || '',
+        country:        b.country         || '',
+        year:           parseInt(b.year)  || new Date().getFullYear(),
+        award:          b.award           || '',
+        featured:       !!b.featured,
+        featured_home:  !!b.featured_home,
+        category:       b.category        || 'crm-automation',
+        category_label: b.category_label  || '',
+        title:          b.title           || '',
+        summary:        b.summary         || '',
+        cover_image:    b.cover_image     || '',
+        video_youtube:  b.video_youtube   || '',
+        video_thumbnail:b.video_thumbnail || '',
+        video_cover:    b.video_cover     || '',
+        solutions_used: Array.isArray(b.solutions_used) ? b.solutions_used : [],
+        challenge:      b.challenge       || '',
+        approach:       b.approach        || '',
+        outcome:        b.outcome         || '',
+        results:        Array.isArray(b.results) ? b.results : [],
+        testimonial:    b.testimonial     || '',
+        tags:           Array.isArray(b.tags) ? b.tags : (b.tags || '').split(',').map(t => t.trim()).filter(Boolean),
+        status:         b.status === 'published' ? 'published' : 'draft',
+      };
+      /* Upsert, not reject — see /api/blogs/new for why. */
+      const existingIdx = cs.findIndex(x => x.slug === slug);
+      if (existingIdx !== -1) cs[existingIdx] = { ...cs[existingIdx], ...entry };
+      else cs.unshift(entry);
+      writeData('case_studies', cs);
+      writeCaseStudyNjk(entry.slug, existingIdx !== -1 ? cs[existingIdx] : entry);
+      return j(res, 200, { ok: true, slug: entry.slug, updated: existingIdx !== -1 });
+    }
+
+    if (p.startsWith('/api/case-studies/') && m === 'PUT') {
+      const slug = p.replace('/api/case-studies/', '');
+      const cs   = readData('case_studies');
+      const idx  = cs.findIndex(x => x.slug === slug);
+      if (idx === -1) return j(res, 404, { error: 'Case study not found' });
+      const b = await readValidatedBody(req, res, 'case_studies.update');
+      if (b === null) return;
+      cs[idx] = { ...cs[idx], ...b, slug };
+      writeData('case_studies', cs);
+      writeCaseStudyNjk(slug, cs[idx]);
+      return j(res, 200, { ok: true });
+    }
+
+    if (p.startsWith('/api/case-studies/') && m === 'DELETE') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const slug = slugify(p.replace('/api/case-studies/', ''));
+      writeData('case_studies', readData('case_studies').filter(x => x.slug !== slug));
+      deleteCaseStudyNjk(slug);
+      fs.rmSync(path.join(DIST, 'case-studies', slug), { recursive: true, force: true });
+      return j(res, 200, { ok: true });
+    }
+
+    /* Live "as-is" preview — renders the draft (unsaved) case study through
+       the real template, so it looks exactly like the published page will,
+       without writing any file or running a build. */
+    if (p === '/api/preview/case-study' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.case-study');
+      if (b === null) return;
+      try {
+        let html = renderCaseStudyPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    if (p === '/api/preview/blog' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.blog');
+      if (b === null) return;
+      try {
+        let html = renderBlogPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    if (p === '/api/preview/event' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.event');
+      if (b === null) return;
+      try {
+        let html = renderEventPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    if (p === '/api/preview/job' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'preview.job');
+      if (b === null) return;
+      try {
+        let html = renderJobPreview(b);
+        html = html.replace('<head>', `<head>\n<base href="http://${req.headers.host}/">`);
+        return j(res, 200, { ok: true, html });
+      } catch (err) {
+        return j(res, 500, { error: 'Preview render failed: ' + err.message });
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       AI WRITING ASSISTANT  (both roles)
+       Drafts a blog article from title + brief. Never publishes — the
+       draft lands in the form for the editor to review, exactly like
+       hand-written content. Requires ANTHROPIC_API_KEY on the server.
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/ai/generate-blog' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'ai.generate-blog');
+      if (b === null) return;
+      if (!b.title || !String(b.title).trim()) {
+        return j(res, 400, { error: 'A title is required — the AI writes from your title and brief.' });
+      }
+      try {
+        const result = await generateBlogDraft({
+          title: String(b.title),
+          category: b.category ? String(b.category) : '',
+          brief: b.brief ? String(b.brief) : '',
+        });
+        if (result.status === 'error') return j(res, 502, { error: result.error });
+        appendAuditLog('ai_generate_blog', { user: getSession(req)?.username, title: String(b.title).slice(0, 120), status: result.status });
+        return j(res, 200, { ok: true, ...result });
+      } catch (err) {
+        const { httpStatus, error } = describeAiError(err);
+        return j(res, httpStatus, { error });
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       JOBS / CAREERS  (team can create/edit; super can delete)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/jobs' && m === 'GET') {
+      return j(res, 200, readData('jobs'));
+    }
+
+    if (p === '/api/jobs/new' && m === 'POST') {
+      const b    = await readValidatedBody(req, res, 'jobs.create');
+      if (b === null) return;
+      const jobs = readData('jobs');
+      const slug = slugify(b.slug || b.title || 'job-' + Date.now());
+      const entry = {
+        slug,
+        title:       b.title        || '',
+        location:    b.location     || '',
+        type:        b.type         || 'Full-time',
+        department:  b.department   || '',
+        description: b.description  || '',
+        requirements: Array.isArray(b.requirements) ? b.requirements
+                      : (b.requirements || '').split('\n').map(r => r.trim()).filter(Boolean),
+        apply_email: b.apply_email  || 'Hello@akadigital.net',
+        active:      b.active !== false,
+        status:      b.status === 'published' ? 'published' : 'draft',
+      };
+      /* Upsert, not reject — see /api/blogs/new for why. */
+      const existingIdx = jobs.findIndex(x => x.slug === slug);
+      if (existingIdx !== -1) jobs[existingIdx] = { ...jobs[existingIdx], ...entry };
+      else jobs.push(entry);
+      writeData('jobs', jobs);
+      return j(res, 200, { ok: true, slug: entry.slug, updated: existingIdx !== -1 });
+    }
+
+    if (p.startsWith('/api/jobs/') && m === 'PUT') {
+      const slug = p.replace('/api/jobs/', '');
+      const jobs = readData('jobs');
+      const idx  = jobs.findIndex(x => x.slug === slug);
+      if (idx === -1) return j(res, 404, { error: 'Job not found' });
+      const b = await readValidatedBody(req, res, 'jobs.update');
+      if (b === null) return;
+      if (b.requirements && !Array.isArray(b.requirements)) {
+        b.requirements = b.requirements.split('\n').map(r => r.trim()).filter(Boolean);
+      }
+      jobs[idx] = { ...jobs[idx], ...b, slug };
+      writeData('jobs', jobs);
+      return j(res, 200, { ok: true });
+    }
+
+    if (p.startsWith('/api/jobs/') && m === 'DELETE') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const slug = p.replace('/api/jobs/', '');
+      writeData('jobs', readData('jobs').filter(x => x.slug !== slug));
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CMS SETTINGS  (super admin only — webhook URLs, platform URLs)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/settings' && m === 'GET') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      return j(res, 200, readData('cms_settings'));
+    }
+
+    if (p === '/api/settings' && m === 'PUT') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const b       = await readValidatedBody(req, res, 'settings.update');
+      if (b === null) return;
+      const current = readData('cms_settings');
+      const updated = { ...current, ...b };
+      writeData('cms_settings', updated);
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SITE SETTINGS — CTA links + popup content (super admin only)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/site-settings' && m === 'GET') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      return j(res, 200, readData('settings'));
+    }
+
+    if (p === '/api/site-settings' && m === 'PUT') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const b       = await readValidatedBody(req, res, 'site_settings.update');
+      if (b === null) return;
+      const current = readData('settings');
+      const updated = { ...current, cta: { ...current.cta, ...b.cta }, popup: { ...current.popup, ...b.popup, bullets: b.popup.bullets || current.popup.bullets } };
+      writeData('settings', updated);
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       GOOGLE USER MANAGEMENT  (super admin only)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/users' && m === 'GET') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      return j(res, 200, readUsers());
+    }
+
+    if (p === '/api/users/new' && m === 'POST') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const b     = await readValidatedBody(req, res, 'users.create');
+      if (b === null) return;
+      const email = (b.email || '').toLowerCase().trim();
+      if (!email || !email.includes('@')) return j(res, 400, { error: 'Valid email required' });
+      const users = readUsers();
+      if (users.find(u => u.email === email)) return j(res, 409, { error: 'Email already exists' });
+      users.push({ email, name: b.name || '', role: b.role || 'team', active: true, status: 'approved', approvedAt: new Date().toISOString(), approvedBy: getSession(req)?.username || 'super' });
+      writeUsers(users);
+      appendAuditLog('google_user_added', { email, role: b.role || 'team', by: getSession(req)?.username });
+      return j(res, 200, { ok: true });
+    }
+
+    if (p.startsWith('/api/users/') && m === 'PUT') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const email = decodeURIComponent(p.replace('/api/users/', ''));
+      const users = readUsers();
+      const idx   = users.findIndex(u => u.email === email);
+      if (idx === -1) return j(res, 404, { error: 'User not found' });
+      const b = await readValidatedBody(req, res, 'users.update');
+      if (b === null) return;
+      const wasPending = users[idx].status === 'pending';
+      users[idx] = { ...users[idx], ...b, email };
+      if (b.status === 'approved' && wasPending) {
+        /* Approval is stamped server-side so the audit trail can't be forged
+           by the client — the Dashboard shows who approved whom, and when. */
+        users[idx].approvedAt = new Date().toISOString();
+        users[idx].approvedBy = getSession(req)?.username || 'super';
+        users[idx].active     = true;
+        if (!users[idx].role) users[idx].role = 'team';
+        appendAuditLog('google_user_approved', { email, role: users[idx].role, by: users[idx].approvedBy });
+      }
+      writeUsers(users);
+      return j(res, 200, { ok: true });
+    }
+
+    if (p.startsWith('/api/users/') && m === 'DELETE') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const email = decodeURIComponent(p.replace('/api/users/', ''));
+      const before = readUsers();
+      const target = before.find(u => u.email === email);
+      writeUsers(before.filter(u => u.email !== email));
+      appendAuditLog(target?.status === 'pending' ? 'google_request_rejected' : 'google_user_removed', { email, by: getSession(req)?.username });
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SUPER ADMIN ONLY — all other data files
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Get all _data JSON files */
+    if (p === '/api/data' && m === 'GET') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const out = {};
+      fs.readdirSync(DATA).filter(f => f.endsWith('.json') && !f.startsWith('_')).forEach(f => {
+        try { out[f.replace('.json', '')] = JSON.parse(fs.readFileSync(path.join(DATA, f), 'utf8')); } catch {}
+      });
+      return j(res, 200, out);
+    }
+
+    /* Update a specific data field by dot-path */
+    if (p.startsWith('/api/data/') && m === 'POST') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const file = path.join(DATA, p.replace('/api/data/', '') + '.json');
+      if (!fs.existsSync(file)) return j(res, 404, { error: 'File not found' });
+      const b = await readValidatedBody(req, res, 'data.update');
+      if (b === null) return;
+      try {
+        const obj  = JSON.parse(fs.readFileSync(file, 'utf8'));
+        const keys = (b.path || '').split('.').filter(Boolean);
+        let ref = obj;
+        keys.slice(0, -1).forEach(k => { if (typeof ref[k] === 'object') ref = ref[k]; });
+        ref[keys[keys.length - 1]] = b.value;
+        fs.writeFileSync(file, JSON.stringify(obj, null, 2));
+        return j(res, 200, { ok: true });
+      } catch (e) { return j(res, 500, { error: e.message }); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       VISUAL EDITOR (both roles can view, super can approve)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/edits' && m === 'GET')  return j(res, 200, loadEdits());
+
+    if (p === '/api/edits' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'edits.save');
+      if (b === null) return;
+      const e = loadEdits();
+      e.pending = b.changes || [];
+      e.lastSaved = new Date().toISOString();
+      saveEdits(e);
+      return j(res, 200, { ok: true, count: e.pending.length });
+    }
+
+    if (p === '/api/edits/clear' && m === 'POST') {
+      const e = loadEdits(); e.pending = []; saveEdits(e);
+      return j(res, 200, { ok: true });
+    }
+
+    if (p === '/api/approve' && m === 'POST') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const e = loadEdits();
+      e.approved = [...(e.approved || []), ...e.pending];
+      e.pending  = [];
+      e.lastApproved = new Date().toISOString();
+      saveEdits(e);
+      return j(res, 200, { ok: true, total: e.approved.length });
+    }
+
+    if (p === '/api/approve/revert' && m === 'POST') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const b = await readValidatedBody(req, res, 'edits.revert');
+      if (b === null) return;
+      const e = loadEdits();
+      e.approved = (e.approved || []).filter(x => x.id !== b.id);
+      saveEdits(e);
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       IMAGE UPLOAD (both roles)
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/upload' && m === 'POST') {
+      const ct = (req.headers['content-type'] || '').split(';')[0].trim();
+      if (ct === 'application/json') {
+        const b = await readValidatedBody(req, res, 'upload.json');
+        if (b === null) return;
+        if (!b.base64 || !b.filename) return j(res, 400, { error: 'Missing base64/filename' });
+        try {
+          const url = await saveUploadedImage(Buffer.from(b.base64.replace(/^data:[^;]+;base64,/, ''), 'base64'), b.filename);
+          return j(res, 200, { ok: true, url });
+        } catch (err) {
+          return j(res, 400, { error: 'Could not process image: ' + err.message });
+        }
+      }
+      const boundary = (req.headers['content-type'] || '').split('boundary=')[1];
+      if (!boundary) return j(res, 400, { error: 'No boundary' });
+      const parsed = await readMultipart(req, boundary);
+      if (parsed === TOO_LARGE) return j(res, 413, { error: 'Image too large (max 15MB)' });
+      const file = parsed.files.image;
+      if (!file) return j(res, 400, { error: 'No image field' });
+      try {
+        const url = await saveUploadedImage(file.data, file.filename);
+        return j(res, 200, { ok: true, url });
+      } catch (err) {
+        return j(res, 400, { error: 'Could not process image: ' + err.message });
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       BUILD + EXPORT  (both roles)
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Opens an SSE stream and keeps it alive with heartbeat comments while a
+       long build runs — Hostinger's LiteSpeed proxy kills idle connections,
+       which the browser reports as "Connection lost" even when the build
+       finishes fine server-side. Returns a send() plus a finish() that
+       clears the heartbeat. */
+    function openSse(res) {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*', 'X-Accel-Buffering': 'no' });
+      const heartbeat = setInterval(() => { try { res.write(': ping\n\n'); } catch {} }, 5000);
+      return {
+        send: (status, msg) => { try { res.write(`data: ${JSON.stringify({ status, msg })}\n\n`); } catch {} },
+        finish: () => { clearInterval(heartbeat); try { res.end(); } catch {} },
+      };
+    }
+
+    if (p === '/api/build' && (m === 'POST' || m === 'GET')) {
+      const sse = openSse(res);
+      sse.send('building', 'Running npm run build...');
+      exec('npm run build', { cwd: ROOT, env: EXEC_ENV, maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
+        if (err) sse.send('error', (stderr || err.message).slice(0, 800));
+        else     sse.send('done', 'Build complete! Site is live.');
+        sse.finish();
+      });
+      return;
+    }
+
+    /* Export ZIP for Hostinger */
+    if (p === '/api/export' && (m === 'POST' || m === 'GET')) {
+      /* Errors must go out as SSE, not plain JSON — the caller is an
+         EventSource, which turns any non-stream response into a generic
+         "Connection lost" with the real reason invisible. */
+      const sse = openSse(res);
+      if (!fs.existsSync(path.join(ROOT, 'dist', 'index.html'))) {
+        sse.send('error', 'Run Build Site first, then export.');
+        return sse.finish();
+      }
+      sse.send('building', 'Packaging for Hostinger...');
+      const date    = new Date().toISOString().slice(0,10).replace(/-/g,'');
+      const zipName = `akadigital-hostinger-deploy-${date}.zip`;
+      fs.mkdirSync(path.join(ROOT, 'exports'), { recursive: true });
+      const zipCmd = process.platform === 'win32'
+        ? `powershell -Command "Compress-Archive -Force -Path dist\\* -DestinationPath exports\\${zipName}"`
+        : `cd dist && zip -r ../exports/${zipName} .`;
+      exec(zipCmd, { cwd: ROOT, maxBuffer: 10 * 1024 * 1024 }, (err) => {
+        if (err) sse.send('error', err.message.slice(0, 400));
+        else     sse.send('done', `ZIP ready: exports/${zipName}`);
+        sse.finish();
+      });
+      return;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PUBLISH LIVE  (super admin only)
+       This server serves dist/ directly to akadigital.net, so rebuilding
+       IS publishing. The FTP upload is an optional extra hop for setups
+       where a separate host serves the files — only used when
+       FTP_HOST/FTP_USER/FTP_PASS are configured.
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/deploy' && (m === 'POST' || m === 'GET')) {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+
+      const FTP_HOST = process.env.FTP_HOST || '';
+      const FTP_USER = process.env.FTP_USER || '';
+      const FTP_PASS = process.env.FTP_PASS || '';
+      const FTP_DIR  = process.env.FTP_DIR  || '/public_html';
+      const useFtp   = !!(FTP_HOST && FTP_USER && FTP_PASS);
+
+      const sse = openSse(res);
+      sse.send('building', 'Building site...');
+
+      exec('npm run build', { cwd: ROOT, env: EXEC_ENV, maxBuffer: 10 * 1024 * 1024 }, async (err, stdout, stderr) => {
+        if (err) {
+          sse.send('error', 'Build failed: ' + (stderr || err.message).slice(0, 500));
+          return sse.finish();
+        }
+        if (!useFtp) {
+          sse.send('done', 'Published! The rebuilt site is now live at akadigital.net (this server serves it directly — no FTP needed).');
+          return sse.finish();
+        }
+        sse.send('deploying', 'Build complete. Connecting to Hostinger FTP...');
+
+        try {
+          const ftp    = require('basic-ftp');
+          const client = new ftp.Client(60000);
+          client.ftp.verbose = false;
+
+          await client.access({ host: FTP_HOST, user: FTP_USER, password: FTP_PASS, secure: false });
+          sse.send('deploying', 'Connected. Uploading files to ' + FTP_DIR + '...');
+
+          await client.ensureDir(FTP_DIR);
+          await client.uploadFromDir(path.join(ROOT, 'dist'), FTP_DIR);
+          client.close();
+
+          sse.send('done', 'Live! Site deployed to akadigital.net');
+        } catch (ftpErr) {
+          sse.send('error', 'FTP error: ' + ftpErr.message);
+        }
+        sse.finish();
+      });
+      return;
+    }
+
+    return j(res, 404, { error: 'Unknown API route' });
+  }
+
+  /* ── 4. Serve static site (dist/ + public/ fallback) ─────────────────── */
+  let fp = resolveFile(p, DIST);
+
+  if (!fs.existsSync(fp) || fs.statSync(fp).isDirectory()) {
+    const pub = resolveFile(p, PUBLIC);
+    if (fs.existsSync(pub) && !fs.statSync(pub).isDirectory()) fp = pub;
+  }
+
+  if (!fs.existsSync(fp) || fs.statSync(fp).isDirectory()) {
+    const nf = path.join(DIST, '404.html');
+    res.writeHead(404, { 'Content-Type': 'text/html' });
+    return res.end(fs.existsSync(nf) ? fs.readFileSync(nf) : Buffer.from('<h1>404</h1>'));
+  }
+
+  const ext  = path.extname(fp);
+  const data = fs.readFileSync(fp);
+
+  if (ext === '.html') {
+    const edits = loadEdits();
+    let html = data.toString();
+    html = applyApprovedEdits(html, edits.approved || []);
+    html = html.replace('</body>', INJECT + '\n</body>');
+    return reply(res, 200, html, 'text/html');
+  }
+
+  reply(res, 200, data, mime(ext));
+
+}).listen(PORT, () => {
+  console.log('\n╔══════════════════════════════════════════════════════════╗');
+  console.log('║       AKA Digital — CMS + Editor Server  v2.0           ║');
+  console.log('╠══════════════════════════════════════════════════════════╣');
+  console.log(`║  🌐  Site:    http://localhost:${PORT}                      ║`);
+  console.log(`║  🔑  Admin:   http://localhost:${PORT}/admin                ║`);
+  console.log('╠══════════════════════════════════════════════════════════╣');
+  console.log('║  Set ADMIN_USER/ADMIN_PASS and TEAM_USER/TEAM_PASS in the environment to customize credentials. ║');
+  console.log('╚══════════════════════════════════════════════════════════╝\n');
+
+  // Auto-build on startup so dist/ is always fresh after a deployment
+  console.log('[startup] Running initial build...');
+  exec('npm run build', { cwd: ROOT, env: EXEC_ENV }, (err, stdout, stderr) => {
+    if (err) {
+      console.error('[startup] Build failed:', stderr || err.message);
+    } else {
+      console.log('[startup] Build complete ✓');
+    }
+  });
+});
