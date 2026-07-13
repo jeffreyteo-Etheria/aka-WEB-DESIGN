@@ -47,10 +47,15 @@ jobs:
           # the CA-signed wildcard *.hstgr.io — an IP can never match it. Alias
           # a hstgr.io name to the IP so full TLS verification (chain + host)
           # stays enabled and validates against Hostinger's real certificate.
-          CONNECT_HOST="$FTP_HOST"
-          if [[ "$FTP_HOST" =~ ^[0-9.]+$ ]]; then
+          HOST_CLEAN="$(printf '%s' "$FTP_HOST" | tr -d '[:space:]')"
+          HOST_CLEAN="${HOST_CLEAN#ftps://}"; HOST_CLEAN="${HOST_CLEAN#ftp://}"; HOST_CLEAN="${HOST_CLEAN%%/*}"
+          if [[ "$HOST_CLEAN" == *.hstgr.io ]]; then
+            CONNECT_HOST="$HOST_CLEAN"
+          else
+            IP="$(getent ahostsv4 "$HOST_CLEAN" | awk '{print $1; exit}')"
             CONNECT_HOST="ftp.hstgr.io"
-            echo "$FTP_HOST $CONNECT_HOST" | sudo tee -a /etc/hosts
+            echo "$IP $CONNECT_HOST" | sudo tee -a /etc/hosts >/dev/null
+            echo "Aliased $CONNECT_HOST to the resolved server IP for cert-valid FTPS"
           fi
           lftp <<LFTP
           set ftp:ssl-force true
