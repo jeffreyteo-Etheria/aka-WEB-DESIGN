@@ -1,0 +1,90 @@
+name: Deploy reach dashboard (manual)
+
+# Uploads the AKA REACH dashboard (index.html) and the Campaign Assets
+# _IMAGES library from the private uplay-campaign-builder repo into the
+# live /reach docroot. UPLOAD-ONLY: explicit put + additive mirror —
+# never syncs with delete, never touches state.php / assets.php /
+# claude.php / gemini.php / image.php / .htaccess or any server data.
+# Requires secret UPLAY_DEPLOY_KEY = read-only deploy key of
+# jeffreyteo-Etheria/uplay-campaign-builder.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "inspect = read-only listing; deploy = upload dashboard + campaign images"
+        type: choice
+        options: [inspect, deploy]
+        default: inspect
+      remote_dir:
+        description: "Absolute FTP path of the live /reach docroot"
+        required: false
+        default: "/domains/akadigital.net/public_html/reach"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out dashboard source (private repo, read-only deploy key)
+        uses: actions/checkout@v4
+        with:
+          repository: jeffreyteo-Etheria/uplay-campaign-builder
+          ssh-key: ${{ secrets.UPLAY_DEPLOY_KEY }}
+          path: src
+
+      - name: Stage upload set (index.html + campaign image library only)
+        run: |
+          mkdir -p out
+          cp "src/AKA_Reach_UPlay_Campaign_Builder_v6.html" out/index.html
+          cp -r "src/Campaign Assets _IMAGES" "out/Campaign Assets _IMAGES"
+          echo "Staged files: $(find out -type f | wc -l)"; du -sh out
+
+      - name: Upload via FTPS
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          TARGET_DIR: ${{ inputs.remote_dir || '/domains/akadigital.net/public_html/reach' }}
+          MODE: ${{ inputs.mode || 'inspect' }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          # FTP_HOST is the raw server IP but the FTPS cert is the wildcard
+          # *.hstgr.io — alias a hstgr.io name to the IP so full TLS
+          # verification stays enabled (same pattern as the redirect deploy).
+          HOST_CLEAN="$(printf '%s' "$FTP_HOST" | tr -d '[:space:]')"
+          HOST_CLEAN="${HOST_CLEAN#ftps://}"; HOST_CLEAN="${HOST_CLEAN#ftp://}"; HOST_CLEAN="${HOST_CLEAN%%/*}"
+          if [[ "$HOST_CLEAN" == *.hstgr.io ]]; then
+            CONNECT_HOST="$HOST_CLEAN"
+          else
+            IP="$(getent ahostsv4 "$HOST_CLEAN" | awk '{print $1; exit}')"
+            CONNECT_HOST="ftp.hstgr.io"
+            echo "$IP $CONNECT_HOST" | sudo tee -a /etc/hosts >/dev/null
+            echo "Aliased $CONNECT_HOST to the resolved server IP for cert-valid FTPS"
+          fi
+          if [ "$MODE" = "inspect" ]; then
+            lftp <<LFTP
+          set ftp:ssl-force true
+          set ssl:verify-certificate yes
+          set net:max-retries 2
+          open -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$CONNECT_HOST"
+          set cmd:fail-exit no
+          echo === $TARGET_DIR
+          cls -la "$TARGET_DIR"
+          echo === $TARGET_DIR/Campaign Assets _IMAGES
+          cls -la "$TARGET_DIR/Campaign Assets _IMAGES"
+          LFTP
+          else
+            lftp <<LFTP
+          set ftp:ssl-force true
+          set ssl:verify-certificate yes
+          set net:max-retries 3
+          set net:timeout 30
+          open -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$CONNECT_HOST"
+          put -O "$TARGET_DIR" out/index.html
+          mirror -R --no-perms --only-newer --parallel=4 "out/Campaign Assets _IMAGES" "$TARGET_DIR/Campaign Assets _IMAGES"
+          echo === after deploy
+          cls -la "$TARGET_DIR"
+          cls -la "$TARGET_DIR/Campaign Assets _IMAGES"
+          LFTP
+          fi
