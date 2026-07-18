@@ -28,7 +28,7 @@
     "@anthropic-ai/sdk": "^0.110.0",
     "@composio/core": "^0.13.1",
     "@tailwindcss/forms": "^0.5.7",
-    "autoprefixer": "^10.4.19",
+    "autoprefixer": "^10.5.4",
     "basic-ftp": "^5.3.1",
     "concurrently": "^9.0.0",
     "heic-convert": "^2.1.0",
