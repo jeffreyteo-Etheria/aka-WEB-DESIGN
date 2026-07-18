@@ -517,18 +517,30 @@ function openContactThankYou() {
     };
 
     var webhookUrl = "{{ cms_settings.webhook_url }}";
+
+    // Guarantees the CTA never gets stuck spinning even if the webhook call
+    // hangs (no response, no rejection) — fires showSuccess() exactly once,
+    // either when the webhook call settles or after a fixed safety timeout.
+    var settled = false;
+    function finishSubmit() {
+      if (settled) return;
+      settled = true;
+      showSuccess();
+    }
+
     if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {
       fetch(webhookUrl, {
         method: "POST",
         mode:   "no-cors",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body:   JSON.stringify(payload)
-      }).catch(function(){}).finally(function() { showSuccess(); });
+      }).catch(function(){}).finally(finishSubmit);
+      setTimeout(finishSubmit, 6000);
     } else {
       // Fallback mailto if webhook not yet configured
       var mailBody = Object.entries(payload).map(function(p){return p[0]+': '+p[1];}).join('\n');
       window.location.href = "mailto:" + contact.email + "?cc=Hello@akadigital.net&subject=Website Enquiry — " + encodeURIComponent(payload.inquiry_type || "General") + "&body=" + encodeURIComponent(mailBody);
-      showSuccess();
+      finishSubmit();
     }
   });
 
