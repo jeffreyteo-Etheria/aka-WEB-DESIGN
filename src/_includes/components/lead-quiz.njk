@@ -428,69 +428,86 @@
     submitText.classList.add('hidden');
     spinner.classList.remove('hidden');
 
-    var sol = SOLUTIONS[state.solution] || SOLUTIONS['crm-automation'];
-    var brand = document.getElementById('quiz-brand').value;
-    var phone = document.getElementById('quiz-phone').value;
-    var pain = document.getElementById('quiz-h-pain').value || '—';
-    var budget = document.getElementById('quiz-h-budget').value || '—';
-
-    /* CRM bridge: Google Sheets webhook (same pattern as contact-form.njk / careers.njk) */
-    /* Market routing: on the contact page the quiz sits below the market
-       selector, whose choice lands in the hidden #form-market field. Route
-       the lead to that market's country director; anything that isn't
-       VN / KR / SG falls back to Jeffrey (regional default). */
-    var DIRECTORS = {
-      vn: 'phuong.pham@akadigital.net',
-      kr: 'kw.hwang@akadigital.net',
-      sg: 'jeffrey.teo@akadigital.net'
-    };
-    var marketEl = document.getElementById('form-market');
-    var market = (marketEl && marketEl.value) || 'sg';
-    var director = DIRECTORS[market] || 'jeffrey.teo@akadigital.net';
-    var payload = {
-      form_type:   'lead',
-      source_page: window.location.pathname,
-      market:      market,
-      assigned_to: director,
-      solution:    sol.title,
-      pain_point:  pain,
-      budget:      budget,
-      name:        name.value,
-      brand:       brand,
-      company:     company.value,
-      email:       email.value,
-      phone:       phone
-    };
-    var webhookUrl = '{{ cms_settings.webhook_url }}';
-    if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {
-      fetch(webhookUrl, {
-        method: 'POST',
-        mode:   'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body:   JSON.stringify(payload)
-      }).catch(function () {});
-    } else {
-      var body = [
-        'Solution: ' + sol.title,
-        'Challenge: ' + pain,
-        'Budget: ' + budget,
-        '',
-        'Name: ' + name.value,
-        'Brand: ' + brand,
-        'Company: ' + company.value,
-        'Email: ' + email.value,
-        'Phone: ' + phone
-      ].join('\n');
-      var subject = 'Solution Match: ' + sol.title + ' — ' + name.value;
-      window.location.href = 'mailto:' + director + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-    }
-
-    /* Show result screen */
-    setTimeout(function () {
+    /* Guarantees the CTA never gets stuck mid-spin: called from the normal
+       400ms path below, and also as a fallback if anything in the try block
+       throws before reaching it. */
+    var revealed = false;
+    function revealResult() {
+      if (revealed) return;
+      revealed = true;
+      submitBtn.disabled = false;
+      submitText.classList.remove('hidden');
+      spinner.classList.add('hidden');
       document.getElementById('quiz-progress').style.width = '100%';
       document.getElementById('quiz-step-label').textContent = 'Complete';
       showStep(5);
-    }, 400);
+    }
+
+    try {
+      var sol = SOLUTIONS[state.solution] || SOLUTIONS['crm-automation'];
+      var brand = document.getElementById('quiz-brand').value;
+      var phone = document.getElementById('quiz-phone').value;
+      var pain = document.getElementById('quiz-h-pain').value || '—';
+      var budget = document.getElementById('quiz-h-budget').value || '—';
+
+      /* CRM bridge: Google Sheets webhook (same pattern as contact-form.njk / careers.njk) */
+      /* Market routing: on the contact page the quiz sits below the market
+         selector, whose choice lands in the hidden #form-market field. Route
+         the lead to that market's country director; anything that isn't
+         VN / KR / SG falls back to Jeffrey (regional default). */
+      var DIRECTORS = {
+        vn: 'phuong.pham@akadigital.net',
+        kr: 'kw.hwang@akadigital.net',
+        sg: 'jeffrey.teo@akadigital.net'
+      };
+      var marketEl = document.getElementById('form-market');
+      var market = (marketEl && marketEl.value) || 'sg';
+      var director = DIRECTORS[market] || 'jeffrey.teo@akadigital.net';
+      var payload = {
+        form_type:   'lead',
+        source_page: window.location.pathname,
+        market:      market,
+        assigned_to: director,
+        solution:    sol.title,
+        pain_point:  pain,
+        budget:      budget,
+        name:        name.value,
+        brand:       brand,
+        company:     company.value,
+        email:       email.value,
+        phone:       phone
+      };
+      var webhookUrl = '{{ cms_settings.webhook_url }}';
+      if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {
+        fetch(webhookUrl, {
+          method: 'POST',
+          mode:   'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body:   JSON.stringify(payload)
+        }).catch(function () {});
+      } else {
+        var body = [
+          'Solution: ' + sol.title,
+          'Challenge: ' + pain,
+          'Budget: ' + budget,
+          '',
+          'Name: ' + name.value,
+          'Brand: ' + brand,
+          'Company: ' + company.value,
+          'Email: ' + email.value,
+          'Phone: ' + phone
+        ].join('\n');
+        var subject = 'Solution Match: ' + sol.title + ' — ' + name.value;
+        window.location.href = 'mailto:' + director + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      }
+    } catch (err) {
+      /* fall through to revealResult below regardless */
+    }
+
+    /* Show result screen — fixed delay, decoupled from whether the webhook
+       call actually finishes, so a slow/unreachable webhook can't strand the
+       button in its spinner state. */
+    setTimeout(revealResult, 400);
   });
 })();
 </script>
