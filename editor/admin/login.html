@@ -45,9 +45,9 @@
         <input id="password" name="password" type="password" autocomplete="current-password"
                placeholder="••••••••••••" required />
       </div>
-      <div id="loginError" class="error-msg" style="display:none"></div>
       <button type="submit" class="btn-primary" id="loginBtn">Sign In</button>
     </form>
+    <div id="loginError" class="error-msg" style="display:none"></div>
   </div>
 
   <!-- Google Identity Services — loaded only when client ID is available -->
@@ -115,6 +115,14 @@
 
     /* ── Google Sign-In ── */
     fetch('/api/config').then(r => r.json()).then(cfg => {
+      /* Password login can be turned off server-side (DISABLE_PASSWORD_LOGIN)
+         once every admin has Google access — hide the dead-end form instead
+         of letting people submit into a 403. */
+      if (cfg.password_login_enabled === false) {
+        document.getElementById('loginForm').style.display = 'none';
+        document.querySelector('.divider').style.display = 'none';
+      }
+
       if (!cfg.google_client_id) return; // Google not configured — hide button
 
       document.getElementById('googleSection').style.display = 'block';

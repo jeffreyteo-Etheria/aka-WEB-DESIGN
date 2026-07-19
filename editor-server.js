@@ -60,6 +60,27 @@ const USERS = [
     display:  'Team Member',
   },
 ];
+/* Username/password login (USERS above) is a single shared secret sitting in
+   Hostinger env vars — anyone with panel access has it, and it can't be tied
+   to a person in the audit log. Set DISABLE_PASSWORD_LOGIN=true once every
+   super admin can sign in with Google, to retire that shared credential
+   without deleting ADMIN_USER/ADMIN_PASS — flipping the var back (no code
+   change, no redeploy) is the entire recovery path if Google sign-in is ever
+   unavailable. */
+const PASSWORD_LOGIN_DISABLED = String(process.env.DISABLE_PASSWORD_LOGIN || '').toLowerCase() === 'true';
+
+/* Google accounts that are ALWAYS super admin, independent of cms_users.json.
+   cms_users.json lives outside the deploy dir specifically because it can be
+   lost (see CMS_USERS note below) — without this list, losing that file with
+   password login also disabled would lock everyone out with no recovery path
+   short of SSH/File Manager. These emails are re-synced into cms_users.json
+   on every login so they're visible in the Users dashboard, but the env list
+   here is authoritative: editing the file can't revoke them, only editing
+   this environment variable can. Comma-separated, case-insensitive. */
+const SUPER_ADMIN_EMAILS = String(process.env.SUPER_ADMIN_EMAILS || '')
+  .split(',')
+  .map(e => e.trim().toLowerCase())
+  .filter(Boolean);
 const loginLimiter = createRateLimiter(securityConfig.rateLimits.login);
 const apiLimiter = createRateLimiter(securityConfig.rateLimits.api);
 
@@ -434,6 +455,9 @@ http.createServer(async (req, res) => {
   /* ── 3. API ──────────────────────────────────────────────────────────── */
   if (p.startsWith('/api/')) {
     if (p === '/api/login' && m === 'POST') {
+      if (PASSWORD_LOGIN_DISABLED) {
+        return j(res, 403, { error: 'Password login is disabled. Sign in with Google.' });
+      }
       const limit = loginLimiter(clientIp);
       if (!limit.allowed) {
         appendSecurityLog('login_rate_limited', { clientIp });
@@ -482,7 +506,10 @@ http.createServer(async (req, res) => {
 
     /* ── PUBLIC CONFIG (Google Client ID — safe to expose, it's a public value) ── */
     if (p === '/api/config') {
-      return j(res, 200, { google_client_id: process.env.GOOGLE_CLIENT_ID || '' });
+      return j(res, 200, {
+        google_client_id: process.env.GOOGLE_CLIENT_ID || '',
+        password_login_enabled: !PASSWORD_LOGIN_DISABLED,
+      });
     }
 
     /* ── GOOGLE OAUTH LOGIN ── */
@@ -497,8 +524,22 @@ http.createServer(async (req, res) => {
           return j(res, 401, { error: 'Google email not verified' });
         const email = String(info.email).toLowerCase().trim();
         const users = readUsers();
-        const user  = users.find(u => u.email === email);
-        if (!user) {
+        let   user  = users.find(u => u.email === email);
+        const isReservedSuper = SUPER_ADMIN_EMAILS.includes(email);
+        if (isReservedSuper) {
+          /* Reserved in the SUPER_ADMIN_EMAILS env var — always super admin,
+             regardless of cms_users.json state. Kept in sync with the file so
+             it shows up correctly in the Users dashboard, but the env var is
+             what actually grants access; editing/deleting this entry via the
+             UI cannot revoke it (see the PUT/DELETE guards below). */
+          if (!user || user.status !== 'approved' || user.role !== 'super' || user.active === false) {
+            const idx = users.findIndex(u => u.email === email);
+            const entry = { email, name: user?.name || info.name || '', role: 'super', active: true, status: 'approved', approvedAt: new Date().toISOString(), approvedBy: 'system:SUPER_ADMIN_EMAILS' };
+            if (idx === -1) users.push(entry); else users[idx] = { ...users[idx], ...entry };
+            writeUsers(users);
+            user = entry;
+          }
+        } else if (!user) {
           /* Unknown Google account → record an access request instead of a
              dead-end rejection. Pending entries never grant a session; a
              super admin approves or rejects them from the Dashboard. */
@@ -506,11 +547,11 @@ http.createServer(async (req, res) => {
           writeUsers(users);
           appendAuditLog('google_access_requested', { email, clientIp });
           return j(res, 403, { pending: true, error: 'Access request sent. A super admin must approve your account before you can sign in.' });
-        }
-        if (user.status === 'pending')
+        } else if (user.status === 'pending') {
           return j(res, 403, { pending: true, error: 'Your access request is still awaiting admin approval.' });
-        if (user.active === false)
+        } else if (user.active === false) {
           return j(res, 403, { error: 'Your account has been disabled. Contact your administrator.' });
+        }
         const t = mkToken();
         SESSIONS.set(t, { username: email, role: user.role || 'team', display: user.name || info.name || email, createdAt: Date.now(), expiresAt: Date.now() + securityConfig.sessionTtlMs });
         persistSessions();
@@ -918,7 +959,7 @@ http.createServer(async (req, res) => {
 
     if (p === '/api/users' && m === 'GET') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
-      return j(res, 200, readUsers());
+      return j(res, 200, readUsers().map(u => ({ ...u, reserved: SUPER_ADMIN_EMAILS.includes(u.email) })));
     }
 
     if (p === '/api/users/new' && m === 'POST') {
@@ -938,6 +979,8 @@ http.createServer(async (req, res) => {
     if (p.startsWith('/api/users/') && m === 'PUT') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
       const email = decodeURIComponent(p.replace('/api/users/', ''));
+      if (SUPER_ADMIN_EMAILS.includes(email))
+        return j(res, 400, { error: 'This account is set as a permanent super admin via the SUPER_ADMIN_EMAILS environment variable — edit that on the server to change it.' });
       const users = readUsers();
       const idx   = users.findIndex(u => u.email === email);
       if (idx === -1) return j(res, 404, { error: 'User not found' });
@@ -961,6 +1004,8 @@ http.createServer(async (req, res) => {
     if (p.startsWith('/api/users/') && m === 'DELETE') {
       if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
       const email = decodeURIComponent(p.replace('/api/users/', ''));
+      if (SUPER_ADMIN_EMAILS.includes(email))
+        return j(res, 400, { error: 'This account is set as a permanent super admin via the SUPER_ADMIN_EMAILS environment variable — edit that on the server to remove it.' });
       const before = readUsers();
       const target = before.find(u => u.email === email);
       writeUsers(before.filter(u => u.email !== email));

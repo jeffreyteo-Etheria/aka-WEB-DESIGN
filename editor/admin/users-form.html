@@ -63,11 +63,17 @@
       To enable Google login, set the <code>GOOGLE_CLIENT_ID</code> environment variable in Hostinger's Node.js settings.
       Get your Client ID from <strong>Google Cloud Console → APIs &amp; Services → Credentials → Create OAuth 2.0 Client ID</strong>
       (Web application). Add <code>https://akadigital.net</code> as an Authorised JavaScript Origin.
-      The master admin account (username/password) always works regardless.
       Anyone signing in with an unknown Google account creates an <strong>access request</strong> —
       approve or reject it here or on the Dashboard. On Hostinger also set <code>CMS_USERS_FILE</code>
       to a path outside the app directory (e.g. <code>/home/&lt;user&gt;/cms_users.json</code>) so the
       approved-user list survives Git deploys.
+      <br><br>
+      <strong>Permanent super admins</strong>
+      Set <code>SUPER_ADMIN_EMAILS</code> (comma-separated Gmail addresses) to guarantee those accounts
+      always have super access, even if <code>cms_users.json</code> is ever lost or edited — shown below
+      with a 🔒 Reserved badge. Set <code>DISABLE_PASSWORD_LOGIN=true</code> once every super admin can
+      sign in with Google to retire the shared admin/team password; flip it back at any time (no
+      redeploy needed) as an emergency fallback.
     </div>
 
     <!-- Add user form -->
@@ -114,13 +120,13 @@
         <div class="list-item">
           <div class="list-item-info">
             <span class="list-item-title">admin</span>
-            <span class="list-item-meta">Password login · <span class="badge badge-super">Super Admin</span> · Full access — change password in editor-server.js → ADMIN_PASS env var</span>
+            <span class="list-item-meta">Password login · <span class="badge badge-super">Super Admin</span> · Full access — change password via ADMIN_PASS env var. Disabled site-wide when DISABLE_PASSWORD_LOGIN=true.</span>
           </div>
         </div>
         <div class="list-item">
           <div class="list-item-info">
             <span class="list-item-title">team</span>
-            <span class="list-item-meta">Password login · <span class="badge badge-team">Team</span> · Blogs &amp; events only — change via TEAM_PASS env var</span>
+            <span class="list-item-meta">Password login · <span class="badge badge-team">Team</span> · Blogs &amp; events only — change via TEAM_PASS env var. Disabled site-wide when DISABLE_PASSWORD_LOGIN=true.</span>
           </div>
         </div>
       </div>
@@ -173,11 +179,15 @@
             <td>${u.email}</td>
             <td>${u.name || '—'}</td>
             <td><span class="badge ${u.role === 'super' ? 'badge-super' : 'badge-team'}">${u.role || 'team'}</span></td>
-            <td><span class="badge ${u.active !== false ? 'badge-on' : 'badge-off'}">${u.active !== false ? 'Active' : 'Disabled'}</span></td>
+            <td>
+              <span class="badge ${u.active !== false ? 'badge-on' : 'badge-off'}">${u.active !== false ? 'Active' : 'Disabled'}</span>
+              ${u.reserved ? '<span class="badge badge-super" title="Set via SUPER_ADMIN_EMAILS environment variable — cannot be changed here">🔒 Reserved</span>' : ''}
+            </td>
             <td style="display:flex;gap:6px;flex-wrap:wrap">
+              ${u.reserved ? '<span style="font-size:12px;color:var(--slate)">Managed via server env var</span>' : `
               <button class="btn-xs" onclick="toggleRole('${u.email}','${u.role === 'super' ? 'team' : 'super'}')">${u.role === 'super' ? '→ Team' : '→ Super'}</button>
               <button class="btn-xs" onclick="toggleActive('${u.email}',${u.active !== false})">${u.active !== false ? 'Disable' : 'Enable'}</button>
-              <button class="btn-xs danger" onclick="removeUser('${u.email}')">Remove</button>
+              <button class="btn-xs danger" onclick="removeUser('${u.email}')">Remove</button>`}
             </td>
           </tr>`).join('')}
         </tbody></table>`;
