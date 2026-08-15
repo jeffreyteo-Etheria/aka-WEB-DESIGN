@@ -5,6 +5,14 @@ DirectoryIndex index.html
   RewriteEngine On
   RewriteCond %{HTTPS} !=on
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Legacy Wix URLs -> current equivalent pages (301, preserves SEO equity)
+  RewriteRule ^home/?$ / [R=301,L]
+  RewriteRule ^about-us/?$ /about [R=301,L]
+  RewriteRule ^products/?$ /solutions [R=301,L]
+  RewriteRule ^sign-up/?$ /contact [R=301,L]
+  RewriteRule ^whycrm/?$ /solutions/crm-automation [R=301,L]
+  RewriteRule ^resource/?$ /insights [R=301,L]
 </IfModule>
 
 <IfModule mod_headers.c>
