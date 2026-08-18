@@ -16,8 +16,7 @@
     { "label": "Case Studies",   "href": "/case-studies",  "icon": "analytics" },
     { "label": "Blog",          "href": "/blog",          "icon": "edit_note" },
     { "label": "Insights",       "href": "/insights",      "icon": "article" },
-    { "label": "Careers",        "href": "/careers",       "icon": "work" },
-    { "label": "LOG IN", "href": "/os", "icon": "login", "external": false, "platform": true }
+    { "label": "Careers",        "href": "/careers",       "icon": "work" }
   ],
   "mobile": [
     { "label": "Home",      "href": "/",             "icon": "home" },
