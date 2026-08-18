@@ -1,3 +1,23 @@
+# DISABLED — 2026-08-18
+#
+# The live site is no longer served from public_html/ as flat static files.
+# It now runs via a Node.js app (editor-server.js) through Phusion Passenger,
+# configured in a .htaccess that lives only on the server and is managed by
+# that app — not by this repo. If this workflow ran again, its FTP sync would
+# overwrite that .htaccess, strip out the PassengerAppRoot directives, and
+# likely take the live site down.
+#
+# This file is deliberately:
+#   1. Moved out of .github/workflows/ so GitHub Actions no longer sees it
+#      as a workflow at all (a push here cannot trigger it).
+#   2. Disabled server-side via `gh workflow disable` (persists independent
+#      of file content/location; requires an explicit `gh workflow enable`
+#      to undo — a plain push will not re-enable it).
+#
+# Do not move this back into .github/workflows/ or re-enable it without
+# first confirming how it should coexist with the current Node.js/Passenger
+# deployment.
+
 name: Deploy to Hostinger via FTP
 
 on:
