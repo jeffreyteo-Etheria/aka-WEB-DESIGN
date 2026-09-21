@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CTA & Popup Settings — AKA Digital CMS</title>
+  <title>Edit Contact — AKA Digital CMS</title>
   <link rel="stylesheet" href="/admin/admin.css" />
   <style>
     .card          { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:28px; margin-bottom:24px; }
@@ -49,10 +49,12 @@
       <div class="nav-section">CRM & Automation</div>
       <a href="/admin/crm-hub"        class="nav-item"><span class="nav-icon">⬡</span> CRM Hub</a>
       <div class="nav-section super-only" style="display:none">Site Data</div>
-      <a href="/admin/site-settings"  class="nav-item active super-only" style="display:none">
+      <a href="/admin/site-settings"  class="nav-item super-only" style="display:none">
         <span class="nav-icon">⚡</span> CTA &amp; Popup Settings
       </a>
-      <a href="/admin/edit-contact" class="nav-item super-only" style="display:none"><span class="nav-icon">☎</span> Edit Contact</a>
+      <a href="/admin/edit-contact"   class="nav-item active super-only" style="display:none">
+        <span class="nav-icon">☎</span> Edit Contact
+      </a>
       <div class="nav-section" style="margin-top:auto">Tools</div>
       <a href="#" class="nav-item" id="buildBtn"><span class="nav-icon">⚙</span> Build Site</a>
       <a href="#" class="nav-item" id="exportBtn"><span class="nav-icon">⬇</span> Export ZIP</a>
@@ -71,132 +73,21 @@
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">CTA &amp; Popup Settings</h1>
-        <p class="page-sub">Edit button labels, redirect URLs, and lead-gen popup content. Saving rebuilds the site automatically.</p>
+        <h1 class="page-title">Edit Contact</h1>
+        <p class="page-sub">Update each office's contact person, email and phone once — it applies across the Contact page, Homepage, lead forms, quiz routing and SEO schema. Saving rebuilds the site.</p>
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════
-         SECTION 1 — CTA BUTTON LINKS
-         ══════════════════════════════════════ -->
-    <div class="card">
-      <p class="card-title">1 — CTA Button Links</p>
-      <p class="card-desc">Set the label and destination URL for the three main buttons across the website.</p>
+    <div id="contactCards"></div>
 
-      <!-- Solution Plan -->
-      <div class="cta-row">
-        <div class="cta-row-label">
-          Solution Plan Button
-          <span class="cta-badge">Homepage lead quiz</span>
-        </div>
-        <div>
-          <label class="field-label">Button Text</label>
-          <input id="solution_plan_text" type="text" class="form-input" placeholder="Get My Custom Solution Plan" />
-        </div>
-        <div>
-          <label class="field-label">Redirect URL</label>
-          <input id="solution_plan_url" type="text" class="form-input" placeholder="/contact" />
-        </div>
-      </div>
-
-      <!-- Book Session -->
-      <div class="cta-row">
-        <div class="cta-row-label">
-          Book Session Button
-          <span class="cta-badge">Blog sidebar + popup</span>
-        </div>
-        <div>
-          <label class="field-label">Button Text</label>
-          <input id="book_session_text" type="text" class="form-input" placeholder="Book Free Session" />
-        </div>
-        <div>
-          <label class="field-label">Redirect URL</label>
-          <input id="book_session_url" type="text" class="form-input" placeholder="/contact" />
-        </div>
-      </div>
-
-      <!-- Get Started -->
-      <div class="cta-row">
-        <div class="cta-row-label">
-          Get Started Button
-          <span class="cta-badge">Sticky bottom bar</span>
-        </div>
-        <div>
-          <label class="field-label">Button Text</label>
-          <input id="get_started_text" type="text" class="form-input" placeholder="Get Started" />
-        </div>
-        <div>
-          <label class="field-label">Redirect URL</label>
-          <input id="get_started_url" type="text" class="form-input" placeholder="/contact?market=sg" />
-        </div>
-      </div>
+    <div class="save-bar">
+      <button id="saveBtn" class="btn-primary">Save &amp; Rebuild Site</button>
+      <span class="save-msg" id="saveMsg" style="display:none">✓ Saved — rebuilding…</span>
+      <span id="saveErr" style="display:none;color:#ef4444;font-size:13px"></span>
     </div>
 
-    <!-- ══════════════════════════════════════
-         SECTION 2 — LEAD GEN POPUP CONTENT
-         ══════════════════════════════════════ -->
-    <div class="card">
-      <p class="card-title">2 — Lead Gen Popup Content</p>
-      <p class="card-desc">The exit-intent popup shown to visitors when they move to leave the page. All fields are editable — changes apply site-wide after saving.</p>
-
-      <!-- Title -->
-      <span class="section-tag">Popup Title</span>
-      <div class="row full" style="margin-bottom:18px">
-        <div>
-          <input id="popup_title" type="text" class="form-input"
-                 placeholder="Get Your Free Digital Growth Strategy Session" />
-        </div>
-      </div>
-
-      <!-- Subtitle -->
-      <span class="section-tag">Popup Subtitle</span>
-      <div class="row full" style="margin-bottom:18px">
-        <div>
-          <input id="popup_subtitle" type="text" class="form-input"
-                 placeholder="30-minute video call with our team..." />
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Content bullets -->
-      <span class="section-tag">Content</span>
-      <div class="row full" style="margin-bottom:18px">
-        <div>
-          <textarea id="popup_content" class="form-input"
-                    placeholder="One bullet point per line…"></textarea>
-          <p class="char-note">Each line = one bullet point shown in the popup. Edit or replace any line. Press Enter to add a new bullet.</p>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Button -->
-      <span class="section-tag">Popup Button</span>
-      <div class="row">
-        <div>
-          <label class="field-label">Button Text</label>
-          <input id="popup_button_text" type="text" class="form-input" placeholder="Book Free Session" />
-        </div>
-        <div>
-          <label class="field-label">Popup Redirect URL</label>
-          <input id="popup_button_url" type="text" class="form-input" placeholder="/contact" />
-          <p class="field-hint">Use a site path (/contact) or full URL (https://…)</p>
-        </div>
-      </div>
-
-      <!-- Save -->
-      <div class="save-bar">
-        <button class="btn-primary" id="saveBtn">Save &amp; Rebuild Site</button>
-        <span class="save-msg" id="saveMsg" style="display:none">✓ Saved — rebuilding site…</span>
-        <span class="error-msg" id="saveErr" style="display:none"></span>
-      </div>
-    </div>
-
-    <!-- Build log -->
-    <div id="buildLog" class="build-log" style="display:none">
-      <div class="build-log-header">Build Output</div>
-      <div id="buildLogText" class="build-log-text"></div>
+    <div id="buildLog" style="display:none;margin-top:20px">
+      <pre id="buildLogText" style="background:#0b1120;color:#a7f3d0;padding:16px;border-radius:10px;font-size:12px;max-height:260px;overflow:auto"></pre>
     </div>
 
   </main>
@@ -212,37 +103,57 @@
     document.querySelectorAll('.super-only').forEach(el => el.style.display = '');
     document.getElementById('logoutBtn').addEventListener('click', logout);
 
-    // ── Load current settings ──
-    async function loadSettings() {
-      const data = await apiFetch('/api/site-settings');
-      if (!data) return;
-      const cta   = data.cta   || {};
-      const popup = data.popup || {};
+    const MARKETS = [
+      { key: 'sg', title: 'Singapore — Regional HQ' },
+      { key: 'vn', title: 'Vietnam — Ho Chi Minh City' },
+      { key: 'kr', title: 'South Korea — Seoul' },
+      { key: 'id', title: 'Indonesia — Jakarta' }
+    ];
+    const FIELDS = [
+      { f: 'name',    label: 'Contact Person',    hint: '' },
+      { f: 'title',   label: 'Job Title',         hint: '' },
+      { f: 'email',   label: 'Email',             hint: 'Shown on cards and used as the lead-routing address' },
+      { f: 'phone',   label: 'Phone',             hint: 'Any format, e.g. (+84) 909 297 155 — tel: and WhatsApp links are derived automatically' },
+      { f: 'channel', label: 'Preferred Channel', hint: 'e.g. WhatsApp / Zalo' },
+      { f: 'label',   label: 'Office Label',      hint: 'e.g. Regional HQ, Seoul' }
+    ];
+    function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
-      setVal('solution_plan_text', cta.solution_plan_text);
-      setVal('solution_plan_url',  cta.solution_plan_url);
-      setVal('book_session_text',  cta.book_session_text);
-      setVal('book_session_url',   cta.book_session_url);
-      setVal('get_started_text',   cta.get_started_text);
-      setVal('get_started_url',    cta.get_started_url);
-
-      setVal('popup_title',       popup.title);
-      setVal('popup_subtitle',    popup.subtitle);
-      setVal('popup_button_text', popup.button_text);
-      setVal('popup_button_url',  popup.button_url);
-
-      // Bullets array → textarea (one line per bullet)
-      const bullets = popup.bullets || [];
-      setVal('popup_content', bullets.join('\n'));
+    function render(data) {
+      document.getElementById('contactCards').innerHTML = MARKETS.map(m => {
+        const c = data[m.key] || {};
+        const rows = FIELDS.map(x => `
+          <div>
+            <label class="field-label">${x.label}</label>
+            <input id="${m.key}_${x.f}" type="text" class="form-input" value="${esc(c[x.f])}" />
+            ${x.hint ? `<p class="field-hint">${x.hint}</p>` : ''}
+          </div>`).join('');
+        return `
+        <div class="card">
+          <p class="card-title">${m.title}</p>
+          <p class="card-desc">Country / office details shown across the site.</p>
+          <div class="row">${rows}</div>
+          <div class="row full">
+            <div>
+              <label class="field-label">Office Address (one line per row)</label>
+              <textarea id="${m.key}_address" class="form-input" style="min-height:80px">${esc(c.address)}</textarea>
+            </div>
+          </div>
+          <label style="display:flex;gap:8px;align-items:center;font-size:13px">
+            <input id="${m.key}_show_phone_on_card" type="checkbox" ${c.show_phone_on_card ? 'checked' : ''} />
+            Show phone number on the Contact page office card
+          </label>
+        </div>`;
+      }).join('');
     }
 
-    function setVal(id, val) {
-      const el = document.getElementById(id);
-      if (el && val !== undefined && val !== null) el.value = val;
+    async function loadContacts() {
+      const data = await apiFetch('/api/contacts');
+      if (data) render(data);
     }
-    function getVal(id) { return (document.getElementById(id) || {}).value || ''; }
 
-    // ── Save ──
+    function val(id) { return (document.getElementById(id) || {}).value || ''; }
+
     document.getElementById('saveBtn').addEventListener('click', async () => {
       const btn = document.getElementById('saveBtn');
       const msg = document.getElementById('saveMsg');
@@ -250,52 +161,31 @@
       btn.disabled = true; btn.textContent = 'Saving…';
       msg.style.display = 'none'; err.style.display = 'none';
 
-      // Textarea → array (split by newline, drop empty lines)
-      const bullets = getVal('popup_content')
-        .split('\n')
-        .map(l => l.trim())
-        .filter(l => l.length > 0);
+      const contacts = {};
+      MARKETS.forEach(m => {
+        contacts[m.key] = { address: val(m.key + '_address'), show_phone_on_card: document.getElementById(m.key + '_show_phone_on_card').checked };
+        FIELDS.forEach(x => { contacts[m.key][x.f] = val(m.key + '_' + x.f); });
+      });
 
-      const payload = {
-        cta: {
-          solution_plan_text: getVal('solution_plan_text'),
-          solution_plan_url:  getVal('solution_plan_url'),
-          book_session_text:  getVal('book_session_text'),
-          book_session_url:   getVal('book_session_url'),
-          get_started_text:   getVal('get_started_text'),
-          get_started_url:    getVal('get_started_url')
-        },
-        popup: {
-          title:       getVal('popup_title'),
-          subtitle:    getVal('popup_subtitle'),
-          bullets:     bullets,
-          button_text: getVal('popup_button_text'),
-          button_url:  getVal('popup_button_url')
-        }
-      };
-
-      const res = await apiFetch('/api/site-settings', 'PUT', payload);
+      const res = await apiFetch('/api/contacts', 'PUT', { contacts });
       if (res && res.ok) {
         msg.style.display = 'inline';
         const log = document.getElementById('buildLog');
         const txt = document.getElementById('buildLogText');
         log.style.display = 'block'; txt.textContent = 'Building site…\n';
-        let saveFinished = false;
+        let finished = false;
         const es = new EventSource('/api/build?token=' + encodeURIComponent(localStorage.getItem('aka_cms_token') || ''));
         es.onmessage = ev => {
           try {
             const d = JSON.parse(ev.data);
             txt.textContent += (d.msg || '') + '\n';
-            if (d.status === 'done')  { txt.textContent += '✓ Done — changes are live.\n'; saveFinished = true; es.close(); }
-            if (d.status === 'error') { txt.textContent += '✗ Build error.\n'; saveFinished = true; es.close(); }
+            if (d.status === 'done')  { txt.textContent += '✓ Done — changes are live.\n'; finished = true; es.close(); }
+            if (d.status === 'error') { txt.textContent += '✗ Build error.\n'; finished = true; es.close(); }
           } catch {}
         };
-        es.onerror = () => {
-          if (!saveFinished) txt.textContent += '⚠ Build connection lost — check server logs.\n';
-          es.close();
-        };
+        es.onerror = () => { if (!finished) txt.textContent += '⚠ Build connection lost — check server logs.\n'; es.close(); };
       } else {
-        err.textContent = 'Save failed. Try again.'; err.style.display = 'block';
+        err.textContent = (res && res.error) || 'Save failed. Try again.'; err.style.display = 'inline';
       }
       btn.disabled = false; btn.textContent = 'Save & Rebuild Site';
     });
@@ -355,7 +245,7 @@
       };
     });
 
-    loadSettings();
+    loadContacts();
   </script>
 </body>
 </html>

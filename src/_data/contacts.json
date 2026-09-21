@@ -1,0 +1,54 @@
+{
+  "sg": {
+    "flag": "🇸🇬",
+    "country": "Singapore",
+    "label": "Regional HQ",
+    "address": "1 Paya Lebar Link, #04-01\nPaya Lebar Quarter\nSingapore 408533",
+    "name": "Jeffrey Teo",
+    "title": "Country Director, Regional Markets (SG · MY · ID)",
+    "email": "jeffrey.teo@akadigital.net",
+    "phone": "+65 8699 9719",
+    "show_phone_on_card": false,
+    "channel": "WhatsApp",
+    "photo": "/images/team/jeffrey-teo.jpg"
+  },
+  "vn": {
+    "flag": "🇻🇳",
+    "country": "Vietnam",
+    "label": "Ho Chi Minh City",
+    "address": "Cong ty TNHH AKA Digital Viet Nam\n236/26/8 Dien Bien Phu Street\nGia Dinh Ward, HCMC",
+    "name": "Ms. Phuong Pham (Maisie)",
+    "title": "Country Director, Vietnam",
+    "email": "phuong.pham@akadigital.net",
+    "phone": "(+84) 909 297 155",
+    "show_phone_on_card": true,
+    "channel": "WhatsApp / Zalo",
+    "photo": "/images/team/phuong-pham.jpg"
+  },
+  "kr": {
+    "flag": "🇰🇷",
+    "country": "South Korea",
+    "label": "Seoul",
+    "address": "Seoul Office",
+    "name": "KS Hwang",
+    "title": "Country Director, South Korea",
+    "email": "KS.Hwang@Akadigital.net",
+    "phone": "(+82) 10 2335 3076",
+    "show_phone_on_card": true,
+    "channel": "LINE / Phone / WhatsApp",
+    "photo": "/images/team/ks-hwang.jpg"
+  },
+  "id": {
+    "flag": "🇮🇩",
+    "country": "Indonesia",
+    "label": "Jakarta",
+    "address": "EightyEight Tower A, 35th Floor\nKota Kasablanka 12870\nSouth Jakarta",
+    "name": "Jeffrey Teo",
+    "title": "Country Director, Regional Markets (SG · MY · ID)",
+    "email": "jeffrey.teo@akadigital.net",
+    "phone": "+65 8699 9719",
+    "show_phone_on_card": false,
+    "channel": "WhatsApp",
+    "photo": "/images/team/jeffrey-teo.jpg"
+  }
+}

@@ -6,6 +6,33 @@ module.exports = function (eleventyConfig) {
   // Watch CSS source for changes during dev
   eleventyConfig.addWatchTarget("src/styles/");
 
+  // Filter: strip a display phone number to dialable digits (keeps leading +)
+  eleventyConfig.addFilter("phoneDigits", function (v) {
+    return String(v || "").replace(/[^\d+]/g, "");
+  });
+
+  // Filter: escape text and turn newlines into <br/> (CMS multi-line address fields)
+  eleventyConfig.addFilter("nl2br", function (v) {
+    return String(v || "").split("\n").map(function (l) {
+      return l.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }).join("<br/>");
+  });
+
+  // Filter: keep only image paths whose file actually exists in public/ so a
+  // missing photo never renders as a broken-image icon. Accepts a string or array.
+  eleventyConfig.addFilter("existingImages", function (val) {
+    const fs = require("fs");
+    const path = require("path");
+    const ok = (p) => {
+      if (!p || typeof p !== "string") return false;
+      if (/^https?:\/\//i.test(p)) return true;
+      try { return fs.existsSync(path.join(__dirname, "public", decodeURI(p.split("?")[0]))); }
+      catch (e) { return false; }
+    };
+    if (Array.isArray(val)) return val.filter(ok);
+    return ok(val) ? val : "";
+  });
+
   // Filter: format a date for display
   eleventyConfig.addFilter("dateFormat", function (dateVal) {
     return new Date(dateVal).toLocaleDateString("en-US", {

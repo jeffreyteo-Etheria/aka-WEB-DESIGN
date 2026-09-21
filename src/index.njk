@@ -746,47 +746,19 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
           <p class="text-label-md text-white/40 uppercase tracking-widest mb-5">Our Offices</p>
           <div class="grid grid-cols-2 gap-3">
 
-            <!-- Singapore -->
+            {% for key in ["sg", "vn", "kr", "id"] %}
+            {% set c = contacts[key] %}
             <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
               <div class="flex items-center gap-2 mb-2">
-                <span class="text-xl">🇸🇬</span>
-                <span class="font-bold text-white text-body-md">Singapore</span>
+                <span class="text-xl">{{ c.flag }}</span>
+                <span class="font-bold text-white text-body-md">{{ c.country }}</span>
               </div>
-              <p class="text-label-md text-white/40 uppercase tracking-wider mb-2">Regional HQ</p>
-              <p class="text-label-md text-white/60 leading-relaxed">1 Paya Lebar Link, #04-01<br/>Paya Lebar Quarter, 408533</p>
-            </div>
-
-            <!-- Vietnam -->
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-xl">🇻🇳</span>
-                <span class="font-bold text-white text-body-md">Vietnam</span>
-              </div>
-              <p class="text-label-md text-white/40 uppercase tracking-wider mb-2">Ho Chi Minh City</p>
-              <p class="text-label-md text-white/60 leading-relaxed">236/26/8 Dien Bien Phu<br/>Gia Dinh Ward, HCMC</p>
-            </div>
-
-            <!-- South Korea -->
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-xl">🇰🇷</span>
-                <span class="font-bold text-white text-body-md">South Korea</span>
-              </div>
-              <p class="text-label-md text-white/40 uppercase tracking-wider mb-2">Seoul</p>
-              <p class="text-label-md text-white/60 leading-relaxed">Seoul Office<br/>
-                <a href="mailto:kw.hwang@akadigital.net" class="text-action-yellow hover:underline">kw.hwang@akadigital.net</a>
+              <p class="text-label-md text-white/40 uppercase tracking-wider mb-2">{{ c.label }}</p>
+              <p class="text-label-md text-white/60 leading-relaxed">{{ c.address | nl2br | safe }}{% if key == "kr" %}<br/>
+                <a href="mailto:{{ c.email }}" class="text-action-yellow hover:underline">{{ c.email }}</a>{% endif %}
               </p>
             </div>
-
-            <!-- Indonesia -->
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-xl">🇮🇩</span>
-                <span class="font-bold text-white text-body-md">Indonesia</span>
-              </div>
-              <p class="text-label-md text-white/40 uppercase tracking-wider mb-2">Jakarta</p>
-              <p class="text-label-md text-white/60 leading-relaxed">EightyEight Tower A, 35F<br/>Kota Kasablanka, Jakarta</p>
-            </div>
+            {% endfor %}
 
           </div>
         </div>

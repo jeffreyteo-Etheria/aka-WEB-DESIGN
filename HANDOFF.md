@@ -68,11 +68,11 @@ jeffrey.teo@akadigital.net | +65 8699 9719
 
 Ms. Phuong Pham (Maisie)
 Country Director, Vietnam
-phuong.pham@akadigital.net | +84 90 3045 373
+phuong.pham@akadigital.net | +84 90 9297 155
 
 Mr. KS Hwang
 Country Director, South Korea
-kw.hwang@akadigital.net | +82 10 2335 3076
+KS.Hwang@Akadigital.net | +82 10 2335 3076
 ```
 
 ---
