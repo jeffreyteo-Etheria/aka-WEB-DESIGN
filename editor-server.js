@@ -954,6 +954,70 @@ http.createServer(async (req, res) => {
     }
 
     /* ═══════════════════════════════════════════════════════════════
+       CONTACT DETAILS — office cards, routing contacts, schema phones
+       (super admin only). Single source: src/_data/contacts.json.
+       Saving also syncs email/phone into team.json + settings.offices
+       so every page/template that still reads those stays consistent.
+       ═══════════════════════════════════════════════════════════════ */
+
+    if (p === '/api/contacts' && m === 'GET') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      return j(res, 200, readData('contacts'));
+    }
+
+    if (p === '/api/contacts' && m === 'PUT') {
+      if (!isSuper(req)) return j(res, 403, { error: 'Super admin only' });
+      const b = await readValidatedBody(req, res, 'contacts.update');
+      if (b === null) return;
+      const current = readData('contacts');
+      const EMAIL_RE = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/;
+      const PHONE_RE = /^[0-9+()\-.\s]{5,30}$/;
+      const clean = v => String(v == null ? '' : v).trim();
+      const next = {};
+      for (const key of ['sg', 'vn', 'kr', 'id']) {
+        const cur = current[key] || {};
+        const inp = (b.contacts && b.contacts[key]) || {};
+        const email = clean(inp.email !== undefined ? inp.email : cur.email);
+        const phone = clean(inp.phone !== undefined ? inp.phone : cur.phone);
+        if (!EMAIL_RE.test(email)) return j(res, 400, { error: `Invalid email for ${key.toUpperCase()}` });
+        if (phone && !PHONE_RE.test(phone)) return j(res, 400, { error: `Invalid phone for ${key.toUpperCase()} (digits, +, spaces, brackets only)` });
+        next[key] = {
+          ...cur,
+          name:    clean(inp.name    !== undefined ? inp.name    : cur.name).slice(0, 120),
+          title:   clean(inp.title   !== undefined ? inp.title   : cur.title).slice(0, 160),
+          country: clean(inp.country !== undefined ? inp.country : cur.country).slice(0, 80),
+          label:   clean(inp.label   !== undefined ? inp.label   : cur.label).slice(0, 80),
+          address: clean(inp.address !== undefined ? inp.address : cur.address).slice(0, 500),
+          channel: clean(inp.channel !== undefined ? inp.channel : cur.channel).slice(0, 120),
+          email, phone,
+          show_phone_on_card: inp.show_phone_on_card !== undefined ? !!inp.show_phone_on_card : !!cur.show_phone_on_card,
+        };
+      }
+      writeData('contacts', next);
+      /* Keep legacy consumers in step (team cards on the homepage, office data). */
+      try {
+        const team = readData('team');
+        if (Array.isArray(team)) {
+          team.forEach(t => {
+            const key = ['sg', 'vn', 'kr', 'id'].find(k => (t.markets || []).includes(k.toUpperCase()) && (k === 'sg' || (t.markets || []).length === 1)) || null;
+            if (key && next[key]) { t.email = next[key].email; t.phone = next[key].phone; }
+          });
+          writeData('team', team);
+        }
+        const settings = readData('settings');
+        if (settings && Array.isArray(settings.offices)) {
+          settings.offices.forEach(o => {
+            const key = String(o.country_code || '').toLowerCase();
+            if (next[key]) { o.email = next[key].email; o.phone = next[key].phone; }
+          });
+          writeData('settings', settings);
+        }
+      } catch (e) { console.error('contacts sync failed:', e.message); }
+      appendAuditLog('contacts_updated', { by: getSession(req)?.username });
+      return j(res, 200, { ok: true });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
        GOOGLE USER MANAGEMENT  (super admin only)
        ═══════════════════════════════════════════════════════════════ */
 

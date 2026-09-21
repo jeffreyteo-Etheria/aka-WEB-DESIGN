@@ -39,8 +39,9 @@ layout: layouts/base.njk
 <!-- Hero -->
 <section class="relative min-h-[50vh] flex items-end py-20 bg-on-surface overflow-hidden">
   <div class="absolute inset-0 z-0">
-    <img src="{{ post.cover_image }}" alt="{{ post.title }}"
-      class="w-full h-full object-cover opacity-20" loading="eager" />
+    {% set coverImg = post.cover_image | existingImages %}
+    {% if coverImg %}<img src="{{ coverImg }}" alt="{{ post.title }}"
+      class="w-full h-full object-cover opacity-20" loading="eager" />{% endif %}
     <div class="absolute inset-0 bg-gradient-to-r from-on-surface via-on-surface/80 to-on-surface/40"></div>
   </div>
   <div class="relative z-10 section-container">
@@ -91,14 +92,15 @@ layout: layouts/base.njk
   </div>
 </section>
 
-{% if post.gallery_images and post.gallery_images.length > 0 %}
+{% set galleryImages = post.gallery_images | existingImages %}
+{% if galleryImages and galleryImages.length > 0 %}
 <!-- Photo gallery -->
 <section class="py-16 bg-surface-off-white">
   <div class="section-container">
     <p class="eyebrow mb-3 text-center">Event Gallery</p>
     <h2 class="text-headline-sm font-display text-on-surface text-center mb-10">Photos from the Event</h2>
     <div class="columns-2 md:columns-3 lg:columns-4 gap-3 space-y-3">
-      {% for img in post.gallery_images %}
+      {% for img in galleryImages %}
         <div class="break-inside-avoid overflow-hidden rounded-xl bg-surface-container group cursor-pointer"
              onclick="openLightbox('{{ img }}')">
           <img src="{{ img }}" alt="{{ post.title }} — photo {{ loop.index }}"

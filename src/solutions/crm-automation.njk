@@ -437,7 +437,7 @@ solutionSlug: crm-automation
       form_type:    'lead',
       source_page:  window.location.pathname,
       market:       'SG/SEA',
-      assigned_to:  'phuong.pham@akadigital.net',
+      assigned_to:  '{{ contacts.vn.email }}',
       name:         f.name || '',
       company:      f.company || '',
       email:        f.email || '',
@@ -466,7 +466,7 @@ solutionSlug: crm-automation
     } else {
       /* Webhook not configured yet — mailto fallback so no lead is lost */
       var body = Object.keys(payload).map(function (k) { return k + ': ' + payload[k]; }).join('\n');
-      window.location.href = 'mailto:phuong.pham@akadigital.net?cc=jeffrey.teo@akadigital.net'
+      window.location.href = 'mailto:{{ contacts.vn.email }}?cc={{ contacts.sg.email }}'
         + '&subject=' + encodeURIComponent('CRM Maturity Audit Request — ' + (f.name || ''))
         + '&body=' + encodeURIComponent(body);
       done();

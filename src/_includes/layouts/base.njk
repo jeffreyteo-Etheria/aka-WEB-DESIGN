@@ -63,14 +63,14 @@
         "contactPoint": [
           {
             "@type": "ContactPoint",
-            "telephone": "+65-8699-9719",
+            "telephone": "{{ contacts.sg.phone | phoneDigits }}",
             "contactType": "sales",
             "areaServed": "SG",
             "availableLanguage": ["English"]
           },
           {
             "@type": "ContactPoint",
-            "telephone": "+84-90-3045-373",
+            "telephone": "{{ contacts.vn.phone | phoneDigits }}",
             "contactType": "sales",
             "areaServed": "VN",
             "availableLanguage": ["Vietnamese","English"]

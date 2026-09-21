@@ -115,7 +115,7 @@
     ✓ Message sent! We'll be in touch within 1 business day.
   </p>
   <p id="form-error" class="hidden text-body-md text-center text-error font-bold py-2">
-    Something went wrong. Please email us directly at jeffrey.teo@akadigital.net
+    Something went wrong. Please email us directly at {{ contacts.sg.email }}
   </p>
 </form>
 
@@ -137,7 +137,7 @@
       form_type:   'lead',
       source_page: window.location.pathname,
       market:      'SG/SEA',
-      assigned_to: 'jeffrey.teo@akadigital.net',
+      assigned_to: '{{ contacts.sg.email }}',
       name:        (document.getElementById('form-name')    || {}).value || '',
       company:     (document.getElementById('form-company') || {}).value || '',
       email:       (document.getElementById('form-email')   || {}).value || '',
@@ -183,7 +183,7 @@
     } else {
       /* Webhook not configured yet — mailto fallback so no lead is lost */
       var body = Object.keys(payload).map(function(k) { return k + ': ' + payload[k]; }).join('\n');
-      window.location.href = 'mailto:jeffrey.teo@akadigital.net?cc=phuong.pham@akadigital.net'
+      window.location.href = 'mailto:{{ contacts.sg.email }}?cc={{ contacts.vn.email }}'
         + '&subject=' + encodeURIComponent('New Enquiry — AKA Digital Website')
         + '&body=' + encodeURIComponent(body);
       showSuccess();
