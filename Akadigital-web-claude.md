@@ -121,7 +121,7 @@ Home (`index.njk`) · About · Careers · Case Studies (index + individual templ
 |---|---|---|---|
 | Singapore | Headquarters | 1 Paya Lebar Link, #04-01, Paya Lebar Quarter, Singapore 408533 | Jeffrey Teo — jeffrey.teo@akadigital.net |
 | Vietnam — Ho Chi Minh City | Cong ty TNHH AKA Digital Viet Nam (AKA Digital Vietnam Ltd) | 236/26/8, Dien Bien Phu Street, Gia Dinh Ward, HCMC | Phuong Pham (Maisie) — phuong.pham@akadigital.net, (+84) 909297155 |
-| Korea — Seoul | — | — | KS Hwang — KS.Hwang@Akadigital.net, (+82) 10 2335 3076 |
+| Korea — Seoul | — | — | KS Hwang — ks.hwang@akadigital.net, (+82) 10 2335 3076 |
 | Indonesia — Jakarta | — | EightyEight Tower A, 35th Floor, Kota Kasablanka 12870, South Jakarta | Jeffrey Teo — jeffrey.teo@akadigital.net |
 
 Update `team.json` / `settings.json` and the Contact page to reflect this corrected office list — it currently may only reflect Vietnam + Singapore.
