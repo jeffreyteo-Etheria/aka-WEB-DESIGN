@@ -12,7 +12,7 @@
     "dev": "concurrently \"npm run css:watch\" \"eleventy --serve --port=3000\"",
     "editor": "node editor-server.js",
     "editor:dev": "concurrently \"npm run css:watch\" \"eleventy --watch\" \"node editor-server.js\"",
-    "build": "npm run css:build && node node_modules/@11ty/eleventy/cmd.cjs --output=dist" 
+    "build": "npm run css:build && node node_modules/@11ty/eleventy/cmd.cjs --output=dist"
     "test:security": "node --test tests/security.test.js",
     "backup": "node scripts/backup-site.js",
     "css:build": "node node_modules/tailwindcss/lib/cli.js -i src/styles/main.css -o public/css/main.css --minify",
