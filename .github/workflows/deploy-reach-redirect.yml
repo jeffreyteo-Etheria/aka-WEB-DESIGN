@@ -1,0 +1,113 @@
+name: Deploy reach redirect (manual)
+
+# One-off manual deploy of a single .htaccess into the live docroot's
+# reach/ folder. IMPORTANT: reach.akadigital.net's docroot IS
+# /domains/akadigital.net/public_html/reach (confirmed 13 Jul 2026 —
+# subdomain PHP endpoints created reach_data/ and assets/ in it), so the
+# redirect MUST be host-conditioned or the subdomain loops onto itself,
+# and no index.html may be uploaded (it would overwrite the dashboard).
+# Uploads exactly one file with an explicit `put` — never syncs, never
+# deletes, never touches other files.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "inspect = read-only listings; deploy = upload the two redirect files"
+        type: choice
+        options: [inspect, deploy]
+        default: inspect
+      remote_dir:
+        description: "Absolute FTP path of the /reach folder inside the LIVE docroot (deploy mode)"
+        required: false
+        default: "/domains/akadigital.net/public_html/reach"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create redirect .htaccess
+        run: |
+          mkdir -p out
+          cat > out/.htaccess <<'EOF'
+          # Scoped to the shared /reach docroot. This same folder serves BOTH
+          # reach.akadigital.net (canonical) and akadigital.net/reach (legacy),
+          # so only redirect requests that arrive via the legacy hostnames.
+          RewriteEngine On
+          RewriteCond %{HTTP_HOST} !^reach\.akadigital\.net$ [NC]
+          RewriteRule ^(.*)$ https://reach.akadigital.net/$1 [R=301,L]
+          EOF
+          ls -la out
+
+      - name: Upload via FTPS
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          TARGET_DIR: ${{ inputs.remote_dir || '/domains/akadigital.net/public_html/reach' }}
+          MODE: ${{ inputs.mode || 'inspect' }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          # FTP_HOST is Hostinger's raw server IP, but the FTPS certificate is
+          # the CA-signed wildcard *.hstgr.io — an IP can never match it. Alias
+          # a hstgr.io name to the IP so full TLS verification (chain + host)
+          # stays enabled and validates against Hostinger's real certificate.
+          HOST_CLEAN="$(printf '%s' "$FTP_HOST" | tr -d '[:space:]')"
+          HOST_CLEAN="${HOST_CLEAN#ftps://}"; HOST_CLEAN="${HOST_CLEAN#ftp://}"; HOST_CLEAN="${HOST_CLEAN%%/*}"
+          if [[ "$HOST_CLEAN" == *.hstgr.io ]]; then
+            CONNECT_HOST="$HOST_CLEAN"
+          else
+            IP="$(getent ahostsv4 "$HOST_CLEAN" | awk '{print $1; exit}')"
+            CONNECT_HOST="ftp.hstgr.io"
+            echo "$IP $CONNECT_HOST" | sudo tee -a /etc/hosts >/dev/null
+            echo "Aliased $CONNECT_HOST to the resolved server IP for cert-valid FTPS"
+          fi
+          if [ "$MODE" = "inspect" ]; then
+            # Read-only: list the account layout so the true docroot can be
+            # confirmed before anything is uploaded. No writes of any kind.
+            lftp <<LFTP
+          set ftp:ssl-force true
+          set ssl:verify-certificate yes
+          set net:max-retries 2
+          open -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$CONNECT_HOST"
+          set cmd:fail-exit no
+          echo === /
+          cls -la /
+          echo === /domains/
+          cls -la /domains/
+          echo === /domains/akadigital.net/public_html/
+          cls -la /domains/akadigital.net/public_html/
+          echo === /domains/akadigital.net/public_html/reach/
+          cls -la /domains/akadigital.net/public_html/reach/
+          echo === /public_html/
+          cls -la /public_html/
+          bye
+          LFTP
+          else
+            lftp <<LFTP
+          set ftp:ssl-force true
+          set ssl:verify-certificate yes
+          set net:max-retries 2
+          open -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$CONNECT_HOST"
+          set cmd:fail-exit yes
+          cd "$TARGET_DIR"
+          put out/.htaccess -o .htaccess
+          cls -la
+          bye
+          LFTP
+          fi
+
+      - name: Verify redirect is live
+        if: ${{ inputs.mode == 'deploy' }}
+        run: |
+          sleep 5
+          code=$(curl -s -o /dev/null -w '%{http_code}' https://akadigital.net/reach/)
+          loc=$(curl -s -o /dev/null -w '%{redirect_url}' https://akadigital.net/reach/)
+          echo "akadigital.net/reach/ -> $code $loc"
+          # canonical subdomain must still serve the dashboard, NOT redirect
+          sub=$(curl -s -o /dev/null -w '%{http_code} %{size_download}' https://reach.akadigital.net/)
+          echo "reach.akadigital.net/ -> $sub"
+          test "$code" = "301"
+          echo "$loc" | grep -q '^https://reach.akadigital.net/'
+          echo "$sub" | grep -q '^200 '
