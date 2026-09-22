@@ -72,7 +72,7 @@ phuong.pham@akadigital.net | +84 90 9297 155
 
 Mr. KS Hwang
 Country Director, South Korea
-ks.hwang@akadigital.net | +82 10 2335 3076
+KS.Hwang@Akadigital.net | +82 10 2335 3076
 ```
 
 ---
