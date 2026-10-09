@@ -423,12 +423,25 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 reveal-up" style="animation-delay:0.1s">
       {% for partner in partners %}
+        {% if partner.slug == "adjust" %}
+        <a href="https://www.appsflyer.com/" aria-label="AppsFlyer — Attribution"
+           class="group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
+          <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">AppsFlyer</span>
+          <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors" translate="no">{{ partner.category }}</span>
+        </a>
+        {% else %}
         <a href="/tech-partners#{{ partner.slug }}"
            class="group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
           <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">{{ partner.name }}</span>
           <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors" translate="no">{{ partner.category }}</span>
         </a>
+        {% endif %}
       {% endfor %}
+      <a href="https://www.braze.com/" aria-label="braze — Customer Engagement"
+         class="group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
+        <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">braze</span>
+        <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors" translate="no">Customer Engagement</span>
+      </a>
     </div>
 
     <div class="text-center mt-12">
