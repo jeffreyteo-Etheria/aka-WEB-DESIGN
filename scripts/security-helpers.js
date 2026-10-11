@@ -137,7 +137,8 @@ function getSecurityHeaders(extra = {}) {
     'X-Frame-Options': 'DENY',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
-    'Cross-Origin-Opener-Policy': 'same-origin',
+    // allow-popups: the Google Sign-In popup must post back to its opener
+    'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
     'Cross-Origin-Resource-Policy': 'same-origin',
     'Cache-Control': 'no-store, max-age=0',
     ...extra,
