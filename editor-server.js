@@ -98,6 +98,7 @@ const PUBLIC     = path.join(ROOT, 'public');
 const contentStore = require('./scripts/content-store');
 const CONTENT_RESTORE = contentStore.restore(ROOT);
 if (CONTENT_RESTORE.enabled) console.log('[content-store]', JSON.stringify(CONTENT_RESTORE));
+else if (CONTENT_RESTORE.error) console.error('[content-store] protection OFF:', CONTENT_RESTORE.error);
 else console.warn('[content-store] CMS_CONTENT_DIR not set — CMS edits will be lost on the next Git deploy');
 const EDITOR     = path.join(ROOT, 'editor');
 const ADMIN      = path.join(ROOT, 'editor', 'admin');
@@ -515,6 +516,7 @@ http.createServer(async (req, res) => {
         serverStartedAt: SERVER_STARTED_AT,
         distBuiltAt,
         contentProtected: contentStore.isEnabled(),
+        contentStoreError: contentStore.lastError(),
       });
     }
 

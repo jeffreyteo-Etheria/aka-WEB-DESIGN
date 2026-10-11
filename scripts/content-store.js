@@ -30,7 +30,9 @@ const SEED_FILES = [
 const SEED_DIRS = ['src/blog', 'src/case-studies', 'public/images/uploads'];
 
 let ROOT = null;
-const enabled = () => !!(DIR && ROOT);
+let ACTIVE = false;      // true only after a successful restore/seed
+let LAST_ERROR = null;   // surfaced on /api/health so a bad path is diagnosable
+const enabled = () => ACTIVE;
 const rel = abs => path.relative(ROOT, abs).split(path.sep).join('/');
 
 function readDeleted() {
@@ -54,10 +56,27 @@ function walk(dirAbs, out = []) {
   return out;
 }
 
-/* Call once at startup, before the first build. Returns a summary for logs. */
+/* Call once at startup, before the first build. Never throws: a bad
+   CMS_CONTENT_DIR (wrong path, no permission) must not take the site down —
+   protection just stays off and the error is reported. */
 function restore(rootDir) {
   ROOT = rootDir;
   if (!DIR) return { enabled: false };
+  if (!path.isAbsolute(DIR)) {
+    LAST_ERROR = 'CMS_CONTENT_DIR must be an absolute path like /home/<user>/cms-content (got "' + DIR + '")';
+    return { enabled: false, error: LAST_ERROR };
+  }
+  try {
+    const result = restoreUnsafe();
+    ACTIVE = true;
+    return result;
+  } catch (e) {
+    LAST_ERROR = e.message;
+    return { enabled: false, error: e.message };
+  }
+}
+
+function restoreUnsafe() {
   fs.mkdirSync(DIR, { recursive: true });
 
   // First run: seed the mirror from what's deployed right now.
@@ -112,4 +131,4 @@ function remove(absPath) {
   } catch (e) { console.error('[content-store] remove failed:', absPath, e.message); }
 }
 
-module.exports = { restore, persist, remove, isEnabled: () => !!DIR };
+module.exports = { restore, persist, remove, isEnabled: () => ACTIVE, lastError: () => LAST_ERROR };
