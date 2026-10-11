@@ -165,6 +165,8 @@
        */
     };
 
+    if (window.akaTrack) window.akaTrack('generate_lead', { form_name: 'contact', service: payload.service, page_path: payload.source_page });
+
     var submitBtn = document.getElementById('form-submit');
     submitBtn.disabled = true;
     function showSuccess() {

@@ -177,6 +177,7 @@ function submitApplication() {
   if (!name || !email) { alert('Please enter your name and email.'); return; }
 
   const payload = { form_type:'career', role, name, email, phone, linkedin, cover };
+  if (window.akaTrack) window.akaTrack('job_application', { role: role });
   const webhookUrl = '{{ cms_settings.webhook_url }}';
 
   if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {

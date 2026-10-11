@@ -477,6 +477,7 @@
         email:       email.value,
         phone:       phone
       };
+      if (window.akaTrack) window.akaTrack('generate_lead', { form_name: 'solution_quiz', solution: sol.title, budget: budget, page_path: location.pathname });
       var webhookUrl = '{{ cms_settings.webhook_url }}';
       if (webhookUrl && webhookUrl.indexOf('REPLACE') === -1) {
         fetch(webhookUrl, {

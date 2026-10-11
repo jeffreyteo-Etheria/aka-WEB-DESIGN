@@ -10,6 +10,21 @@
 
     gtag('config', 'AW-18312944521');
     gtag('config', 'G-P5JG9ZQCNC');
+
+    /* Conversion events for GA4. Never pass names, emails or phone numbers —
+       Google's policy forbids PII in analytics. */
+    window.akaTrack = function (name, params) {
+      try { gtag('event', name, params || {}); } catch (e) {}
+    };
+    // Email / phone / WhatsApp link clicks anywhere on the site
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href') || '';
+      var method = /^mailto:/i.test(href) ? 'email' : /^tel:/i.test(href) ? 'phone'
+                 : /wa\.me|whatsapp\.com|zalo\.me/i.test(href) ? 'messaging' : null;
+      if (method) window.akaTrack('contact_click', { method: method, page_path: location.pathname });
+    }, true);
   </script>
 
   <meta charset="UTF-8" />
