@@ -179,6 +179,7 @@
           <button type="button" class="btn-primary" id="aiGenerateBtn">Generate Draft</button>
           <span id="aiStatus" class="form-status"></span>
         </div>
+        <div id="aiConn" class="hint" style="margin-top:8px;font-size:12.5px;"></div>
         <div id="aiNeedsInfo" style="display:none;margin-top:12px;padding:12px 14px;background:#fffbeb;border:1px solid #f2a13d55;border-radius:8px;">
           <strong style="font-size:13px;">The AI needs more information before it can write this without guessing:</strong>
           <ul id="aiNeedsInfoList" style="margin:8px 0 0;padding-left:20px;font-size:13.5px;"></ul>
@@ -334,6 +335,24 @@
       const saved = localStorage.getItem(MODE_KEY);
       if (saved === 'ai') { document.querySelector('input[name="createMode"][value="ai"]').checked = true; applyMode('ai'); }
     } catch {}
+
+    // AI connection indicator — tells the editor whether the server can see
+    // its API key before they spend time writing a brief.
+    apiFetch('/api/ai/status').then(s => {
+      const el = document.getElementById('aiConn');
+      if (!s || s.error) return;
+      if (s.configured && s.looks_valid) {
+        el.innerHTML = '<span style="color:#16a34a">● AI connected</span> · model ' + s.model;
+        return;
+      }
+      let msg = !s.configured
+        ? '● AI not connected — the server cannot see ANTHROPIC_API_KEY. In hPanel → Node.js, check the name is exact, then Restart the app.'
+        : '● The key the server sees does not start with "sk-ant-" — re-paste the full key in hPanel, then Restart.';
+      if (s.similar_env_names && s.similar_env_names.length) msg += ' Similar variables the server sees: ' + s.similar_env_names.join(', ');
+      else if (s.similar_env_names) msg += ' (The server sees no ANTHROPIC variables at all — the app has not been restarted since the key was added, or it was added to a different app.)';
+      el.textContent = msg;
+      el.style.color = '#b91c1c';
+    }).catch(() => {});
 
     // ── Clean paste ──────────────────────────────────────────────────────
     /* Rebuilds pasted (or AI-generated) HTML from a whitelist, so Word /

@@ -50,7 +50,9 @@ const OUTPUT_SCHEMA = {
 async function generateBlogDraft({ title, category, brief }) {
   // Constructed lazily so a missing API key surfaces as a clear, catchable
   // error on this request rather than crashing the whole CMS at startup.
-  const client = new Anthropic();
+  // Trim: a key pasted into hPanel with a trailing space/newline would
+  // otherwise produce an invalid auth header.
+  const client = new Anthropic({ apiKey: (process.env.ANTHROPIC_API_KEY || '').trim() || undefined });
 
   const userPrompt = [
     `Write a blog article draft for the AKA Digital blog.`,

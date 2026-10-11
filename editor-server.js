@@ -838,6 +838,25 @@ http.createServer(async (req, res) => {
        hand-written content. Requires ANTHROPIC_API_KEY on the server.
        ═══════════════════════════════════════════════════════════════ */
 
+    /* Diagnostic for "AI is not set up" — reports whether this process can
+       see the key, never the key itself. Super admins also get the names of
+       any ANTHROPIC-ish env vars, to catch typos/stray spaces in hPanel. */
+    if (p === '/api/ai/status' && m === 'GET') {
+      const key = process.env.ANTHROPIC_API_KEY || '';
+      const out = {
+        configured: key.trim().length > 0,
+        looks_valid: /^sk-ant-/.test(key.trim()),
+        has_whitespace: key.length > 0 && key !== key.trim(),
+        model: process.env.AI_MODEL || 'claude-opus-5-5',
+      };
+      if (isSuper(req)) {
+        out.similar_env_names = Object.keys(process.env)
+          .filter(k => /anthropic|^ai_|api_?key/i.test(k))
+          .map(k => JSON.stringify(k)); // quoted so stray spaces are visible
+      }
+      return j(res, 200, out);
+    }
+
     if (p === '/api/ai/generate-blog' && m === 'POST') {
       const b = await readValidatedBody(req, res, 'ai.generate-blog');
       if (b === null) return;
