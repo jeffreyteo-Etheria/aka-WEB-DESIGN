@@ -12,6 +12,7 @@
     #googleSignIn:hover { border-color:#0B1F4B;box-shadow:0 2px 8px rgba(0,0,0,.08); }
     #googleSignIn img { width:20px;height:20px; }
     #googleSection { display:none; }
+    #googleBtn { display:flex;justify-content:center;min-height:44px; }
     .info-msg { background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:12px; }
   </style>
 </head>
@@ -151,8 +152,27 @@
         });
       };
 
-      document.getElementById('googleSignIn').addEventListener('click', () => {
-        google.accounts.id.prompt();
+      /* Swap our styled button for Google's rendered one. prompt() (One Tap)
+         is silently suppressed after a dismissal cooldown, with third-party
+         cookies blocked, or in incognito — the click then does nothing.
+         The rendered button always opens the account chooser. */
+      const holder = document.getElementById('googleSignIn');
+      const tryRender = () => {
+        if (!window.google?.accounts?.id) return false;
+        const slot = document.createElement('div');
+        slot.id = 'googleBtn';
+        holder.replaceWith(slot);
+        google.accounts.id.renderButton(slot, {
+          type: 'standard', theme: 'outline', size: 'large', shape: 'rectangular',
+          text: 'signin_with', logo_alignment: 'center',
+          width: Math.min(400, slot.parentElement.clientWidth || 320),
+        });
+        return true;
+      };
+      const loaded = script.onload;
+      script.onload = () => { loaded(); tryRender(); };
+      holder.addEventListener('click', () => {
+        if (!tryRender()) showError('Google sign-in is still loading — try again in a moment.');
       });
     }).catch(() => {});
   </script>
