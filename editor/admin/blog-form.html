@@ -21,6 +21,14 @@
     }
     .preview-frame-header .btn-xs { cursor: pointer; border: 1px solid var(--border); background: #fff; }
     #previewStatus { font-size: 12px; color: var(--slate, #64748b); }
+    .mode-switch { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px; }
+    .mode-opt { display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border:1.5px solid var(--border,#e2e8f0); border-radius:10px; cursor:pointer; text-transform:none; letter-spacing:0; font-weight:400; }
+    .mode-opt:has(input:checked) { border-color:#0B1F4B; background:#f1f5ff; }
+    .mode-opt input { margin-top:3px; }
+    .mode-opt strong { display:block; font-size:14px; color:#060F24; }
+    .mode-opt small { display:block; font-size:12.5px; color:var(--slate,#64748b); margin-top:2px; line-height:1.4; }
+    .paste-tip { font-size:13.5px; line-height:1.55; padding:12px 14px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; color:#14532d; }
+    .paste-tip kbd { font-size:11.5px; padding:1px 5px; border:1px solid #86efac; border-radius:4px; background:#fff; }
     #previewFrame { flex: 1; width: 100%; border: 0; background: #fff; }
     @media (max-width: 1200px) {
       .editor-layout { flex-direction: column; }
@@ -143,8 +151,28 @@
         </label>
       </div>
 
+      <!-- How to create the article: by hand/paste (no AI) or AI draft -->
+      <div class="form-group full">
+        <label>How do you want to create the article?</label>
+        <div class="mode-switch" role="radiogroup" aria-label="Article creation mode">
+          <label class="mode-opt"><input type="radio" name="createMode" value="manual" checked />
+            <span><strong>✍️ Write or paste it myself</strong><small>Type in the editor, or paste from Word, Google Docs, ChatGPT or a web page — no AI used</small></span></label>
+          <label class="mode-opt"><input type="radio" name="createMode" value="ai" />
+            <span><strong>✨ Generate with AI</strong><small>Claude drafts it from your title + brief; you review before publishing</small></span></label>
+        </div>
+      </div>
+
+      <!-- Paste helper (manual mode) -->
+      <div class="form-group full" id="pastePanel">
+        <div class="paste-tip">
+          📋 <strong>Pasting an article?</strong> Click in the <em>Article Content</em> box below and press <kbd>Ctrl</kbd>+<kbd>V</kbd>.
+          Fonts, colours and stray formatting are removed automatically; headings, bold, lists, quotes and links are kept.
+          The excerpt and read time fill themselves in if empty — then click <strong>Publish</strong>.
+        </div>
+      </div>
+
       <!-- AI Writing Assistant -->
-      <div class="form-group full" style="background:var(--paper,#f8fafc);border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+      <div class="form-group full" id="aiPanel" style="display:none;background:var(--paper,#f8fafc);border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
         <label>✨ AI Writing Assistant <span class="hint">— drafts the article below from your title + brief; you review and edit before saving</span></label>
         <textarea id="ai_brief" rows="4" placeholder="What should this article cover? Paste your key points, facts, figures, client names, links — the AI only uses what you give it here. It will not invent statistics or examples; if something's missing, it asks instead."></textarea>
         <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;">
@@ -290,6 +318,136 @@
     }
     bodyEditor.addEventListener('input', updateWordCount);
 
+    // ── Creation mode: write/paste by hand (default) or AI draft ─────────
+    const MODE_KEY = 'aka.blog.createMode';
+    function applyMode(mode) {
+      document.getElementById('pastePanel').style.display = mode === 'ai' ? 'none' : '';
+      document.getElementById('aiPanel').style.display    = mode === 'ai' ? '' : 'none';
+    }
+    document.querySelectorAll('input[name="createMode"]').forEach(r => {
+      r.addEventListener('change', () => {
+        applyMode(r.value);
+        try { localStorage.setItem(MODE_KEY, r.value); } catch {}
+      });
+    });
+    try {
+      const saved = localStorage.getItem(MODE_KEY);
+      if (saved === 'ai') { document.querySelector('input[name="createMode"][value="ai"]').checked = true; applyMode('ai'); }
+    } catch {}
+
+    // ── Clean paste ──────────────────────────────────────────────────────
+    /* Rebuilds pasted (or AI-generated) HTML from a whitelist, so Word /
+       Google Docs / web-page styling never reaches the article: only the
+       formatting the toolbar itself can produce survives. */
+    const KEEP = { P:'p', H2:'h2', H3:'h3', UL:'ul', OL:'ol', LI:'li', BLOCKQUOTE:'blockquote',
+                   STRONG:'strong', B:'strong', EM:'em', I:'em', A:'a', BR:'br',
+                   H1:'h2', H4:'h3', H5:'h3', H6:'h3' };
+    const DROP = new Set(['SCRIPT','STYLE','META','LINK','TITLE','IFRAME','OBJECT','EMBED','FORM',
+                          'INPUT','BUTTON','SELECT','TEXTAREA','IMG','SVG','PICTURE','VIDEO','AUDIO','CANVAS','NOSCRIPT']);
+    const BLOCK_SRC = new Set(['DIV','SECTION','ARTICLE','HEADER','FOOTER','MAIN','ASIDE','TR','DD','DT','FIGURE','FIGCAPTION','PRE']);
+
+    function cleanHtml(html) {
+      const src = new DOMParser().parseFromString(html, 'text/html');
+      const out = document.createElement('div');
+      const walk = (node, parent) => {
+        node.childNodes.forEach(n => {
+          if (n.nodeType === 3) { parent.appendChild(document.createTextNode(n.nodeValue)); return; }
+          if (n.nodeType !== 1 || DROP.has(n.tagName)) return;
+          const style = (n.getAttribute('style') || '').toLowerCase();
+          let tag = KEEP[n.tagName];
+          // Google Docs wraps everything in <b style="font-weight:normal">
+          if (tag === 'strong' && /font-weight:\s*(normal|400)/.test(style)) tag = null;
+          // Docs/Word mark bold/italic via styled spans instead of tags
+          if (!tag && n.tagName === 'SPAN') {
+            if (/font-weight:\s*(bold|[6-9]00)/.test(style)) tag = 'strong';
+            else if (/font-style:\s*italic/.test(style)) tag = 'em';
+          }
+          if (!tag && BLOCK_SRC.has(n.tagName) && !n.querySelector('p,div,h1,h2,h3,h4,h5,h6,ul,ol,li,table,blockquote')) tag = 'p';
+          if (tag === 'p' && parent.tagName === 'LI') tag = null; // Docs/ChatGPT wrap list items in <p>
+          if (!tag) { walk(n, parent); return; } // unwrap: keep text, drop the wrapper
+          const el = document.createElement(tag);
+          if (tag === 'a') {
+            const href = (n.getAttribute('href') || '').trim();
+            if (/^(https?:|mailto:|\/|#)/i.test(href)) el.setAttribute('href', href); else { walk(n, parent); return; }
+          }
+          walk(n, el);
+          if (tag !== 'br' && !el.textContent.trim() && !el.querySelector('br')) return; // skip empty shells
+          parent.appendChild(el);
+        });
+      };
+      walk(src.body, out);
+      // Loose text/inline runs at the top level become paragraphs.
+      const fixed = document.createElement('div');
+      let para = null;
+      [...out.childNodes].forEach(n => {
+        const isBlock = n.nodeType === 1 && /^(P|H2|H3|UL|OL|BLOCKQUOTE)$/.test(n.tagName);
+        if (isBlock) { para = null; fixed.appendChild(n); return; }
+        if (n.nodeType === 3 && !n.nodeValue.trim()) return;
+        if (!para) { para = document.createElement('p'); fixed.appendChild(para); }
+        para.appendChild(n);
+      });
+      return fixed.innerHTML;
+    }
+
+    /* Plain-text paste (Notepad, some chat apps): blank lines → paragraphs,
+       Markdown-style "# ", "- ", "1. " and **bold** → real formatting. */
+    function textToHtml(text) {
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*])\*(?!\s)(.+?)\*/g, '$1<em>$2</em>');
+      return text.replace(/\r\n?/g, '\n').split(/\n{2,}/).map(block => {
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        if (!lines.length) return '';
+        if (lines.length === 1 && /^#{1,2}\s+/.test(lines[0])) return '<h2>' + inline(lines[0].replace(/^#+\s+/, '')) + '</h2>';
+        if (lines.length === 1 && /^#{3,6}\s+/.test(lines[0])) return '<h3>' + inline(lines[0].replace(/^#+\s+/, '')) + '</h3>';
+        if (lines.every(l => /^[-*•]\s+/.test(l))) return '<ul>' + lines.map(l => '<li>' + inline(l.replace(/^[-*•]\s+/, '')) + '</li>').join('') + '</ul>';
+        if (lines.every(l => /^\d+[.)]\s+/.test(l))) return '<ol>' + lines.map(l => '<li>' + inline(l.replace(/^\d+[.)]\s+/, '')) + '</li>').join('') + '</ol>';
+        if (lines.every(l => /^>\s?/.test(l))) return '<blockquote>' + inline(lines.map(l => l.replace(/^>\s?/, '')).join(' ')) + '</blockquote>';
+        return '<p>' + lines.map(inline).join('<br>') + '</p>';
+      }).join('');
+    }
+
+    // Read time and excerpt fill themselves in unless the editor set them.
+    let readTimeTouched = false;
+    document.getElementById('read_time').addEventListener('input', () => { readTimeTouched = true; });
+    function autofillFromBody() {
+      const text  = bodyEditor.innerText.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      if (!readTimeTouched && words) document.getElementById('read_time').value = Math.max(1, Math.round(words / 200));
+      const excerptEl = document.getElementById('excerpt');
+      if (!excerptEl.value.trim()) {
+        const first = [...bodyEditor.querySelectorAll('p')].map(p => p.innerText.trim()).find(t => t.length > 40);
+        if (first) {
+          excerptEl.value = first.length <= 160 ? first : first.slice(0, 157).replace(/\s+\S*$/, '') + '…';
+          excerptEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    }
+
+    bodyEditor.addEventListener('paste', e => {
+      const cd = e.clipboardData;
+      if (!cd) return;
+      e.preventDefault();
+      const rawHtml = cd.getData('text/html');
+      let html = rawHtml ? cleanHtml(rawHtml) : textToHtml(cd.getData('text/plain'));
+      // A pasted top heading becomes the post title when the title is empty.
+      const titleEl = document.getElementById('title');
+      if (!titleEl.value.trim()) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        const firstEl = tmp.firstElementChild;
+        if (firstEl && firstEl.tagName === 'H2' && firstEl.textContent.trim().length < 150) {
+          titleEl.value = firstEl.textContent.trim();
+          titleEl.dispatchEvent(new Event('input', { bubbles: true }));
+          firstEl.remove();
+          html = tmp.innerHTML;
+        }
+      }
+      document.execCommand('insertHTML', false, html);
+      updateWordCount();
+      autofillFromBody();
+      if (typeof schedulePreview === 'function') schedulePreview();
+    });
+
     // Tab toggle (Write / Preview)
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -332,6 +490,7 @@
         document.getElementById('date').value        = post.date;
         document.getElementById('category').value    = post.category;
         document.getElementById('read_time').value   = post.read_time;
+        readTimeTouched = true; // keep the saved value; don't auto-recalculate on edit
         document.getElementById('tags').value        = Array.isArray(post.tags) ? post.tags.join(', ') : '';
         document.getElementById('featured').checked  = post.featured;
         bodyEditor.innerHTML = post.body_html || '';
