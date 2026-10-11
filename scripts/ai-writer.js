@@ -12,7 +12,7 @@
 
    Auth: reads ANTHROPIC_API_KEY from the environment (set it in Hostinger
    hPanel → Node.js → Environment variables). Model can be overridden with
-   AI_MODEL; defaults to claude-opus-4-8. */
+   AI_MODEL; defaults to claude-opus-5-5. */
 
 const Anthropic = require('@anthropic-ai/sdk');
 
@@ -64,12 +64,20 @@ async function generateBlogDraft({ title, category, brief }) {
 
   // Streaming keeps the connection alive for the minutes a full article can
   // take; finalMessage() collects the complete response.
-  const stream = client.messages.stream({
-    model: process.env.AI_MODEL || 'claude-opus-4-8',
+  // Opus 5.5 defaults to effort "medium"; "high" keeps long-form drafts at
+  // full quality. fallbacks: "default" re-runs a safety-classifier decline on
+  // a fallback model inside the same call instead of failing the draft.
+  const stream = client.beta.messages.stream({
+    model: process.env.AI_MODEL || 'claude-opus-5-5',
     max_tokens: 16000,
     thinking: { type: 'adaptive' },
     system: SYSTEM_PROMPT,
-    output_config: { format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
+    output_config: {
+      effort: 'high',
+      format: { type: 'json_schema', schema: OUTPUT_SCHEMA },
+    },
+    betas: ['server-side-fallback-2026-07-01'],
+    fallbacks: 'default',
     messages: [{ role: 'user', content: userPrompt }],
   });
   const message = await stream.finalMessage();
