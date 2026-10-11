@@ -17,7 +17,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const DIR = (process.env.CMS_CONTENT_DIR || '').trim();
+/* "~/cms-content" expands to the server account's home folder, so hPanel
+   users don't need to know their exact /home/<user> path. */
+const RAW_DIR = (process.env.CMS_CONTENT_DIR || '').trim();
+const DIR = RAW_DIR.startsWith('~/') ? path.join(require('os').homedir(), RAW_DIR.slice(2)) : RAW_DIR;
 const SEEDED_MARKER = '.seeded';
 const DELETED_FILE = '.deleted.json';
 
@@ -63,7 +66,7 @@ function restore(rootDir) {
   ROOT = rootDir;
   if (!DIR) return { enabled: false };
   if (!path.isAbsolute(DIR)) {
-    LAST_ERROR = 'CMS_CONTENT_DIR must be an absolute path like /home/<user>/cms-content (got "' + DIR + '")';
+    LAST_ERROR = 'CMS_CONTENT_DIR must be an absolute path like ~/cms-content (got "' + DIR + '")';
     return { enabled: false, error: LAST_ERROR };
   }
   try {
