@@ -205,7 +205,10 @@
     fetch('/api/health').then(r => r.json()).then(h => {
       const fmt = iso => iso ? new Date(iso).toLocaleString() : '—';
       document.getElementById('buildInfo').innerHTML =
-        `Commit: ${h.gitCommit || '—'}<br>Server started: ${fmt(h.serverStartedAt)}<br>Site last built: ${fmt(h.distBuiltAt)}`;
+        `Commit: ${h.gitCommit || '—'}<br>Server started: ${fmt(h.serverStartedAt)}<br>Site last built: ${fmt(h.distBuiltAt)}<br>` +
+        (h.contentProtected
+          ? '<span style="color:#16a34a">● Posts protected from code deploys</span>'
+          : '<span style="color:#b91c1c">● Posts NOT protected — set CMS_CONTENT_DIR in hPanel, then restart</span>');
     }).catch(() => {});
 
     /* ── SSE stream helper — works with EventSource (GET + token in query) ── */

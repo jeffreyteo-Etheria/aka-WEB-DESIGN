@@ -92,6 +92,13 @@ const ROOT       = __dirname;
 const DIST       = path.join(ROOT, 'dist');
 const DATA       = path.join(ROOT, 'src', '_data');
 const PUBLIC     = path.join(ROOT, 'public');
+
+/* Restore CMS content saved outside the deploy dir (CMS_CONTENT_DIR) before
+   anything reads it — a Git deploy just reset these files to the repo state. */
+const contentStore = require('./scripts/content-store');
+const CONTENT_RESTORE = contentStore.restore(ROOT);
+if (CONTENT_RESTORE.enabled) console.log('[content-store]', JSON.stringify(CONTENT_RESTORE));
+else console.warn('[content-store] CMS_CONTENT_DIR not set — CMS edits will be lost on the next Git deploy');
 const EDITOR     = path.join(ROOT, 'editor');
 const ADMIN      = path.join(ROOT, 'editor', 'admin');
 const EDITS      = path.join(DATA,   '_edits.json');
@@ -112,6 +119,7 @@ async function saveUploadedImage(buffer, originalFilename) {
   }
   const name = `upload-${Date.now()}${outExt}`;
   fs.writeFileSync(path.join(UPLOADS, name), data);
+  contentStore.persist(path.join(UPLOADS, name));
   return `/images/uploads/${name}`;
 }
 
@@ -148,10 +156,12 @@ function writeUsers(data) {
 function writeBlogNjk(slug) {
   const content = `---\nlayout: layouts/blog-post.njk\npermalink: /blog/${slug}/index.html\npostSlug: ${slug}\n---\n`;
   fs.writeFileSync(path.join(BLOG_PAGES, `${slug}.njk`), content);
+  contentStore.persist(path.join(BLOG_PAGES, `${slug}.njk`));
 }
 function deleteBlogNjk(slug) {
   const fp = path.join(BLOG_PAGES, `${slug}.njk`);
   if (fs.existsSync(fp)) fs.unlinkSync(fp);
+  contentStore.remove(fp);
 }
 
 /* Quote a string for safe use as a YAML frontmatter scalar — user-entered
@@ -180,10 +190,12 @@ function writeCaseStudyNjk(slug, entry) {
     : 'This case study is not published yet.';
   const content = `---\nlayout: layouts/base.njk\ntitle: ${yamlQuote(title)}\ndescription: ${yamlQuote(description)}\npermalink: /case-studies/${slug}/index.html\nstudySlug: ${slug}\n---\n{% include "case-studies/template.njk" %}\n`;
   fs.writeFileSync(path.join(CASE_STUDY_PAGES, `${slug}.njk`), content);
+  contentStore.persist(path.join(CASE_STUDY_PAGES, `${slug}.njk`));
 }
 function deleteCaseStudyNjk(slug) {
   const fp = path.join(CASE_STUDY_PAGES, `${slug}.njk`);
   if (fs.existsSync(fp)) fs.unlinkSync(fp);
+  contentStore.remove(fp);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -363,6 +375,7 @@ function readData(file) {
 
 function writeData(file, data) {
   fs.writeFileSync(path.join(DATA, file + '.json'), JSON.stringify(data, null, 2));
+  contentStore.persist(path.join(DATA, file + '.json'));
 }
 
 function slugify(str) {
@@ -380,7 +393,7 @@ function loadEdits() {
   try { return JSON.parse(fs.readFileSync(EDITS, 'utf8')); }
   catch { return { pending: [], approved: [] }; }
 }
-function saveEdits(d) { fs.writeFileSync(EDITS, JSON.stringify(d, null, 2)); }
+function saveEdits(d) { fs.writeFileSync(EDITS, JSON.stringify(d, null, 2)); contentStore.persist(EDITS); }
 
 const INJECT = `
 <link  rel="stylesheet" href="/__editor/editor.css"/>
@@ -501,6 +514,7 @@ http.createServer(async (req, res) => {
         gitCommit: GIT_COMMIT,
         serverStartedAt: SERVER_STARTED_AT,
         distBuiltAt,
+        contentProtected: contentStore.isEnabled(),
       });
     }
 
@@ -1124,6 +1138,7 @@ http.createServer(async (req, res) => {
         keys.slice(0, -1).forEach(k => { if (typeof ref[k] === 'object') ref = ref[k]; });
         ref[keys[keys.length - 1]] = b.value;
         fs.writeFileSync(file, JSON.stringify(obj, null, 2));
+        contentStore.persist(file);
         return j(res, 200, { ok: true });
       } catch (e) { return j(res, 500, { error: e.message }); }
     }
