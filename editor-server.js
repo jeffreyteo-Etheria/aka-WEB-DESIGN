@@ -28,7 +28,7 @@ const {
 } = require('./scripts/security-helpers');
 const securityConfig = require('./config/security.config');
 const { renderCaseStudyPreview, renderBlogPreview, renderEventPreview, renderJobPreview } = require('./scripts/preview-renderer');
-const { generateBlogDraft, describeAiError } = require('./scripts/ai-writer');
+const { generateBlogDraft, suggestSeo, describeAiError } = require('./scripts/ai-writer');
 
 /* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
    with a PATH that doesn't include the directory npm actually lives in, even
@@ -598,6 +598,15 @@ http.createServer(async (req, res) => {
       return j(res, 200, readData('blogs'));
     }
 
+    /* Built-in SEO drafts (src/_data/seo_suggestions.json, shipped with the
+       code) — the form shows them as the default when a post's own SEO
+       fields are blank, since that's what the live page uses. */
+    if (p === '/api/seo-suggestions' && m === 'GET') {
+      let shareCards = [];
+      try { shareCards = fs.readdirSync(path.join(PUBLIC, 'images', 'blog', 'share')); } catch {}
+      return j(res, 200, { suggestions: readData('seo_suggestions'), share_cards: shareCards });
+    }
+
     /* CREATE blog post */
     if (p === '/api/blogs/new' && m === 'POST') {
       const b  = await readValidatedBody(req, res, 'blogs.create');
@@ -893,6 +902,31 @@ http.createServer(async (req, res) => {
         if (result.status === 'error') return j(res, 502, { error: result.error });
         appendAuditLog('ai_generate_blog', { user: getSession(req)?.username, title: String(b.title).slice(0, 120), status: result.status });
         return j(res, 200, { ok: true, ...result });
+      } catch (err) {
+        const { httpStatus, error } = describeAiError(err);
+        return j(res, httpStatus, { error });
+      }
+    }
+
+    /* AI-suggested SEO title + meta description for the blog form's
+       "SEO & Social Sharing" fields — the editor reviews before publishing. */
+    if (p === '/api/ai/seo-suggest' && m === 'POST') {
+      const b = await readValidatedBody(req, res, 'ai.seo-suggest');
+      if (b === null) return;
+      if (!b.title || !String(b.title).trim()) {
+        return j(res, 400, { error: 'Enter a title first.' });
+      }
+      try {
+        const result = await suggestSeo({
+          title: String(b.title),
+          excerpt: b.excerpt ? String(b.excerpt) : '',
+          category: b.category ? String(b.category) : '',
+          tags: Array.isArray(b.tags) ? b.tags.map(String) : [],
+          body_html: b.body_html ? String(b.body_html) : '',
+        });
+        if (result.status === 'error') return j(res, 502, { error: result.error });
+        appendAuditLog('ai_seo_suggest', { user: getSession(req)?.username, title: String(b.title).slice(0, 120) });
+        return j(res, 200, { ok: true, seo_title: result.seo_title, seo_description: result.seo_description });
       } catch (err) {
         const { httpStatus, error } = describeAiError(err);
         return j(res, httpStatus, { error });

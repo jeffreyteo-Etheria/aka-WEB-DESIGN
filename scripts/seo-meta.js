@@ -17,8 +17,13 @@ const UNSHAREABLE_IMAGE = /\.(avif|svg)(\?|#|$)/i;
 
 const SHARE_CARD_DIR = path.join(__dirname, '..', 'public', 'images', 'blog', 'share');
 
-function shareCard(slug) {
-  return slug && fs.existsSync(path.join(SHARE_CARD_DIR, slug + '.jpg')) ? `/images/blog/share/${slug}.jpg` : '';
+/* A 1200x630 JPG made from a cover that doesn't work as a share image (AVIF,
+   too small, wrong shape) lives at share/<cover file name>.jpg. Keyed by the
+   cover, not the post, so replacing the cover in the CMS retires the card. */
+function shareCard(cover) {
+  if (!cover || /^https?:/i.test(cover)) return '';
+  const name = path.basename(cover.split(/[?#]/)[0]).replace(/\.[^.]+$/, '') + '.jpg';
+  return fs.existsSync(path.join(SHARE_CARD_DIR, name)) ? `/images/blog/share/${name}` : '';
 }
 
 function absUrl(siteUrl, p) {
@@ -41,24 +46,25 @@ function isoDate(d) {
 }
 
 /* Called from base.njk / blog-post.njk as
-   seoMeta({ postSlug, blogs, settings, title, description, url: page.url }).
-   Precedence for posts: CMS SEO field → page front matter → post content. */
+   seoMeta({ postSlug, blogs, settings, suggestions, title, description, url: page.url }).
+   Precedence for posts: CMS SEO field → seo_suggestions.json → page front
+   matter → post content. */
 function seoMeta(o) {
   o = o || {};
   const s = o.settings || {};
   const site = s.siteUrl || '';
   const post = o.postSlug ? (o.blogs || []).find(b => b.slug === o.postSlug) : null;
+  const sug = (post && o.suggestions && o.suggestions[post.slug]) || {};
 
-  const title = (post && post.seo_title) || o.title
+  const title = (post && post.seo_title) || sug.title || o.title
     || (post && post.title ? `${post.title} | ${s.name || 'AKA Digital'}` : '')
     || s.name || '';
   const description = clip(plainText(
-    (post && (post.seo_description || post.excerpt)) || o.description || s.description
+    (post && (post.seo_description || sug.description || post.excerpt)) || o.description || s.description
   ), 300);
 
-  // Share image: CMS override → pre-made card in public/images/blog/share/
-  // (JPG versions of old AVIF covers) → cover image → site default
-  let image = (post && post.og_image) || (post && shareCard(post.slug)) || (post && post.cover_image) || '';
+  // Share image: CMS override → share card made from the cover → cover → site default
+  let image = (post && (post.og_image || shareCard(post.cover_image) || post.cover_image)) || '';
   if (!image || UNSHAREABLE_IMAGE.test(image)) image = s.og_image || DEFAULT_OG_IMAGE;
   image = absUrl(site, image);
 

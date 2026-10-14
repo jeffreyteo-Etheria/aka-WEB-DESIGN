@@ -30,7 +30,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   {# Blog posts get their meta from the CMS post (blogs.json) via postSlug #}
-  {% set meta = seoMeta({ postSlug: postSlug, blogs: blogs, settings: settings, title: title, description: description, url: page.url }) %}
+  {% set meta = seoMeta({ postSlug: postSlug, blogs: blogs, settings: settings, suggestions: seo_suggestions, title: title, description: description, url: page.url }) %}
   <meta name="description" content="{{ meta.description }}" />
   <link rel="canonical" href="{{ meta.url }}" />
 

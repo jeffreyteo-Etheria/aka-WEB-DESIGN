@@ -12,7 +12,7 @@ layout: layouts/base.njk
 {% else %}
 
 <!-- Blog Post Schema.org -->
-{% set meta = seoMeta({ postSlug: postSlug, blogs: blogs, settings: settings, title: title, description: description, url: page.url }) %}
+{% set meta = seoMeta({ postSlug: postSlug, blogs: blogs, settings: settings, suggestions: seo_suggestions, title: title, description: description, url: page.url }) %}
 <script type="application/ld+json">{{ meta.schema | jsonLd | safe }}</script>
 
 <!-- Breadcrumb -->

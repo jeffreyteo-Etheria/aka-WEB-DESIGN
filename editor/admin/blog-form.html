@@ -108,10 +108,17 @@
 
       <!-- SEO & social sharing (optional overrides) -->
       <div class="form-group full">
-        <label>SEO &amp; Social Sharing <span style="font-weight:400;opacity:.7">(optional — leave blank to use the title, excerpt and cover image)</span></label>
-        <input id="seo_title" type="text" maxlength="70" placeholder="SEO title for Google &amp; LinkedIn (≈60 characters). Default: post title + &quot; | AKA Digital&quot;" />
-        <textarea id="seo_description" rows="2" maxlength="300" style="margin-top:8px" placeholder="Meta description (≈155 characters). Default: the excerpt"></textarea>
-        <input id="og_image" type="text" style="margin-top:8px" placeholder="Share image URL — JPG or PNG, 1200×630 works best. Default: cover image (AVIF is not shown by LinkedIn/Facebook)" />
+        <label>SEO &amp; Social Sharing <span style="font-weight:400;opacity:.7">(optional — leave blank to use the defaults shown under each field)</span></label>
+        <input id="seo_title" type="text" maxlength="70" placeholder="SEO title for Google &amp; LinkedIn (≈60 characters)" />
+        <div id="seoTitleHint" class="hint" style="font-size:12.5px;margin-top:4px;"></div>
+        <textarea id="seo_description" rows="2" maxlength="300" style="margin-top:8px" placeholder="Meta description (≈155 characters)"></textarea>
+        <div id="seoDescHint" class="hint" style="font-size:12.5px;margin-top:4px;"></div>
+        <input id="og_image" type="text" style="margin-top:8px" placeholder="Share image URL — JPG or PNG, 1200×630 works best" />
+        <div id="seoImageHint" class="hint" style="font-size:12.5px;margin-top:4px;"></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;">
+          <button type="button" class="btn-xs" id="seoSuggestBtn">✨ Suggest title &amp; description</button>
+          <span id="seoSuggestStatus" class="form-status"></span>
+        </div>
       </div>
 
       <!-- Row 5: Meta fields -->
@@ -525,6 +532,7 @@
         document.getElementById('featured').checked  = post.featured;
         bodyEditor.innerHTML = post.body_html || '';
         updateWordCount();
+        updateSeoHints();
         if (post.cover_image) {
           preview.src = post.cover_image;
           preview.style.display = 'block';
@@ -533,6 +541,115 @@
         refreshPreview();
       });
     }
+
+    /* ── SEO & Social Sharing: show what the live page will actually use
+       for each field, and warn when it will be cut off or cropped. ── */
+    const SEO_TITLE_MAX = 60, SEO_DESC_MAX = 155;
+    let seoDefaults = { suggestions: {}, share_cards: [] };
+    apiFetch('/api/seo-suggestions').then(r => { if (r && !r.error) { seoDefaults = r; updateSeoHints(); } }).catch(() => {});
+
+    function seoSlug() { return document.getElementById('slug').value || slugify(document.getElementById('title').value); }
+    function escHtml(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function lengthNote(text, max) {
+      const n = text.length;
+      return n > max
+        ? `<span style="color:#d97706">⚠ ${n} characters — Google cuts off after ~${max}. Shorten it or click Suggest.</span>`
+        : `<span style="color:#16a34a">✓ ${n} characters</span>`;
+    }
+
+    function updateSeoHints() {
+      const sug = (seoDefaults.suggestions || {})[seoSlug()] || {};
+      const title = document.getElementById('title').value.trim();
+      const ownTitle = document.getElementById('seo_title').value.trim();
+      const effTitle = ownTitle || sug.title || (title ? title + ' | AKA Digital' : '');
+      document.getElementById('seoTitleHint').innerHTML = !effTitle ? '' :
+        (ownTitle ? '' : `Blank — live page uses ${sug.title ? 'the built-in draft' : 'the post title'}: “${escHtml(effTitle)}” · `) + lengthNote(effTitle, SEO_TITLE_MAX);
+
+      const ownDesc = document.getElementById('seo_description').value.trim();
+      const excerpt = document.getElementById('excerpt').value.trim();
+      const effDesc = ownDesc || sug.description || excerpt;
+      document.getElementById('seoDescHint').innerHTML = !effDesc ? '' :
+        (ownDesc ? '' : `Blank — live page uses ${sug.description ? 'the built-in draft' : 'the excerpt'}: “${escHtml(effDesc)}” · `) + lengthNote(effDesc, SEO_DESC_MAX);
+
+      checkShareImage();
+    }
+
+    // Loads the image the share card will use and checks its size and shape
+    // (LinkedIn/Facebook show 1.91:1 and crop anything else).
+    let shareCheckSeq = 0;
+    function checkShareImage() {
+      const el = document.getElementById('seoImageHint');
+      const own = document.getElementById('og_image').value.trim();
+      const cover = document.getElementById('cover_image').value.trim();
+      const card = cover && !/^https?:/i.test(cover)
+        ? cover.split(/[?#]/)[0].split('/').pop().replace(/\.[^.]+$/, '') + '.jpg' : '';
+      if (!own && card && (seoDefaults.share_cards || []).includes(card)) {
+        el.innerHTML = '<span style="color:#16a34a">✓ Blank — live page uses a ready-made 1200×630 share card made from the cover.</span>';
+        return;
+      }
+      const src = own || cover;
+      if (!src) { el.textContent = 'No cover image — shares will use the AKA logo.'; return; }
+      if (/\.(avif|svg)(\?|#|$)/i.test(src)) {
+        el.innerHTML = '<span style="color:#d97706">⚠ LinkedIn and Facebook can’t show AVIF/SVG — shares will use the AKA logo. Add a JPG or PNG share image.</span>';
+        return;
+      }
+      const seq = ++shareCheckSeq;
+      const img = new Image();
+      img.onload = () => {
+        if (seq !== shareCheckSeq) return;
+        const w = img.naturalWidth, h = img.naturalHeight, ratio = w / h;
+        const label = (own ? 'Share image' : 'Blank — live page uses the cover') + ` (${w}×${h})`;
+        if (w < 1000) el.innerHTML = `<span style="color:#d97706">⚠ ${label} is small — LinkedIn may show a small thumbnail. Add a 1200×630 share image.</span>`;
+        else if (ratio < 1.7 || ratio > 2.1) el.innerHTML = `<span style="color:#d97706">⚠ ${label} isn’t 1.91:1 — LinkedIn will crop the ${ratio > 2.1 ? 'sides' : 'top and bottom'}. Check nothing important is cut, or add a 1200×630 share image.</span>`;
+        else el.innerHTML = `<span style="color:#16a34a">✓ ${label} — good shape for LinkedIn and Facebook.</span>`;
+      };
+      img.onerror = () => { if (seq === shareCheckSeq) el.innerHTML = '<span style="color:#dc2626">⚠ The share image could not be loaded — check the URL.</span>'; };
+      img.src = src;
+    }
+
+    ['title', 'slug', 'excerpt', 'cover_image', 'seo_title', 'seo_description', 'og_image'].forEach(id =>
+      document.getElementById(id).addEventListener('input', updateSeoHints));
+    document.getElementById('cover_image').addEventListener('change', updateSeoHints);
+
+    document.getElementById('seoSuggestBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('seoSuggestBtn');
+      const status = document.getElementById('seoSuggestStatus');
+      const sug = (seoDefaults.suggestions || {})[seoSlug()];
+      // A reviewed built-in draft exists — use it without an AI call
+      if (sug) {
+        document.getElementById('seo_title').value = sug.title;
+        document.getElementById('seo_description').value = sug.description;
+        status.textContent = '✓ Filled from the built-in draft — edit if needed, then Publish.';
+        status.className = 'form-status success';
+        updateSeoHints();
+        return;
+      }
+      if (!document.getElementById('title').value.trim()) {
+        status.textContent = '⚠ Enter a title first.';
+        status.className = 'form-status error';
+        return;
+      }
+      btn.disabled = true;
+      status.textContent = 'Suggesting…';
+      status.className = 'form-status';
+      try {
+        const p = getFormPayload();
+        const r = await apiFetch('/api/ai/seo-suggest', 'POST', {
+          title: p.title, excerpt: p.excerpt, category: p.category, tags: p.tags, body_html: p.body_html,
+        });
+        if (!r || r.error) throw new Error(r && r.error || 'No response');
+        document.getElementById('seo_title').value = r.seo_title;
+        document.getElementById('seo_description').value = r.seo_description;
+        status.textContent = '✓ Suggested — review and edit, then Publish.';
+        status.className = 'form-status success';
+        updateSeoHints();
+      } catch (e) {
+        status.textContent = '⚠ ' + e.message;
+        status.className = 'form-status error';
+      } finally {
+        btn.disabled = false;
+      }
+    });
 
     function getFormPayload() {
       return {

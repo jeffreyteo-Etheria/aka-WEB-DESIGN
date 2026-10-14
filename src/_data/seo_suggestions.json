@@ -1,0 +1,123 @@
+{
+  "_note": "SEO title (<=60 chars) + meta description (<=155 chars) per blog slug. Used only when the post's own SEO fields in the CMS are blank. See scripts/seo-meta.js.",
+  "7-lifecycle-email-campaigns-for-apps": {
+    "title": "7 Lifecycle Email Campaigns Every App Needs | AKA Digital",
+    "description": "Behaviour-triggered email is the highest-ROI retention channel for apps. The 7 lifecycle campaigns every app team should run, from onboarding to win-back."
+  },
+  "7-strategies-incentivise-customer-loyalty": {
+    "title": "7 Data-Driven Customer Loyalty Strategies | AKA Digital",
+    "description": "Retention costs 5–7x less than acquisition. Seven proven, data-driven loyalty strategies used by leading brands across Southeast Asia."
+  },
+  "cdp-vs-crm-which-does-your-brand-need": {
+    "title": "CDP vs CRM: Which Does Your Brand Need? | AKA Digital",
+    "description": "CDP or CRM? The real difference between them, where each fits in your MarTech stack, and how to decide what your brand actually needs."
+  },
+  "clevertap-and-salesforce-crm-connecting-customer-data-to-improve-engagement-effectiveness": {
+    "title": "CleverTap + Salesforce CRM Integration | AKA Digital",
+    "description": "Connect Salesforce CRM data to CleverTap to personalise push, email and in-app engagement. How the native integration works and how to implement it."
+  },
+  "drive-innovation-advanced-martech-solutions": {
+    "title": "Drive Innovation with Advanced MarTech | AKA Digital",
+    "description": "How advanced marketing technology streamlines marketing, uncovers customer insight and personalises at scale, plus how to choose the right tools."
+  },
+  "enhance-customer-satisfaction-with-martech": {
+    "title": "Improve Customer Satisfaction with MarTech | AKA Digital",
+    "description": "Customer satisfaction is now a marketing outcome. How Southeast Asian brands use MarTech like CleverTap and MoEngage to personalise CX and build loyalty."
+  },
+  "first-party-data-strategy-cookieless-marketing": {
+    "title": "First-Party Data Strategy: 5 Steps to Go Cookieless",
+    "description": "Third-party cookies are fading out. AKA Digital's 5-step first-party data playbook for enterprise brands in Southeast Asia, from collection to activation."
+  },
+  "from-push-ads-to-personalised-engagement": {
+    "title": "Push Ads to Personalised Engagement | AKA Digital",
+    "description": "Blanket push notifications no longer work. How mobile marketing moved from broadcast blasts to personalised, behaviour-driven engagement."
+  },
+  "geo-crm-how-organisations-can-start-turning-ai-visibility-into-leads": {
+    "title": "GEO + CRM: Turn AI Visibility into Leads | AKA Digital",
+    "description": "Being cited in AI search is only half the job. How to connect GEO and AI search visibility to CRM automation so discovery turns into qualified leads."
+  },
+  "how-ai-agents-are-transforming-paid-advertising-from-campaign-managers-to-autonomous-growth-systems": {
+    "title": "AI Agents Are Transforming Paid Advertising | AKA Digital",
+    "description": "AI agents are moving paid ads from manual campaign management to autonomous optimisation. How to use them across Google, Meta and LinkedIn Ads."
+  },
+  "how-blue-wizard-uses-mixpanel-gaming": {
+    "title": "How Blue Wizard Uses Mixpanel for Game Analytics",
+    "description": "How Blue Wizard Digital uses Mixpanel behavioural analytics to lift player retention and monetisation in its mobile games."
+  },
+  "how-cakeresume-uses-mixpanel": {
+    "title": "How CakeResume Uses Mixpanel to Boost Job Seeker Activation",
+    "description": "How CakeResume, one of Asia's fastest-growing job platforms, uses Mixpanel product analytics to lift job seeker activation, engagement and retention."
+  },
+  "how-check-city-uses-mixpanel-fintech": {
+    "title": "How Check City Uses Mixpanel to Lift Fintech Conversions",
+    "description": "How Check City uses Mixpanel to understand customer behaviour and reduce drop-off in high-stakes financial application funnels."
+  },
+  "how-crm-specialist-uses-data-drive-growth": {
+    "title": "How CRM Specialists Use Customer Data to Drive Growth",
+    "description": "A CRM specialist does more than manage contacts. How experts use customer data, automation and analytics to drive measurable revenue growth."
+  },
+  "how-kkday-uses-mixpanel-travel-asia": {
+    "title": "How KKday Uses Mixpanel to Personalise Travel in Asia",
+    "description": "How KKday uses Mixpanel product analytics to optimise discovery, booking conversion and traveller retention across 100+ destinations in Asia."
+  },
+  "how-lemonade-uses-mixpanel-insurtech": {
+    "title": "How Lemonade Uses Mixpanel to Reinvent Insurance",
+    "description": "How insurtech Lemonade uses Mixpanel product analytics to deliver instant policies, fast claims and a digital-first customer experience."
+  },
+  "how-shake-shack-uses-product-analytics": {
+    "title": "How Shake Shack Uses Product Analytics for Digital Dining",
+    "description": "How Shake Shack uses product analytics to improve mobile ordering, remove friction from digital dining and drive customer loyalty."
+  },
+  "how-ticketmaster-uses-mixpanel": {
+    "title": "How Ticketmaster Uses Mixpanel to Optimise Ticket Sales",
+    "description": "How Ticketmaster uses Mixpanel product analytics to reduce friction and lift conversion in one of the world's highest-stakes purchase funnels."
+  },
+  "how-uber-uses-mixpanel-product-intelligence": {
+    "title": "How Uber Uses Mixpanel for Product Intelligence at Scale",
+    "description": "Uber runs billions of trips in 70+ countries. How product intelligence and behavioural analytics power decisions at one of the most data-driven companies."
+  },
+  "how-usa-today-sports-uses-mixpanel": {
+    "title": "How USA Today Sports Uses Mixpanel to Engage Fans",
+    "description": "How USA Today Sports uses Mixpanel audience analytics to understand fan behaviour across digital touchpoints and drive deeper engagement."
+  },
+  "how-zalora-uses-mixpanel-sea-ecommerce": {
+    "title": "How Zalora Uses Mixpanel to Grow eCommerce in SEA",
+    "description": "How Zalora, Southeast Asia's leading fashion platform, uses Mixpanel to optimise discovery, conversion and retention for millions of shoppers."
+  },
+  "key-tools-for-product-analytics-success": {
+    "title": "Key Tools for Product Analytics Success | AKA Digital",
+    "description": "The product analytics tools that turn user behaviour data into better decisions, higher retention and a stronger user experience, and how to use them well."
+  },
+  "kol-marketing-vietnam-roi-measurement": {
+    "title": "KOL Marketing in Vietnam: How to Measure Real ROI",
+    "description": "Most brands measure KOL campaigns on reach. How to run influencer and TikTok campaigns in Vietnam that tie to revenue, and measure the real ROI."
+  },
+  "martech-stack-2025-sea-enterprise": {
+    "title": "The 2025 MarTech Stack for SEA Enterprises | AKA Digital",
+    "description": "With 10,000+ MarTech tools on the market, AKA Digital's framework for building an enterprise marketing stack in Southeast Asia that actually delivers."
+  },
+  "product-manager-guide-to-analytics": {
+    "title": "The Product Manager's Guide to Analytics | AKA Digital",
+    "description": "A practical framework for product managers to use analytics for better decisions, higher retention and faster growth: data, not instinct alone."
+  },
+  "programmatic-dooh-southeast-asia-guide": {
+    "title": "Programmatic DOOH in Southeast Asia: 2025 Guide",
+    "description": "Digital out-of-home has gone programmatic, and Southeast Asia is one of its fastest-growing markets. What enterprise marketers need to know to plan it."
+  },
+  "role-of-marketing-technology-consulting-services": {
+    "title": "The Role of MarTech Consulting Services | AKA Digital",
+    "description": "Choosing and using the right marketing technology takes expertise most in-house teams lack. How MarTech consulting turns tools into measurable ROI."
+  },
+  "understanding-email-sender-reputation": {
+    "title": "Email Sender Reputation: The Key to Deliverability",
+    "description": "Great email is wasted if it misses the inbox. What sender reputation is, why it matters and how to protect it, especially in Southeast Asian markets."
+  },
+  "unlocking-growth-b2b-ecommerce-advisory": {
+    "title": "B2B eCommerce Advisory: Key Benefits | AKA Digital",
+    "description": "How B2B eCommerce advisory helps businesses handle complex pricing, large orders and long sales cycles, and unlock growth in a fast-moving market."
+  },
+  "what-is-geo-generative-engine-optimisation": {
+    "title": "What is GEO? Generative Engine Optimisation Guide",
+    "description": "Google AI Overviews, ChatGPT Search and Perplexity are changing how buyers find brands. GEO is the discipline that gets you cited, not just ranked."
+  }
+}

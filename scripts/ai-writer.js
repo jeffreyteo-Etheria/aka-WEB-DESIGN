@@ -95,6 +95,58 @@ async function generateBlogDraft({ title, category, brief }) {
   return JSON.parse(text);
 }
 
+const SEO_SYSTEM_PROMPT = `You write search and social-share metadata for AKA Digital blog posts (B2B MarTech agency, Southeast Asia).
+
+Return:
+- seo_title: at most 60 characters. Lead with the main keyword or the specific brand/topic. Append " | AKA Digital" only if the whole title still fits in 60 characters. No clickbait, no ALL CAPS.
+- seo_description: 120–155 characters. Say what the reader learns or gets, in plain active language. Include the main keyword naturally.
+
+Use ONLY facts present in the post. Never add numbers, clients, or claims the post does not contain. AKA Digital's platform partnerships are exclusive only in Vietnam — never imply exclusivity elsewhere.`;
+
+const SEO_SCHEMA = {
+  type: 'object',
+  properties: {
+    seo_title: { type: 'string' },
+    seo_description: { type: 'string' },
+  },
+  required: ['seo_title', 'seo_description'],
+  additionalProperties: false,
+};
+
+/* Suggests an SEO title + meta description for the CMS "SEO & Social
+   Sharing" fields. The editor reviews before publishing. */
+async function suggestSeo({ title, excerpt, category, tags, body_html }) {
+  const client = new Anthropic({ apiKey: (process.env.ANTHROPIC_API_KEY || '').trim() || undefined });
+  const body = String(body_html || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 6000);
+  // Short structured output: effort "low" is plenty for two lines of copy.
+  const message = await client.beta.messages.create({
+    model: process.env.AI_MODEL || 'claude-opus-5-5',
+    max_tokens: 4000,
+    system: SEO_SYSTEM_PROMPT,
+    output_config: { effort: 'low', format: { type: 'json_schema', schema: SEO_SCHEMA } },
+    betas: ['server-side-fallback-2026-07-01'],
+    fallbacks: 'default',
+    messages: [{
+      role: 'user',
+      content: [
+        `Post title: ${title}`,
+        category ? `Category: ${category}` : null,
+        tags && tags.length ? `Tags: ${[].concat(tags).join(', ')}` : null,
+        excerpt ? `Excerpt: ${excerpt}` : null,
+        body ? `Article text (truncated):\n${body}` : null,
+      ].filter(Boolean).join('\n'),
+    }],
+  });
+  if (message.stop_reason === 'refusal') {
+    return { status: 'error', error: 'The AI declined this request. Write the SEO fields by hand.' };
+  }
+  if (message.stop_reason === 'max_tokens') {
+    return { status: 'error', error: 'The AI response was cut off. Try again.' };
+  }
+  const text = message.content.filter(b => b.type === 'text').map(b => b.text).join('');
+  return { status: 'ok', ...JSON.parse(text) };
+}
+
 /* Maps SDK errors to a { httpStatus, error } pair with messages a
    non-technical CMS user can act on. */
 function describeAiError(err) {
@@ -121,4 +173,4 @@ function describeAiError(err) {
   return { httpStatus: 500, error: 'AI generation failed: ' + err.message };
 }
 
-module.exports = { generateBlogDraft, describeAiError };
+module.exports = { generateBlogDraft, suggestSeo, describeAiError };
