@@ -618,6 +618,10 @@ http.createServer(async (req, res) => {
         read_time:    parseInt(b.read_time) || 5,
         featured:     !!b.featured,
         body_html:    b.body_html     || '',
+        // Optional SEO / share-card overrides (see scripts/seo-meta.js)
+        seo_title:       b.seo_title       || '',
+        seo_description: b.seo_description || '',
+        og_image:        b.og_image        || '',
         status:       b.status === 'published' ? 'published' : 'draft',
       };
 
@@ -641,7 +645,8 @@ http.createServer(async (req, res) => {
       if (idx === -1) return j(res, 404, { error: 'Post not found' });
       const b = await readValidatedBody(req, res, 'blogs.update');
       if (b === null) return;
-      blogs[idx] = { ...blogs[idx], ...b, slug }; // preserve slug
+      // preserve slug; updated_at feeds article:modified_time / dateModified
+      blogs[idx] = { ...blogs[idx], ...b, slug, updated_at: new Date().toISOString() };
       writeData('blogs', blogs);
       /* Re-write the per-slug wrapper on every update: if it ever went
          missing (deploy overwrite, manual cleanup), the post would save fine

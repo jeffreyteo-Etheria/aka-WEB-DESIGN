@@ -106,6 +106,14 @@
         <input id="cover_image" type="text" placeholder="or paste image URL: /images/uploads/..." style="margin-top:8px" />
       </div>
 
+      <!-- SEO & social sharing (optional overrides) -->
+      <div class="form-group full">
+        <label>SEO &amp; Social Sharing <span style="font-weight:400;opacity:.7">(optional — leave blank to use the title, excerpt and cover image)</span></label>
+        <input id="seo_title" type="text" maxlength="70" placeholder="SEO title for Google &amp; LinkedIn (≈60 characters). Default: post title + &quot; | AKA Digital&quot;" />
+        <textarea id="seo_description" rows="2" maxlength="300" style="margin-top:8px" placeholder="Meta description (≈155 characters). Default: the excerpt"></textarea>
+        <input id="og_image" type="text" style="margin-top:8px" placeholder="Share image URL — JPG or PNG, 1200×630 works best. Default: cover image (AVIF is not shown by LinkedIn/Facebook)" />
+      </div>
+
       <!-- Row 5: Meta fields -->
       <div class="form-group">
         <label>Author Name</label>
@@ -504,6 +512,9 @@
         document.getElementById('slug').value        = post.slug;
         document.getElementById('excerpt').value     = post.excerpt;
         document.getElementById('cover_image').value = post.cover_image;
+        document.getElementById('seo_title').value       = post.seo_title || '';
+        document.getElementById('seo_description').value = post.seo_description || '';
+        document.getElementById('og_image').value        = post.og_image || '';
         document.getElementById('author').value      = post.author;
         document.getElementById('author_title').value= post.author_title;
         document.getElementById('date').value        = post.date;
@@ -529,6 +540,9 @@
         title:        document.getElementById('title').value,
         excerpt:      document.getElementById('excerpt').value,
         cover_image:  document.getElementById('cover_image').value,
+        seo_title:       document.getElementById('seo_title').value.trim(),
+        seo_description: document.getElementById('seo_description').value.trim(),
+        og_image:        document.getElementById('og_image').value.trim(),
         author:       document.getElementById('author').value,
         author_title: document.getElementById('author_title').value,
         date:         document.getElementById('date').value,

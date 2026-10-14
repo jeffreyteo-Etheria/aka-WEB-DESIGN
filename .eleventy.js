@@ -75,6 +75,11 @@ module.exports = function (eleventyConfig) {
     return ev.location ? `${d} — ${ev.location}` : d;
   });
 
+  // SEO + share-card meta (og:image, BlogPosting schema) — see scripts/seo-meta.js
+  const { seoMeta, jsonLd } = require("./scripts/seo-meta");
+  eleventyConfig.addNunjucksGlobal("seoMeta", seoMeta);
+  eleventyConfig.addFilter("jsonLd", jsonLd);
+
   // Shortcode: current year for footer copyright
   eleventyConfig.addShortcode("year", () => `${new Date().getFullYear()}`);
 

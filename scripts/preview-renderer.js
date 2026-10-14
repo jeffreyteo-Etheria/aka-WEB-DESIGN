@@ -17,6 +17,24 @@ const env = nunjucks.configure([INCLUDES, SRC], { autoescape: true });
 env.addFilter('dateFormat', function (dateVal) {
   return new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 });
+env.addFilter('phoneDigits', function (v) {
+  return String(v || '').replace(/[^\d+]/g, '');
+});
+env.addFilter('nl2br', function (v) {
+  return String(v || '').split('\n').map(function (l) {
+    return l.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }).join('<br/>');
+});
+env.addFilter('existingImages', function (val) {
+  const ok = (p) => {
+    if (!p || typeof p !== 'string') return false;
+    if (/^https?:\/\//i.test(p)) return true;
+    try { return fs.existsSync(path.join(ROOT, 'public', decodeURI(p.split('?')[0]))); }
+    catch (e) { return false; }
+  };
+  if (Array.isArray(val)) return val.filter(ok);
+  return ok(val) ? val : '';
+});
 env.addFilter('findBySlug', function (arr, slug) {
   return (arr || []).find(item => item.slug === slug);
 });
@@ -35,6 +53,9 @@ env.addFilter('eventDateDisplay', function (ev) {
   const d = ev.date ? new Date(ev.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
   return ev.location ? `${d} — ${ev.location}` : d;
 });
+const { seoMeta, jsonLd } = require('./seo-meta');
+env.addGlobal('seoMeta', seoMeta);
+env.addFilter('jsonLd', jsonLd);
 env.addGlobal('year', () => `${new Date().getFullYear()}`);
 
 function readJson(name) {
@@ -51,14 +72,15 @@ function stripFrontmatter(src) {
   return src.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '');
 }
 
+/* Every src/_data/*.json file, keyed by name — same global data Eleventy
+   gives the layout (nav, footer contacts, cms_settings, …). */
 function baseContext(pageUrl) {
-  return {
-    settings:   readJson('settings'),
-    navigation: readJson('navigation'),
-    partners:   readJson('partners'),
-    solutions:  readJson('solutions'),
-    page: { url: pageUrl },
-  };
+  const ctx = {};
+  for (const f of fs.readdirSync(DATA)) {
+    if (f.endsWith('.json')) ctx[f.slice(0, -5)] = readJson(f.slice(0, -5));
+  }
+  ctx.page = { url: pageUrl };
+  return ctx;
 }
 
 /* Wraps rendered inner-page HTML in the real base.njk layout (header, nav,

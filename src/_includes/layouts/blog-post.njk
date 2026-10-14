@@ -12,27 +12,8 @@ layout: layouts/base.njk
 {% else %}
 
 <!-- Blog Post Schema.org -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "{{ post.title }}",
-  "description": "{{ post.excerpt }}",
-  "image": "{{ post.cover_image }}",
-  "datePublished": "{{ post.date }}",
-  "author": {
-    "@type": "Person",
-    "name": "{{ post.author }}"
-  },
-  "publisher": {
-    "@id": "{{ settings.siteUrl }}/#organization"
-  },
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "{{ settings.siteUrl }}/blog/{{ post.slug }}"
-  }
-}
-</script>
+{% set meta = seoMeta({ postSlug: postSlug, blogs: blogs, settings: settings, title: title, description: description, url: page.url }) %}
+<script type="application/ld+json">{{ meta.schema | jsonLd | safe }}</script>
 
 <!-- Breadcrumb -->
 <nav class="pt-20 pb-4 bg-surface-off-white" aria-label="Breadcrumb">
