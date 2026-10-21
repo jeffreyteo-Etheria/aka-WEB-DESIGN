@@ -42,6 +42,12 @@ module.exports = function (eleventyConfig) {
     });
   });
 
+  // Filter: RFC-822 date for RSS <pubDate> ("Tue, 14 Oct 2026 00:00:00 GMT")
+  eleventyConfig.addFilter("rfc822", function (dateVal) {
+    const d = new Date(dateVal);
+    return isNaN(d) ? "" : d.toUTCString();
+  });
+
   // Filter: find a solution by slug from the solutions array
   eleventyConfig.addFilter("findBySlug", function (arr, slug) {
     return (arr || []).find((item) => item.slug === slug);

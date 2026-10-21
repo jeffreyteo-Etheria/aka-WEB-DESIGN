@@ -467,6 +467,15 @@ http.createServer(async (req, res) => {
   }
 
   /* ── 3. API ──────────────────────────────────────────────────────────── */
+  /* Public, read-only JSON feed of the latest posts (built by Eleventy into
+     dist/) — advertised in CRM Hub for social auto-posting tools, so it must
+     not require a CMS login like the /api/ routes below. */
+  if (p === '/api/latest-posts.json' && m === 'GET') {
+    const f = path.join(DIST, 'api', 'latest-posts.json');
+    if (!fs.existsSync(f)) return j(res, 404, { error: 'not found' });
+    return reply(res, 200, fs.readFileSync(f), 'application/json; charset=utf-8');
+  }
+
   if (p.startsWith('/api/')) {
     if (p === '/api/login' && m === 'POST') {
       if (PASSWORD_LOGIN_DISABLED) {

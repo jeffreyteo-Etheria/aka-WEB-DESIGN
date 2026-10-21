@@ -10,15 +10,17 @@ eleventyExcludeFromCollections: true
     <description>B2B MarTech insights, AI search strategy, and digital marketing from Southeast Asia's leading MarTech agency.</description>
     <language>en</language>
     <atom:link href="https://akadigital.net/feed.xml" rel="self" type="application/rss+xml" />
-    {% for post in blogs | publishedOnly | sort(false, true, "date") %}{% if loop.index <= 20 %}
+    {# Newest first, so social auto-posting tools (Buffer, Zapier, Make) see new posts #}
+    {% for post in blogs | publishedOnly | sort(true, true, "date") %}{% if loop.index <= 20 %}
+    {% set meta = seoMeta({ postSlug: post.slug, blogs: blogs, settings: settings, suggestions: seo_suggestions, url: "/blog/" + post.slug + "/" }) %}
     <item>
       <title><![CDATA[{{ post.title }}]]></title>
       <link>https://akadigital.net/blog/{{ post.slug }}/</link>
       <guid isPermaLink="true">https://akadigital.net/blog/{{ post.slug }}/</guid>
-      <pubDate>{{ post.date }}</pubDate>
-      <description><![CDATA[{{ post.excerpt }}]]></description>
+      <pubDate>{{ post.date | rfc822 }}</pubDate>
+      <description><![CDATA[{{ meta.description }}]]></description>
       <author>{{ post.author }}</author>
-      {% if post.cover_image %}<media:content url="https://akadigital.net{{ post.cover_image }}" medium="image" />{% endif %}
+      <media:content url="{{ meta.image }}" medium="image" />
       {% for tag in post.tags %}<category>{{ tag }}</category>
       {% endfor %}
     </item>
