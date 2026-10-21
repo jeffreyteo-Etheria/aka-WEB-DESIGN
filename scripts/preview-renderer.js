@@ -85,8 +85,10 @@ function baseContext(pageUrl) {
 
 /* Wraps rendered inner-page HTML in the real base.njk layout (header, nav,
    footer, popups) — same layout every real page on the site uses. */
+const { applyBrandNames } = require('./brand-names');
+
 function renderInLayout(innerHtml, ctx) {
-  return env.render('layouts/base.njk', { ...ctx, content: innerHtml });
+  return applyBrandNames(env.render('layouts/base.njk', { ...ctx, content: innerHtml }));
 }
 
 /* Renders a case study exactly as it will appear once published, using the
@@ -125,7 +127,8 @@ function renderBlogPreview(draft) {
     fs.readFileSync(path.join(INCLUDES, 'layouts', 'blog-post.njk'), 'utf8')
   );
   const inner = env.renderString(templateSrc, ctx);
-  return renderInLayout(inner, ctx);
+  // Blog posts are previewed exactly as written — no platform-name rename
+  return env.render('layouts/base.njk', { ...ctx, content: inner });
 }
 
 /* Events and jobs have no individual detail page — they only ever show up

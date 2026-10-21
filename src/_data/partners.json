@@ -7,7 +7,7 @@
     "category":       "Analytics",
     "href":           "https://mixpanel.com",
     "featured":       true,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "mparticle",
@@ -17,7 +17,7 @@
     "category":       "CDP",
     "href":           "https://www.mparticle.com",
     "featured":       true,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "netcore-cloud",
@@ -27,7 +27,7 @@
     "category":       "Marketing Automation",
     "href":           "https://netcorecloud.com",
     "featured":       true,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "onesignal",
@@ -37,7 +37,7 @@
     "category":       "Engagement",
     "href":           "https://onesignal.com",
     "featured":       true,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "salesforce",
@@ -47,7 +47,7 @@
     "category":       "CRM",
     "href":           "https://www.salesforce.com",
     "featured":       true,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "oracle-marketing",
@@ -57,7 +57,7 @@
     "category":       "Enterprise MarTech",
     "href":           "https://www.oracle.com/marketingcloud",
     "featured":       true,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "clevertap",
@@ -67,7 +67,7 @@
     "category":       "Retention & Engagement",
     "href":           "https://clevertap.com",
     "featured":       true,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "moengage",
@@ -77,7 +77,7 @@
     "category":       "Customer Engagement",
     "href":           "https://www.moengage.com",
     "featured":       true,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "ab-tasty",
@@ -87,7 +87,7 @@
     "category":       "Optimisation",
     "href":           "https://www.abtasty.com",
     "featured":       true,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "emplifi",
@@ -97,7 +97,7 @@
     "category":       "Social & CX",
     "href":           "https://emplifi.io",
     "featured":       false,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "sitecore",
@@ -107,7 +107,7 @@
     "category":       "DXP / CMS",
     "href":           "https://www.sitecore.com",
     "featured":       false,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
     "slug":           "freshworks",
@@ -117,17 +117,27 @@
     "category":       "CRM / Helpdesk",
     "href":           "https://www.freshworks.com",
     "featured":       false,
-    "exclusive_note": "Licensed Partner — Vietnam"
+    "exclusive_note": "Tech Solution Partner — Vietnam"
   },
   {
-    "slug":           "adjust",
-    "name":           "Adjust",
-    "logo":           "/images/partners/adjust.png",
-    "description":    "Mobile measurement and fraud prevention platform. Understand the full mobile customer journey with accurate attribution — from first install to long-term retention. Adjust's fraud prevention suite protects mobile ad spend against invalid traffic at scale.",
+    "slug":           "appsflyer",
+    "name":           "AppsFlyer",
+    "logo":           "/images/partners/appsflyer-color.png",
+    "description":    "Mobile attribution and marketing measurement platform. See which channels, campaigns, and creatives drive installs, in-app events, and revenue — across every ad network. AppsFlyer's Protect360 fraud protection safeguards mobile ad spend against fake installs and bot traffic.",
     "category":       "Attribution",
-    "href":           "https://www.adjust.com",
+    "href":           "https://www.appsflyer.com",
     "featured":       false,
-    "exclusive_note": "Licensed Partner — Southeast Asia"
+    "exclusive_note": "Tech Solution Partner"
+  },
+  {
+    "slug":           "braze",
+    "name":           "Braze",
+    "logo":           "/images/partners/braze-color.png",
+    "description":    "Customer engagement platform for real-time, cross-channel messaging — push, email, in-app, SMS, and WhatsApp from a single view of each customer. Braze Canvas lets marketers build personalised customer journeys that respond to user behaviour as it happens.",
+    "category":       "Customer Engagement",
+    "href":           "https://www.braze.com",
+    "featured":       false,
+    "exclusive_note": "Tech Solution Partner"
   },
   {
     "slug":           "capillary-tech",
@@ -137,7 +147,7 @@
     "category":       "Loyalty & Retail",
     "href":           "https://www.capillarytech.com",
     "featured":       false,
-    "exclusive_note": "Licensed Partner — Southeast Asia"
+    "exclusive_note": "Tech Solution Partner — Southeast Asia"
   },
   {
     "slug":           "xeno",
@@ -147,13 +157,13 @@
     "category":       "Retail CRM",
     "href":           "https://www.xeno.in",
     "featured":       false,
-    "exclusive_note": "Licensed Partner — Southeast Asia"
+    "exclusive_note": "Tech Solution Partner — Southeast Asia"
   },
   {
     "slug":           "hashmeta",
     "name":           "Hashmeta.ai",
     "logo":           "/images/partners/hashmeta.png",
-    "description":    "Southeast Asia's leading GEO (Generative Engine Optimisation) platform — powering AKA Digital's GeoMind solution for AI search visibility audits, LLM citation analysis, and brand presence optimisation across ChatGPT, Gemini, Perplexity, and other AI engines.",
+    "description":    "Southeast Asia's leading GEO (Generative Engine Optimisation) platform — powering AKA Digital's DiscoveryOS solution for AI search visibility audits, LLM citation analysis, and brand presence optimisation across ChatGPT, Gemini, Perplexity, and other AI engines.",
     "category":       "GEO / AI Search",
     "href":           "https://www.hashmeta.ai",
     "featured":       true,

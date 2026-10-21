@@ -80,6 +80,16 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addNunjucksGlobal("seoMeta", seoMeta);
   eleventyConfig.addFilter("jsonLd", jsonLd);
 
+  // Retired platform names (SocialMind, GeoMind…) → current names on every
+  // built page except blog posts, including CMS-held case studies — see scripts/brand-names.js
+  const { applyBrandNames } = require("./scripts/brand-names");
+  eleventyConfig.addTransform("brandNames", function (content) {
+    const out = this.page && this.page.outputPath;
+    // Blog posts are left exactly as written
+    const isPage = out && String(out).endsWith(".html") && !/[\\/]blog[\\/][^\\/]+[\\/]index\.html$/.test(String(out));
+    return isPage ? applyBrandNames(content) : content;
+  });
+
   // Shortcode: current year for footer copyright
   eleventyConfig.addShortcode("year", () => `${new Date().getFullYear()}`);
 

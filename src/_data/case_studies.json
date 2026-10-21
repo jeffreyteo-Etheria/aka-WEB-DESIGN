@@ -133,7 +133,7 @@
       "Netcore"
     ],
     "challenge": "SOJO Hotel was heavily reliant on OTA platforms (Booking.com, Agoda, Expedia) for the majority of their room bookings — paying commission rates of 18–22% per reservation. They needed a direct booking strategy that could compete with OTA convenience while building a proprietary guest relationship that reduced platform dependency and long-term cost per acquisition.",
-    "approach": "AKA Digital designed a CRM-powered direct booking engine using personalised SMS and email automations triggered by guest behaviour: post-stay win-back sequences, anniversary and birthday offers, early-bird exclusive rates for returning guests, and an AI conversational flow via WhatsApp that handled booking inquiries, room preferences, and upsell prompts without human intervention. All campaigns were unified under CRMMind — AKA Digital's proprietary CRM automation stack.",
+    "approach": "AKA Digital designed a CRM-powered direct booking engine using personalised SMS and email automations triggered by guest behaviour: post-stay win-back sequences, anniversary and birthday offers, early-bird exclusive rates for returning guests, and an AI conversational flow via WhatsApp that handled booking inquiries, room preferences, and upsell prompts without human intervention. All campaigns were unified under GrowthOS — AKA Digital's proprietary CRM automation stack.",
     "outcome": "Within two quarters, SOJO Hotel's direct booking share grew from under 20% to over 37% of total reservations. OTA dependency dropped significantly, recovering an estimated 40% of previously paid commission costs — with average booking value rising as CRM-driven upsells converted more guests to superior room categories.",
     "results": [
       {
@@ -457,10 +457,10 @@
       "social-media"
     ],
     "partners_used": [
-      "SocialMind"
+      "SocialOS"
     ],
     "challenge": "Lotteria faced fierce competition from McDonald's and KFC for Gen Z mindshare. Traditional OOH and TV advertising had declining effectiveness with their core 16–25 demographic. They needed an influencer strategy that felt authentic — not just awareness-driven — and could translate online engagement into in-store visits.",
-    "approach": "Powered by SocialMind — AKA Digital's proprietary AI social management platform — the team identified and contracted a tiered influencer roster — from macro food bloggers to micro lifestyle creators — each selected for their genuine engagement rates and audience demographics. Campaign briefs were designed around product moments (new menu launches, seasonal specials, combo deals) that gave influencers authentic content opportunities. Performance tracking linked online content to offline store promo redemptions.",
+    "approach": "Powered by SocialOS — AKA Digital's proprietary AI social management platform — the team identified and contracted a tiered influencer roster — from macro food bloggers to micro lifestyle creators — each selected for their genuine engagement rates and audience demographics. Campaign briefs were designed around product moments (new menu launches, seasonal specials, combo deals) that gave influencers authentic content opportunities. Performance tracking linked online content to offline store promo redemptions.",
     "outcome": "The Lotteria KOL programme delivered sustained earned media reach across multiple campaigns, with promo code tracking demonstrating direct attribution from influencer content to in-store transactions — a first for the brand in Vietnam.",
     "results": [
       {
@@ -512,10 +512,10 @@
       "social-media"
     ],
     "partners_used": [
-      "SocialMind"
+      "SocialOS"
     ],
     "challenge": "Fami needed to re-engage Vietnam's Gen Z and millennial parents with a campaign that felt authentic to the TikTok generation — not a traditional TV commercial. With growing competition in Vietnam's dairy segment, the brand needed cultural relevance and mass participation rather than just broadcast reach.",
-    "approach": "AKA Digital designed the #NhaLaNoi ('Home is Where You Belong') hashtag challenge on TikTok — a participatory content format that invited families across Vietnam to share moments of togetherness. A tiered KOL activation strategy through SocialMind seeded the challenge with macro family and lifestyle creators before opening to organic community participation. Challenge mechanics were gamified with prize incentives to sustain participation momentum.",
+    "approach": "AKA Digital designed the #NhaLaNoi ('Home is Where You Belong') hashtag challenge on TikTok — a participatory content format that invited families across Vietnam to share moments of togetherness. A tiered KOL activation strategy through SocialOS seeded the challenge with macro family and lifestyle creators before opening to organic community participation. Challenge mechanics were gamified with prize incentives to sustain participation momentum.",
     "outcome": "The #NhaLaNoi challenge became one of Vietnam's top-trending TikTok brand campaigns, with over 50 million video views and 2.1 million user-generated challenge participations — generating sustained earned media reach that dramatically outperformed the brand's paid media investment.",
     "results": [
       {
@@ -567,10 +567,10 @@
       "social-media"
     ],
     "partners_used": [
-      "SocialMind"
+      "SocialOS"
     ],
     "challenge": "Highland Coffee was entering a hyper-competitive Vietnamese specialty coffee market dominated by established chains. They needed to build authentic brand distinctiveness among Gen Z and millennial urban consumers — without resorting to promotions or price competition that would dilute brand equity.",
-    "approach": "AKA Digital curated a two-tier KOL strategy using SocialMind: lifestyle and food micro-KOLs (50K–200K followers) on Instagram and TikTok created authentic café-visit content, supplemented by macro travel and lifestyle influencers for broader brand authority. Content was built around the specialty coffee experience — ambience, craft, and personal moments — rather than product specs. Each creator brief was tailored to feel organic, not sponsored.",
+    "approach": "AKA Digital curated a two-tier KOL strategy using SocialOS: lifestyle and food micro-KOLs (50K–200K followers) on Instagram and TikTok created authentic café-visit content, supplemented by macro travel and lifestyle influencers for broader brand authority. Content was built around the specialty coffee experience — ambience, craft, and personal moments — rather than product specs. Each creator brief was tailored to feel organic, not sponsored.",
     "outcome": "Highland Coffee's TikTok became their primary new-customer discovery channel during the campaign, with KOL-generated content continuing to circulate organically months after the paid period ended. The brand's social following grew significantly, and in-store traffic tracked measurably from influencer promo codes.",
     "results": [
       {
@@ -623,7 +623,7 @@
       "digital-programmatic"
     ],
     "partners_used": [
-      "SocialMind",
+      "SocialOS",
       "Meta"
     ],
     "challenge": "Alchemy Food Tech launched their Alchemy Fibre for Rice product into Singapore's competitive health food market as an unknown challenger brand. With limited distribution and a category-defining product, they needed social proof and mass awareness to drive trial among health-conscious Singaporeans aged 35+.",
@@ -679,7 +679,7 @@
       "social-media"
     ],
     "partners_used": [
-      "SocialMind"
+      "SocialOS"
     ],
     "challenge": "Post-COVID travel demand in Singapore rebounded sharply — but EU Holidays needed to cut through a crowded influencer landscape where every travel brand was claiming the same aspirational content space. Their European tour packages needed differentiated storytelling that converted social discovery into actual bookings.",
     "approach": "AKA Digital curated a selective roster of Singapore-based travel, lifestyle, and family content creators whose audiences aligned with EU Holidays' core buyer profiles: professionals aged 30–50 planning premium European holidays. Campaign content was built around specific tour itineraries with direct call-to-actions to booking landing pages.",

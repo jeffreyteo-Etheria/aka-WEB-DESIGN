@@ -62,7 +62,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
 
         <!-- Subheadline -->
         <p class="text-[18px] md:text-[20px] text-white/65 mb-10 leading-relaxed max-w-2xl">
-          We operate across Southeast Asia as a licensed MarTech partner and Vietnam's exclusive representative for global platforms — powering 150+ enterprise brands to turn data into revenue.
+          We operate across Southeast Asia as a tech solution partner and Vietnam's exclusive representative for global MarTech platforms — powering 150+ enterprise brands to turn data into revenue.
         </p>
 
         <!-- CTA row -->
@@ -222,7 +222,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
           The MarTech Partner<br/><span class="text-action-yellow">Southeast Asia Trusts</span>
         </h2>
         <p class="text-body-lg text-white/70 leading-relaxed mb-6">
-          AKA Digital bridges the gap between world-class marketing technology and real business outcomes. As a premier regional agency representing over 15 global MarTech platforms, we are licensed to operate across Southeast Asia and South Korea and serve as the exclusive partner for Vietnam's emerging market.
+          AKA Digital bridges the gap between world-class marketing technology and real business outcomes. As a premier regional agency representing over 15 global MarTech platforms, we operate across Southeast Asia and South Korea and serve as the exclusive partner for Vietnam's emerging market.
         </p>
         <p class="text-body-lg text-white/70 leading-relaxed mb-10">
           We don't just implement software. We design the strategies, train the teams, and deliver the measurable outcomes that make MarTech investments pay off.
@@ -381,7 +381,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
             <h3 class="text-headline-sm font-display text-on-surface">AI-Driven Social That Sells</h3>
           </div>
         </div>
-        <p class="text-body-md text-on-surface-variant mb-5 leading-relaxed">Organic reach is dead without strategy. We build data-driven social campaigns across TikTok, Instagram, Facebook, and LinkedIn — with KOL/influencer partnerships powered by SocialMind that drive real conversions, not just likes.</p>
+        <p class="text-body-md text-on-surface-variant mb-5 leading-relaxed">Organic reach is dead without strategy. We build data-driven social campaigns across TikTok, Instagram, Facebook, and LinkedIn — with KOL/influencer partnerships powered by SocialOS that drive real conversions, not just likes.</p>
         <div class="grid grid-cols-2 gap-3 mb-6">
           <div class="flex items-start gap-2">
             <span class="material-symbols-outlined text-base mt-0.5" style="font-variation-settings:'FILL' 1;color:#833AB4">check_circle</span>
@@ -418,30 +418,17 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
     <div class="text-center mb-14 reveal-up">
       <p class="eyebrow text-primary-fixed mb-3">Our Partner Ecosystem</p>
       <h2 class="text-headline-md font-display text-white text-balance">Operational Expertise Across 15+ World-Class Platforms</h2>
-      <p class="text-body-md text-white/50 mt-3 max-w-xl mx-auto">Vietnam's exclusive representative for the world's best MarTech — licensed across Southeast Asia.</p>
+      <p class="text-body-md text-white/50 mt-3 max-w-xl mx-auto">Vietnam's exclusive representative for the world's best MarTech — operating across Southeast Asia.</p>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 reveal-up" style="animation-delay:0.1s">
       {% for partner in partners %}
-        {% if partner.slug == "adjust" %}
-        <a href="/tech-partners#appsflyer" aria-label="AppsFlyer — Attribution"
-           class="group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
-          <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">AppsFlyer</span>
-          <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors" translate="no">{{ partner.category }}</span>
-        </a>
-        {% else %}
         <a href="/tech-partners#{{ partner.slug }}"
            class="group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
           <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">{{ partner.name }}</span>
           <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors" translate="no">{{ partner.category }}</span>
         </a>
-        {% endif %}
       {% endfor %}
-      <a href="/tech-partners#braze" aria-label="braze — Customer Engagement"
-         class="group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
-        <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">braze</span>
-        <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors" translate="no">Customer Engagement</span>
-      </a>
     </div>
 
     <div class="text-center mt-12">
@@ -621,17 +608,17 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
     <div class="text-center mb-14 reveal-up">
       <p class="eyebrow text-primary mb-3">AKA MARTECH Management Platform</p>
       <h2 class="text-headline-md md:text-display-sm font-display text-white mb-4 text-balance">
-        One Platform. Four Intelligence Engines.
+        Your Operating System for Growth.
       </h2>
       <p class="text-body-lg text-white/60 max-w-2xl mx-auto">
-        Our proprietary MarTech platform gives you centralised access to AI-powered social, search, ads, and CRM intelligence — built for SEA's fastest-growing brands.
+        Not a collection of marketing tools — one connected platform where each module is built around the business outcome it delivers: get discovered, win attention, convert spend into revenue, and keep customers growing.
       </p>
     </div>
 
-    <!-- 4 platform cards (coming soon — not yet live) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
+    <!-- 4 platform modules (coming soon — not yet live) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
 
-      <!-- SocialMind -->
+      <!-- SocialOS -->
       <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0s">
         <div class="absolute top-3 right-3">
           <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
@@ -640,11 +627,12 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
              style="background: linear-gradient(135deg, #F5C400 0%, #e6b800 100%);">
           <span class="material-symbols-outlined text-[#060F24] text-xl">people</span>
         </div>
-        <h3 class="text-headline-sm font-display text-white mb-2">SocialMind</h3>
-        <p class="text-body-sm text-white/50 leading-relaxed">AI-powered social media intelligence. Plan, publish, and measure campaigns across all channels from a single dashboard.</p>
+        <h3 class="text-headline-sm font-display text-white mb-1" translate="no">SocialOS</h3>
+        <p class="text-[11px] font-bold text-primary-fixed/70 uppercase tracking-wider mb-3">Social Media Management &amp; Intelligence</p>
+        <p class="text-body-sm text-white/50 leading-relaxed">The operating system for every social channel — content, publishing, engagement, listening, and reporting, managed in one place.</p>
       </div>
 
-      <!-- GeoMind -->
+      <!-- DiscoveryOS -->
       <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0.1s">
         <div class="absolute top-3 right-3">
           <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
@@ -653,11 +641,12 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
              style="background: linear-gradient(135deg, #0B1F4B 0%, #1a3a7a 100%); border: 1px solid rgba(245,196,0,0.3);">
           <span class="material-symbols-outlined text-primary text-xl">travel_explore</span>
         </div>
-        <h3 class="text-headline-sm font-display text-white mb-2">GeoMind</h3>
-        <p class="text-body-sm text-white/50 leading-relaxed">AI-driven SEO, AEO, and GEO strategy engine. Optimise your brand's visibility across traditional search and AI-generated answers — from Google to ChatGPT and Perplexity.</p>
+        <h3 class="text-headline-sm font-display text-white mb-1" translate="no">DiscoveryOS</h3>
+        <p class="text-[11px] font-bold text-primary-fixed/70 uppercase tracking-wider mb-3">SEO · AEO · GEO · AI Search Visibility</p>
+        <p class="text-body-sm text-white/50 leading-relaxed">Customers must discover your brand first. DiscoveryOS governs how you appear across Google, ChatGPT, Perplexity, Gemini, and the wider AI search ecosystem.</p>
       </div>
 
-      <!-- AdsMind -->
+      <!-- PerformanceOS -->
       <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0.2s">
         <div class="absolute top-3 right-3">
           <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
@@ -666,11 +655,12 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
              style="background: linear-gradient(135deg, #F5C400 0%, #e6b800 100%);">
           <span class="material-symbols-outlined text-[#060F24] text-xl">ads_click</span>
         </div>
-        <h3 class="text-headline-sm font-display text-white mb-2">AdsMind</h3>
-        <p class="text-body-sm text-white/50 leading-relaxed">Unified ads management across Meta, Google, TikTok, and programmatic networks. AI-optimised bidding and creative performance tracking.</p>
+        <h3 class="text-headline-sm font-display text-white mb-1" translate="no">PerformanceOS</h3>
+        <p class="text-[11px] font-bold text-primary-fixed/70 uppercase tracking-wider mb-3">Paid Media &amp; Performance Marketing</p>
+        <p class="text-body-sm text-white/50 leading-relaxed">The system that controls traffic acquisition — budgeting, bidding, attribution, creative testing, and ROI optimisation across every paid channel.</p>
       </div>
 
-      <!-- CRMMind -->
+      <!-- GrowthOS -->
       <div class="relative bg-white/5 border border-white/10 rounded-2xl p-7 cursor-default reveal-up" style="animation-delay:0.3s">
         <div class="absolute top-3 right-3">
           <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Coming Soon</span>
@@ -679,10 +669,27 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
              style="background: linear-gradient(135deg, #0B1F4B 0%, #1a3a7a 100%); border: 1px solid rgba(245,196,0,0.3);">
           <span class="material-symbols-outlined text-primary text-xl">hub</span>
         </div>
-        <h3 class="text-headline-sm font-display text-white mb-2">CRMMind</h3>
-        <p class="text-body-sm text-white/50 leading-relaxed">Intelligent CRM and customer lifecycle automation. Unify customer data, trigger smart sequences, and drive retention at scale.</p>
+        <h3 class="text-headline-sm font-display text-white mb-1" translate="no">GrowthOS</h3>
+        <p class="text-[11px] font-bold text-primary-fixed/70 uppercase tracking-wider mb-3">CRM &amp; Automation</p>
+        <p class="text-body-sm text-white/50 leading-relaxed">The engine that turns leads into revenue — nurturing, retention, loyalty, and full customer lifecycle management.</p>
       </div>
 
+    </div>
+
+    <!-- InsightOS — future intelligence layer across the four modules -->
+    <div class="relative bg-white/[0.03] border border-dashed border-white/15 rounded-2xl px-7 py-5 mb-12 flex flex-col md:flex-row md:items-center gap-4 reveal-up" style="animation-delay:0.35s">
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+           style="background: linear-gradient(135deg, #0B1F4B 0%, #1a3a7a 100%); border: 1px solid rgba(245,196,0,0.3);">
+        <span class="material-symbols-outlined text-primary text-xl">insights</span>
+      </div>
+      <div class="flex-1">
+        <div class="flex flex-wrap items-center gap-3 mb-1">
+          <h3 class="text-headline-sm font-display text-white" translate="no">InsightOS</h3>
+          <span class="bg-white/10 text-white/50 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Future</span>
+          <span class="text-[11px] font-bold text-primary-fixed/70 uppercase tracking-wider">Analytics &amp; Intelligence</span>
+        </div>
+        <p class="text-body-sm text-white/50 leading-relaxed">The intelligence layer that consolidates data from every module for decision-making and predictive insights.</p>
+      </div>
     </div>
 
     <!-- Platform CTA — non-clickable (platform not yet built) -->
