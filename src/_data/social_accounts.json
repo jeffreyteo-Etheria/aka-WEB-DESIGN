@@ -1,0 +1,21 @@
+[
+  {
+    "id":       "linkedin-sg",
+    "network":  "LinkedIn",
+    "label":    "AKA Digital Singapore",
+    "page_url": "https://www.linkedin.com/company/akadigital-singapore/"
+  },
+  {
+    "id":       "linkedin-vn",
+    "network":  "LinkedIn",
+    "label":    "AKA Digital Vietnam",
+    "page_url": "https://www.linkedin.com/company/aka-digital-vietnam/"
+  },
+  {
+    "id":       "facebook",
+    "network":  "Facebook",
+    "label":    "AKA Digital Facebook page",
+    "page_url": "",
+    "enabled":  false
+  }
+]

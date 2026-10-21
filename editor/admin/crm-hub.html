@@ -222,6 +222,32 @@
     <div class="hub-panel" id="panel-social">
 
       <div class="hub-card">
+        <div class="hub-card-title">🔗 Share on Publish — LinkedIn &amp; Facebook</div>
+        <div class="hub-card-desc">
+          Lets writers tick <strong>LinkedIn — AKA Digital Singapore</strong>, and/or <strong>LinkedIn — AKA Digital Vietnam</strong>
+          in the blog editor (Facebook is listed as coming soon). After Publish, the CMS sends the post to your Make.com scenario, which posts it to the ticked accounts.
+          The CMS never stores LinkedIn or Facebook logins — those connections live in Make.com.
+        </div>
+        <label style="font-size:13px;font-weight:700;">Make.com webhook URL (Super Admin)</label>
+        <input type="text" id="s_social_webhook_url" class="form-input" style="margin-top:6px" placeholder="https://hook.eu2.make.com/…" />
+        <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+          <button type="button" class="btn-primary" id="saveSocialWebhookBtn">Save webhook</button>
+          <span id="socialWebhookStatus" style="font-size:13px;"></span>
+        </div>
+        <details style="margin-top:16px;font-size:13px;line-height:1.7;">
+          <summary style="cursor:pointer;font-weight:700;">How to set up the Make.com scenario (one time)</summary>
+          <ol style="margin:10px 0 0 18px;">
+            <li>In Make.com, create a scenario. First module: <strong>Webhooks → Custom webhook</strong>. Copy its URL, paste it above, Save.</li>
+            <li>Publish a test post with one account ticked, so Make learns the data structure: <code>targets</code>, <code>caption</code>, <code>post.title</code>, <code>post.url</code>, <code>post.description</code>, <code>post.image</code>.</li>
+            <li>Add a <strong>Router</strong> with one route per account. Filter each route on <code>targets</code> containing <code>linkedin-sg</code> or <code>linkedin-vn</code>.</li>
+            <li>LinkedIn routes: add the LinkedIn module that creates a <strong>company page post</strong>, connect a LinkedIn user who is an <strong>admin of both company pages</strong>, and pick <em>AKA Digital Singapore</em> or <em>AKA Digital Vietnam</em>. Text = <code>caption</code>, link = <code>post.url</code>.</li>
+            <li><em>Later, when Facebook is switched on:</em> a third route filtered on <code>facebook</code> — add <strong>Facebook Pages → create a post</strong>, connect as a page admin, pick the AKA Digital page. Message = <code>caption</code>, link = <code>post.url</code>.</li>
+            <li>Switch the scenario <strong>ON</strong>. LinkedIn and Facebook build the preview card from the article's share image automatically.</li>
+          </ol>
+        </details>
+      </div>
+
+      <div class="hub-card">
         <div class="hub-card-title">📡 RSS Feed — Social Auto-Publish</div>
         <div class="hub-card-desc">
           Your RSS feed automatically updates every time you publish a new blog post. Connect it to Buffer, Zapier, or Make.com to auto-post to LinkedIn, Facebook, and other channels.
@@ -417,6 +443,7 @@
         sf('s_geomind_url', s.geomind_url);
         sf('s_adsmind_url', s.adsmind_url);
         sf('s_crmmind_url', s.crmmind_url);
+        sf('s_social_webhook_url', s.social_webhook_url);
       });
     } else {
       // Non-super: check CRM status without exposing the URL
@@ -530,6 +557,16 @@
         es.close();
       };
     });
-  </script>
+  
+    // Social sharing webhook — saved on its own (merges into cms_settings)
+    document.getElementById('saveSocialWebhookBtn').addEventListener('click', async () => {
+      const el = document.getElementById('socialWebhookStatus');
+      const url = document.getElementById('s_social_webhook_url').value.trim();
+      if (url && !/^https:\/\//i.test(url)) { el.textContent = '✗ Must start with https://'; el.style.color = '#ef4444'; return; }
+      const r = await apiFetch('/api/settings', 'PUT', { social_webhook_url: url });
+      el.textContent = r.ok ? (url ? '✓ Saved — sharing is on' : '✓ Cleared — sharing is off') : '✗ ' + (r.error || 'Failed');
+      el.style.color = r.ok ? '#22c55e' : '#ef4444';
+    });
+</script>
 </body>
 </html>

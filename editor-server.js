@@ -29,6 +29,7 @@ const {
 const securityConfig = require('./config/security.config');
 const { renderCaseStudyPreview, renderBlogPreview, renderEventPreview, renderJobPreview } = require('./scripts/preview-renderer');
 const { generateBlogDraft, suggestSeo, describeAiError } = require('./scripts/ai-writer');
+const { buildSharePayload, sendToWebhook } = require('./scripts/social-share');
 
 /* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
    with a PATH that doesn't include the directory npm actually lives in, even
@@ -653,6 +654,67 @@ http.createServer(async (req, res) => {
       writeData('blogs', blogs);
       writeBlogNjk(post.slug);
       return j(res, 200, { ok: true, slug: post.slug, updated: existingIdx !== -1 });
+    }
+
+    /* SOCIAL SHARING — accounts offered in the blog form, and whether the
+       Make.com webhook is set up (CRM Hub → Social Publishing). */
+    if (p === '/api/social/accounts' && m === 'GET') {
+      const settings = readData('cms_settings');
+      return j(res, 200, {
+        accounts: readData('social_accounts'),
+        webhook_configured: /^https:\/\//i.test(String(settings.social_webhook_url || '')),
+      });
+    }
+
+    /* Share a published post to the ticked LinkedIn / Facebook accounts via
+       the Make.com webhook. Accounts it was already shared to are skipped
+       unless `repost` is set, so re-publishing an edit never double-posts. */
+    if (/^\/api\/blogs\/[^/]+\/share$/.test(p) && m === 'POST') {
+      const slug = decodeURIComponent(p.split('/')[3]);
+      const b = await readValidatedBody(req, res, 'blogs.share');
+      if (b === null) return;
+      const blogs = readData('blogs');
+      const idx = blogs.findIndex(x => x.slug === slug);
+      if (idx === -1) return j(res, 404, { error: 'Post not found' });
+      const post = blogs[idx];
+      if (post.status !== 'published') return j(res, 400, { error: 'Publish the post before sharing it.' });
+
+      const settings = readData('cms_settings');
+      const webhook = String(settings.social_webhook_url || '').trim();
+      if (!/^https:\/\//i.test(webhook)) {
+        return j(res, 400, { error: 'Social sharing is not set up yet: add the Make.com webhook URL in CRM Hub → Social Publishing.' });
+      }
+
+      const accounts = readData('social_accounts');
+      // accounts with "enabled": false are listed as coming soon, never posted to
+      const known = new Set(accounts.filter(a => a.enabled !== false).map(a => a.id));
+      const requested = (Array.isArray(b.targets) ? b.targets : []).map(String).filter(t => known.has(t));
+      if (!requested.length) return j(res, 400, { error: 'Tick at least one account to share to.' });
+
+      const shares = Array.isArray(post.social_shares) ? post.social_shares : [];
+      const already = new Set(shares.flatMap(sh => sh.targets || []));
+      const targets = b.repost ? requested : requested.filter(t => !already.has(t));
+      const skipped = requested.filter(t => !targets.includes(t));
+      if (!targets.length) return j(res, 200, { ok: true, sent: [], skipped });
+
+      const payload = buildSharePayload({
+        post, blogs, settings: readData('settings'), suggestions: readData('seo_suggestions'),
+        accounts, targets, caption: b.caption ? String(b.caption).slice(0, 2900) : '',
+      });
+      let result;
+      try {
+        result = await sendToWebhook(webhook, payload);
+      } catch (err) {
+        return j(res, 502, { error: 'Could not reach the Make.com webhook: ' + (err.name === 'AbortError' ? 'timed out' : err.message) });
+      }
+      if (!result.ok) {
+        return j(res, 502, { error: `The Make.com webhook rejected the post (HTTP ${result.status}). Check the scenario is switched on.` });
+      }
+      const by = getSession(req)?.username || '';
+      blogs[idx] = { ...post, social_shares: [...shares, { at: new Date().toISOString(), targets, by }] };
+      writeData('blogs', blogs);
+      appendAuditLog('blog_shared', { user: by, slug, targets });
+      return j(res, 200, { ok: true, sent: targets, skipped });
     }
 
     /* UPDATE blog post */

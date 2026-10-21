@@ -121,6 +121,17 @@
         </div>
       </div>
 
+      <!-- Share on LinkedIn / Facebook (sent after Publish, via Make.com) -->
+      <div class="form-group full" id="sharePanel">
+        <label>Share on LinkedIn &amp; Facebook <span style="font-weight:400;opacity:.7">(optional — posts go out after Publish finishes)</span></label>
+        <div id="shareAccounts" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin:6px 0 10px;"></div>
+        <textarea id="share_caption" rows="3" maxlength="2900" placeholder="Caption for the social post. Leave blank to use the meta description."></textarea>
+        <label id="shareRepostWrap" style="display:none;font-weight:400;font-size:13px;margin-top:8px;">
+          <input type="checkbox" id="share_repost" /> Share again to accounts this post was already shared to
+        </label>
+        <div id="shareHint" class="hint" style="font-size:12.5px;margin-top:6px;"></div>
+      </div>
+
       <!-- Row 5: Meta fields -->
       <div class="form-group">
         <label>Author Name</label>
@@ -533,6 +544,8 @@
         bodyEditor.innerHTML = post.body_html || '';
         updateWordCount();
         updateSeoHints();
+        shareHistory = Array.isArray(post.social_shares) ? post.social_shares : [];
+        renderShareHint();
         if (post.cover_image) {
           preview.src = post.cover_image;
           preview.style.display = 'block';
@@ -651,6 +664,73 @@
       }
     });
 
+    /* ── Share on LinkedIn / Facebook ──
+       Ticked accounts are sent to the Make.com webhook after a successful
+       Publish; the server skips accounts this post was already shared to. */
+    let shareAccounts = [], shareConfigured = false, shareHistory = [];
+    apiFetch('/api/social/accounts').then(r => {
+      if (!r || r.error) return;
+      shareAccounts = r.accounts || [];
+      shareConfigured = !!r.webhook_configured;
+      const box = document.getElementById('shareAccounts');
+      box.innerHTML = '';
+      shareAccounts.forEach(a => {
+        const l = document.createElement('label');
+        l.style.cssText = 'display:flex;align-items:center;gap:6px;font-weight:500;font-size:14px;cursor:pointer;';
+        const off = a.enabled === false;
+        if (off) l.style.cssText += 'opacity:.5;cursor:not-allowed;';
+        l.innerHTML = '<input type="checkbox" class="share-target" value="' + a.id + '"' + (off ? ' disabled' : '') + ' /> ' +
+          '<span><strong>' + escHtml(a.network) + '</strong> — ' + escHtml(a.label) + (off ? ' <em>(coming soon)</em>' : '') + '</span>';
+        box.appendChild(l);
+      });
+      renderShareHint();
+    }).catch(() => {});
+
+    function renderShareHint() {
+      const el = document.getElementById('shareHint');
+      const label = id => { const a = shareAccounts.find(x => x.id === id); return a ? a.network + ' — ' + a.label : id; };
+      let html = shareConfigured ? '' :
+        '<span style="color:#d97706">⚠ Not set up yet — a Super Admin must add the Make.com webhook URL in CRM Hub → Social Publishing. Until then nothing is posted.</span><br/>';
+      if (shareHistory.length) {
+        html += 'Already shared: ' + shareHistory.map(sh =>
+          escHtml(sh.targets.map(label).join(', ')) + ' (' + new Date(sh.at).toLocaleDateString() + ')').join('; ');
+      }
+      el.innerHTML = html;
+      document.getElementById('shareRepostWrap').style.display = shareHistory.length ? 'block' : 'none';
+    }
+
+    function selectedShareTargets() {
+      return [...document.querySelectorAll('.share-target:checked')].map(c => c.value);
+    }
+
+    // Called after Publish has rebuilt the live site, so the link preview exists
+    async function shareAfterPublish(statusEl) {
+      const targets = selectedShareTargets();
+      if (!targets.length || !editSlug) return;
+      const note = document.createElement('div');
+      note.style.marginTop = '6px';
+      note.textContent = '⏳ Sharing to LinkedIn / Facebook…';
+      statusEl.appendChild(note);
+      try {
+        const r = await apiFetch('/api/blogs/' + encodeURIComponent(editSlug) + '/share', 'POST', {
+          targets,
+          caption: document.getElementById('share_caption').value.trim(),
+          repost: document.getElementById('share_repost').checked,
+        });
+        if (!r || r.error) throw new Error(r && r.error || 'No response');
+        const label = id => { const a = shareAccounts.find(x => x.id === id); return a ? a.label : id; };
+        note.textContent = (r.sent.length ? '✓ Sent to ' + r.sent.map(label).join(', ') + '. ' : '') +
+          (r.skipped.length ? 'Skipped (already shared): ' + r.skipped.map(label).join(', ') + '.' : '');
+        if (r.sent.length) shareHistory.push({ at: new Date().toISOString(), targets: r.sent });
+        document.querySelectorAll('.share-target').forEach(c => { c.checked = false; });
+        document.getElementById('share_repost').checked = false;
+        renderShareHint();
+      } catch (e) {
+        note.textContent = '⚠ Published, but sharing failed: ' + e.message;
+        note.style.color = '#dc2626';
+      }
+    }
+
     function getFormPayload() {
       return {
         slug:         document.getElementById('slug').value || slugify(document.getElementById('title').value),
@@ -723,6 +803,7 @@
                 a.target = '_blank';
                 a.textContent = 'View it on akadigital.net →';
                 status.appendChild(a);
+                shareAfterPublish(status);
               } else {
                 status.textContent = '⚠ Article saved, but the site rebuild failed: ' + msg;
                 status.className = 'form-status error';
