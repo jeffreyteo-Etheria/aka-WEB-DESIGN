@@ -142,6 +142,11 @@
         </div>
       </div>
 
+      <div class="form-section-title">Share on LinkedIn</div>
+      <div class="form-row">
+        <div class="form-group full" id="sharePanel" style="grid-column:1/-1;"></div>
+      </div>
+
       <div class="form-actions publish-actions">
         <button type="button" class="btn-draft" id="saveDraftBtn">Save as Draft</button>
         <button type="button" class="btn-publish" id="publishBtn">Publish</button>
@@ -168,6 +173,7 @@
   </main>
 
   <script src="/admin/admin.js"></script>
+  <script src="/admin/share-panel.js"></script>
   <script>
     requireAuth();
     document.getElementById('userBadge').textContent = localStorage.getItem('aka_cms_user');
@@ -198,6 +204,7 @@
         f('requirements', (job.requirements || []).join('\n'));
         f('apply_email', job.apply_email);
         document.getElementById('active').checked = job.active !== false;
+        jobShare.setHistory(job.social_shares);
         refreshPreview();
       });
     }
@@ -215,6 +222,15 @@
         active:      document.getElementById('active').checked,
       };
     }
+
+    // Share the opening on LinkedIn — same preview → approve → sign-in flow as blogs
+    const jobShare = SharePanel.mount({
+      container: document.getElementById('sharePanel'),
+      apiBase: '/api/jobs/',
+      getSlug: () => editSlug,
+      noun: 'job',
+      captionPlaceholder: 'Caption for the hiring post. Leave blank for “We’re hiring: <role> — <location>, <type>.” plus the job summary.',
+    });
 
     async function saveJob(targetStatus, btn) {
       if (!document.getElementById('title').value.trim()) {
@@ -254,6 +270,7 @@
               if (ok) {
                 status.innerHTML = '✓ Published — LIVE. <a href="/careers/" target="_blank">See it on the Careers page →</a>';
                 status.style.color = '#22c55e';
+                jobShare.afterPublish(status);
               } else {
                 status.textContent = '⚠ Saved, but the site rebuild failed: ' + msg;
                 status.style.color = '#ef4444';

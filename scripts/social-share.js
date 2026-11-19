@@ -38,6 +38,37 @@ function buildSharePayload({ post, blogs, settings, suggestions, accounts, targe
   };
 }
 
+// 1200x630 "We're hiring" card used as the LinkedIn image for job posts
+const HIRING_CARD = '/images/careers/we-are-hiring.jpg';
+const HIRING_CARD_EXISTS = require('fs').existsSync(require('path').join(__dirname, '..', 'public', HIRING_CARD));
+
+/* Same shape for a job opening, so the same Make scenario posts it: links to
+   the job's card on the Careers page (#job-<slug>). */
+function buildJobSharePayload({ job, settings, accounts, targets, caption }) {
+  const meta = seoMeta({ settings, url: `/careers/#job-${job.slug}` });
+  const chosen = accounts.filter(a => targets.includes(a.id));
+  const where = [job.location, job.type].filter(Boolean).join(', ');
+  const summary = String(job.description || '').replace(/\s+/g, ' ').trim();
+  const short = summary.length > 220 ? summary.slice(0, 219).replace(/\s+\S*$/, '') + '…' : summary;
+  return {
+    event: 'job.published',
+    targets: chosen.map(a => a.id),
+    accounts: chosen,
+    caption: caption || `We're hiring: ${job.title}${where ? ` — ${where}` : ''}.\n\n${short}\n\nApply: ${meta.url}`,
+    post: {
+      slug: job.slug,
+      title: `We're hiring: ${job.title}`,
+      url: meta.url,
+      description: [where, short].filter(Boolean).join(' · ').slice(0, 300),
+      image: HIRING_CARD_EXISTS ? `${String(settings.siteUrl || '').replace(/\/$/, '')}${HIRING_CARD}` : meta.image,
+      author: 'AKA Digital',
+      date: '',
+      category: job.department || 'Careers',
+      tags: ['Careers', 'Hiring'],
+    },
+  };
+}
+
 async function sendToWebhook(webhookUrl, payload) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
@@ -55,4 +86,4 @@ async function sendToWebhook(webhookUrl, payload) {
   }
 }
 
-module.exports = { buildSharePayload, sendToWebhook };
+module.exports = { buildSharePayload, buildJobSharePayload, sendToWebhook };

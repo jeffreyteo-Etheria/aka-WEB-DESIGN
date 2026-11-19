@@ -29,7 +29,7 @@ const {
 const securityConfig = require('./config/security.config');
 const { renderCaseStudyPreview, renderBlogPreview, renderEventPreview, renderJobPreview } = require('./scripts/preview-renderer');
 const { generateBlogDraft, suggestSeo, describeAiError } = require('./scripts/ai-writer');
-const { buildSharePayload, sendToWebhook } = require('./scripts/social-share');
+const { buildSharePayload, buildJobSharePayload, sendToWebhook } = require('./scripts/social-share');
 const { runContentMigrations, REDIRECTS } = require('./scripts/content-migrations');
 
 /* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
@@ -720,21 +720,26 @@ http.createServer(async (req, res) => {
       });
     }
 
-    /* Share a published post to the ticked LinkedIn / Facebook accounts via
+    /* Share a published blog post or job opening to the ticked LinkedIn / Facebook accounts via
        the Make.com webhook. Two steps, so nothing ever posts unreviewed:
        `preview: true` returns exactly what would be sent (nothing is sent);
        sending requires `approved: true`, set only by the editor's
        "Approve & post" button. Accounts it was already shared to are skipped
        unless `repost` is set, so re-publishing an edit never double-posts. */
-    if (/^\/api\/blogs\/[^/]+\/share$/.test(p) && m === 'POST') {
-      const slug = decodeURIComponent(p.split('/')[3]);
-      const b = await readValidatedBody(req, res, 'blogs.share');
+    const shareRoute = /^\/api\/(blogs|jobs)\/([^/]+)\/share$/.exec(p);
+    if (shareRoute && m === 'POST') {
+      const kind = shareRoute[1];               // 'blogs' or 'jobs' — also the data file name
+      const isJob = kind === 'jobs';
+      const slug = decodeURIComponent(shareRoute[2]);
+      const b = await readValidatedBody(req, res, kind + '.share');
       if (b === null) return;
-      const blogs = readData('blogs');
-      const idx = blogs.findIndex(x => x.slug === slug);
-      if (idx === -1) return j(res, 404, { error: 'Post not found' });
-      const post = blogs[idx];
-      if (post.status !== 'published') return j(res, 400, { error: 'Publish the post before sharing it.' });
+      const items = readData(kind);
+      const idx = items.findIndex(x => x.slug === slug);
+      if (idx === -1) return j(res, 404, { error: isJob ? 'Job not found' : 'Post not found' });
+      const post = items[idx];
+      if (post.status !== 'published' || (isJob && post.active === false)) {
+        return j(res, 400, { error: isJob ? 'Publish the job (and keep it Active) before sharing it.' : 'Publish the post before sharing it.' });
+      }
 
       const settings = readData('cms_settings');
       const webhook = String(settings.social_webhook_url || '').trim();
@@ -754,10 +759,13 @@ http.createServer(async (req, res) => {
       const skipped = requested.filter(t => !targets.includes(t));
       if (!targets.length) return j(res, 200, { ok: true, sent: [], skipped });
 
-      const payload = buildSharePayload({
-        post, blogs, settings: readData('settings'), suggestions: readData('seo_suggestions'),
-        accounts, targets, caption: b.caption ? String(b.caption).slice(0, 2900) : '',
-      });
+      const caption = b.caption ? String(b.caption).slice(0, 2900) : '';
+      const payload = isJob
+        ? buildJobSharePayload({ job: post, settings: readData('settings'), accounts, targets, caption })
+        : buildSharePayload({
+            post, blogs: items, settings: readData('settings'), suggestions: readData('seo_suggestions'),
+            accounts, targets, caption,
+          });
       if (b.preview === true) return j(res, 200, { ok: true, preview: payload, skipped });
       if (b.approved !== true) {
         return j(res, 400, { error: 'Nothing was posted: review the preview and click "Approve & post" first.' });
@@ -774,9 +782,9 @@ http.createServer(async (req, res) => {
         return j(res, 502, { error: `The Make.com webhook rejected the post (HTTP ${result.status}). Check the scenario is switched on.` });
       }
       const by = getSession(req)?.username || '';
-      blogs[idx] = { ...post, social_shares: [...shares, { at: new Date().toISOString(), targets, by, approved_by: approver.who }] };
-      writeData('blogs', blogs);
-      appendAuditLog('blog_shared', { user: by, slug, targets, approved_by: approver.who, approver_role: approver.role });
+      items[idx] = { ...post, social_shares: [...shares, { at: new Date().toISOString(), targets, by, approved_by: approver.who }] };
+      writeData(kind, items);
+      appendAuditLog(isJob ? 'job_shared' : 'blog_shared', { user: by, slug, targets, approved_by: approver.who, approver_role: approver.role });
       return j(res, 200, { ok: true, sent: targets, skipped });
     }
 

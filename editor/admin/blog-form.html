@@ -121,16 +121,8 @@
         </div>
       </div>
 
-      <!-- Share on LinkedIn / Facebook (sent after Publish, via Make.com) -->
-      <div class="form-group full" id="sharePanel">
-        <label>Share on LinkedIn &amp; Facebook <span style="font-weight:400;opacity:.7">(optional — after Publish you'll see a preview and must click "Approve &amp; post" before anything is posted)</span></label>
-        <div id="shareAccounts" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin:6px 0 10px;"></div>
-        <textarea id="share_caption" rows="3" maxlength="2900" placeholder="Caption for the social post. Leave blank to use the meta description."></textarea>
-        <label id="shareRepostWrap" style="display:none;font-weight:400;font-size:13px;margin-top:8px;">
-          <input type="checkbox" id="share_repost" /> Share again to accounts this post was already shared to
-        </label>
-        <div id="shareHint" class="hint" style="font-size:12.5px;margin-top:6px;"></div>
-      </div>
+      <!-- Share on LinkedIn / Facebook (preview → approve → sign-in; see /admin/share-panel.js) -->
+      <div class="form-group full" id="sharePanel"></div>
 
       <!-- Row 5: Meta fields -->
       <div class="form-group">
@@ -268,6 +260,7 @@
   </main>
 
   <script src="/admin/admin.js"></script>
+  <script src="/admin/share-panel.js"></script>
   <script>
     requireAuth();
     document.getElementById('userBadge').textContent = localStorage.getItem('aka_cms_user');
@@ -544,8 +537,7 @@
         bodyEditor.innerHTML = post.body_html || '';
         updateWordCount();
         updateSeoHints();
-        shareHistory = Array.isArray(post.social_shares) ? post.social_shares : [];
-        renderShareHint();
+        blogShare.setHistory(post.social_shares);
         if (post.cover_image) {
           preview.src = post.cover_image;
           preview.style.display = 'block';
@@ -664,173 +656,14 @@
       }
     });
 
-    /* ── Share on LinkedIn / Facebook ──
-       Ticked accounts are sent to the Make.com webhook after a successful
-       Publish; the server skips accounts this post was already shared to. */
-    let shareAccounts = [], shareConfigured = false, shareHistory = [];
-    apiFetch('/api/social/accounts').then(r => {
-      if (!r || r.error) return;
-      shareAccounts = r.accounts || [];
-      shareConfigured = !!r.webhook_configured;
-      const box = document.getElementById('shareAccounts');
-      box.innerHTML = '';
-      shareAccounts.forEach(a => {
-        const l = document.createElement('label');
-        l.style.cssText = 'display:flex;align-items:center;gap:6px;font-weight:500;font-size:14px;cursor:pointer;';
-        const off = a.enabled === false;
-        if (off) l.style.cssText += 'opacity:.5;cursor:not-allowed;';
-        l.innerHTML = '<input type="checkbox" class="share-target" value="' + a.id + '"' + (off ? ' disabled' : '') + ' /> ' +
-          '<span><strong>' + escHtml(a.network) + '</strong> — ' + escHtml(a.label) + (off ? ' <em>(' + escHtml(a.note || 'coming soon') + ')</em>' : '') + '</span>';
-        box.appendChild(l);
-      });
-      renderShareHint();
-    }).catch(() => {});
-
-    function renderShareHint() {
-      const el = document.getElementById('shareHint');
-      const label = id => { const a = shareAccounts.find(x => x.id === id); return a ? a.network + ' — ' + a.label : id; };
-      let html = shareConfigured ? '' :
-        '<span style="color:#d97706">⚠ Not set up yet — a Super Admin must add the Make.com webhook URL in CRM Hub → Social Publishing. Until then nothing is posted.</span><br/>';
-      if (shareHistory.length) {
-        html += 'Already shared: ' + shareHistory.map(sh =>
-          escHtml(sh.targets.map(label).join(', ')) + ' (' + new Date(sh.at).toLocaleDateString() + ')').join('; ');
-      }
-      el.innerHTML = html;
-      document.getElementById('shareRepostWrap').style.display = shareHistory.length ? 'block' : 'none';
-    }
-
-    function selectedShareTargets() {
-      return [...document.querySelectorAll('.share-target:checked')].map(c => c.value);
-    }
-
-    /* Called after Publish has rebuilt the live site. Nothing is posted here:
-       it fetches a preview of exactly what would be sent and shows it with an
-       "Approve & post" button. Only that button sends to LinkedIn. */
-    async function shareAfterPublish(statusEl) {
-      const targets = selectedShareTargets();
-      if (!targets.length || !editSlug) return;
-      const box = document.createElement('div');
-      box.style.cssText = 'margin-top:10px;';
-      box.textContent = '⏳ Preparing the LinkedIn post preview…';
-      statusEl.appendChild(box);
-      const request = {
-        targets,
-        caption: document.getElementById('share_caption').value.trim(),
-        repost: document.getElementById('share_repost').checked,
-      };
-      const label = id => { const a = shareAccounts.find(x => x.id === id); return a ? a.network + ' — ' + a.label : id; };
-      let pv;
-      try {
-        pv = await apiFetch('/api/blogs/' + encodeURIComponent(editSlug) + '/share', 'POST', { ...request, preview: true });
-        if (!pv || pv.error) throw new Error(pv && pv.error || 'No response');
-      } catch (e) {
-        box.textContent = '⚠ Published, but the share preview failed: ' + e.message;
-        box.style.color = '#dc2626';
-        return;
-      }
-      if (!pv.preview) {
-        box.textContent = 'Not shared — already posted to ' + pv.skipped.map(label).join(', ') + '. Tick "Share again" to repost.';
-        return;
-      }
-      const p = pv.preview;
-      box.style.cssText = 'margin-top:12px;padding:16px;border:2px solid #0a66c2;border-radius:12px;background:#fff;color:#1f2937;max-width:560px;';
-      box.innerHTML =
-        '<div style="font-weight:800;margin-bottom:6px;">Approve this LinkedIn post?</div>' +
-        '<div style="font-size:13px;margin-bottom:10px;">Posting to: <strong>' + escHtml(p.targets.map(label).join(', ')) + '</strong>' +
-          (pv.skipped.length ? ' · already shared, skipped: ' + escHtml(pv.skipped.map(label).join(', ')) : '') + '</div>' +
-        '<div style="white-space:pre-wrap;font-size:14px;margin-bottom:10px;">' + escHtml(p.caption) + '</div>' +
-        '<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">' +
-          '<img src="' + escHtml(p.post.image) + '" alt="" style="display:block;width:100%;aspect-ratio:1200/630;object-fit:cover;background:#f3f4f6;" />' +
-          '<div style="padding:10px 12px;"><div style="font-weight:700;font-size:14px;">' + escHtml(p.post.title) + '</div>' +
-          '<div style="font-size:12px;color:#6b7280;margin-top:2px;">' + escHtml(p.post.url.replace(/^https?:\/\//, '')) + '</div></div>' +
-        '</div>' +
-        '<div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">' +
-          '<button type="button" class="btn-publish" data-act="approve">✓ Approve &amp; post to LinkedIn</button>' +
-          '<button type="button" class="btn-ghost" data-act="cancel">Don’t post</button>' +
-        '</div>';
-      box.querySelector('[data-act="cancel"]').addEventListener('click', () => {
-        box.style.cssText = 'margin-top:8px;';
-        box.textContent = 'Not posted to LinkedIn. You can share it later by ticking the account and clicking Publish again.';
-      });
-      // Approve → second layer: the approver must sign in again (Google or
-      // team/admin password) before anything is sent.
-      box.querySelector('[data-act="approve"]').addEventListener('click', (ev) => {
-        ev.target.disabled = true;
-        showApprovalSignIn(box, async (reauth) => {
-          const r = await apiFetch('/api/blogs/' + encodeURIComponent(editSlug) + '/share', 'POST', { ...request, approved: true, reauth });
-          if (!r || r.error) throw new Error(r && r.error || 'No response');
-          if (r.sent.length) shareHistory.push({ at: new Date().toISOString(), targets: r.sent });
-          document.querySelectorAll('.share-target').forEach(c => { c.checked = false; });
-          document.getElementById('share_repost').checked = false;
-          renderShareHint();
-          box.style.cssText = 'margin-top:8px;color:#16a34a;';
-          box.textContent = '✓ Approved and sent to ' + r.sent.map(label).join(', ') + '. It appears on LinkedIn within a minute.';
-        });
-      });
-    }
-
-    /* "Confirm it's you" panel shown after Approve. `send(reauth)` posts and
-       throws on failure; nothing is sent until a sign-in is submitted. */
-    let cmsConfig = null;
-    function showApprovalSignIn(box, send) {
-      const panel = document.createElement('div');
-      panel.style.cssText = 'margin-top:14px;padding-top:12px;border-top:1px solid #e5e7eb;';
-      panel.innerHTML =
-        '<div style="font-weight:800;margin-bottom:4px;">Confirm it’s you</div>' +
-        '<div style="font-size:13px;color:#4b5563;margin-bottom:10px;">Sign in again to approve this post. Nothing is posted until you confirm.</div>' +
-        '<div data-g style="display:none;margin-bottom:10px;"><div data-gbtn></div></div>' +
-        '<form data-pw style="display:none;gap:8px;flex-wrap:wrap;align-items:center;">' +
-          '<input name="u" type="text" autocomplete="username" placeholder="Team / admin username" style="flex:1;min-width:160px;" />' +
-          '<input name="p" type="password" autocomplete="current-password" placeholder="Password" style="flex:1;min-width:160px;" />' +
-          '<button type="submit" class="btn-publish">Confirm &amp; post</button>' +
-        '</form>' +
-        '<button type="button" data-cancel class="btn-ghost" style="margin-top:8px;">Cancel — don’t post</button>' +
-        '<div data-msg style="font-size:13px;margin-top:8px;"></div>';
-      box.appendChild(panel);
-      const msg = panel.querySelector('[data-msg]');
-      const run = async (reauth) => {
-        msg.style.color = '#4b5563';
-        msg.textContent = 'Confirming and posting…';
-        try { await send(reauth); }
-        catch (e) { msg.style.color = '#dc2626'; msg.textContent = '⚠ ' + e.message; }
-      };
-      panel.querySelector('[data-cancel]').addEventListener('click', () => {
-        box.style.cssText = 'margin-top:8px;';
-        box.textContent = 'Not posted to LinkedIn. You can share it later by ticking the account and clicking Publish again.';
-      });
-      const pwForm = panel.querySelector('[data-pw]');
-      pwForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const u = pwForm.elements.u.value.trim(), p = pwForm.elements.p.value;
-        if (!u || !p) { msg.style.color = '#dc2626'; msg.textContent = 'Enter your username and password.'; return; }
-        pwForm.elements.p.value = '';
-        run({ method: 'password', username: u, password: p });
-      });
-
-      (cmsConfig ? Promise.resolve(cmsConfig) : fetch('/api/config').then(r => r.json()).then(c => (cmsConfig = c)))
-        .then(cfg => {
-          if (cfg.password_login_enabled !== false) pwForm.style.display = 'flex';
-          if (!cfg.google_client_id) return;
-          const gWrap = panel.querySelector('[data-g]');
-          gWrap.style.display = 'block';
-          const render = () => {
-            google.accounts.id.initialize({
-              client_id: cfg.google_client_id,
-              callback: (resp) => run({ method: 'google', credential: resp.credential }),
-              auto_select: false,
-            });
-            google.accounts.id.renderButton(panel.querySelector('[data-gbtn]'), {
-              type: 'standard', theme: 'outline', size: 'large', text: 'continue_with', width: 280,
-            });
-          };
-          if (window.google?.accounts?.id) return render();
-          const s = document.createElement('script');
-          s.src = 'https://accounts.google.com/gsi/client';
-          s.onload = render;
-          document.head.appendChild(s);
-        })
-        .catch(() => { pwForm.style.display = 'flex'; });
-    }
+    // Share on LinkedIn / Facebook — shared with the job editor
+    const blogShare = SharePanel.mount({
+      container: document.getElementById('sharePanel'),
+      apiBase: '/api/blogs/',
+      getSlug: () => editSlug,
+      noun: 'post',
+      captionPlaceholder: 'Caption for the social post. Leave blank to use the meta description.',
+    });
 
     function getFormPayload() {
       return {
@@ -904,7 +737,7 @@
                 a.target = '_blank';
                 a.textContent = 'View it on akadigital.net →';
                 status.appendChild(a);
-                shareAfterPublish(status);
+                blogShare.afterPublish(status);
               } else {
                 status.textContent = '⚠ Article saved, but the site rebuild failed: ' + msg;
                 status.className = 'form-status error';
