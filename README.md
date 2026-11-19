@@ -16,19 +16,18 @@ This repository now includes:
 3. Apply Hostinger HTTPS and header settings.
 4. Review logs in monitoring/.
 
-## GitHub to Hostinger FTP Deployment
+## Production deployment — Hostinger Node.js
 
-A GitHub Actions workflow is included at [.github/workflows/deploy-hostinger.yml](.github/workflows/deploy-hostinger.yml). To enable it:
+The live site runs `editor-server.js` through Hostinger's Node.js hosting,
+using the `master` branch of `jeffreyteo-Etheria/aka-WEB-DESIGN`.
+Build command: `npm run build`; static output: `dist`.
+Push approved changes, then verify the Hostinger deployment completes and
+`https://akadigital.net/api/health` reports the deployed Git commit.
 
-1. In GitHub, open your repository Settings > Secrets and variables > Actions.
-2. Add these repository secrets:
-   - `FTP_HOST`
-   - `FTP_USERNAME`
-   - `FTP_PASSWORD`
-   - `FTP_PORT` (optional, default `21`)
-   - `FTP_REMOTE_ROOT` (optional, default `/public_html/`)
-3. Push to `main` or `master` to trigger the deployment.
-4. Use the workflow_dispatch option to run it manually.
+The legacy FTP workflow is intentionally disabled under
+`.github/workflows-disabled/`. Do not enable it or replace the live
+`public_html/.htaccess`: that file contains the Node.js application routing.
+The static-hosting instructions below apply only to separate static deployments.
 
 
 **Stack:** Eleventy (11ty) · Tailwind CSS v3 · Nunjucks · Vanilla JS · Formspree
@@ -36,6 +35,31 @@ A GitHub Actions workflow is included at [.github/workflows/deploy-hostinger.yml
 ---
 
 ## Quick Start
+
+### Current local setup (19 November 2026)
+
+Theme D **Clean Agency** is enabled in `src/_data/theme.json`. Its stylesheet
+is `public/themes/clean-agency.css`, loaded after the compiled Tailwind CSS.
+Set `name` to an empty string to restore the base theme. Theme overrides are
+documented in `DESIGN_SYSTEM.md`.
+
+With dependencies already installed, run `npm run dev` and open
+[the local site](http://localhost:3000/) or
+[Insights](http://localhost:3000/insights/). This runs Tailwind and Eleventy
+with live reload. Stop with Ctrl+C. For a production check, run `npm run build`.
+
+`npm start` runs the separate CMS at `http://localhost:3001/admin` and performs
+an initial build. Configure its environment variables before using it with
+your team; `npm run dev` is sufficient for theme work.
+
+For layout review, switch Insights to VI and check both Activities & Events
+and Media Coverage at phone, tablet, and desktop widths. Full editorial
+translation requires access to Google Translate. The navigation drawer is
+used below 1280px; translated desktop menus may wrap and the content offset
+tracks their actual height.
+
+`npm run export:css` works on Windows and includes the theme styles under
+`exports/css/themes/`. A full site build copies them to `dist/themes/`.
 
 ### Requirements
 - Node.js 18 or later

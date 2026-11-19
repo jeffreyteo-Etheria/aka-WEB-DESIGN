@@ -20,7 +20,7 @@
     </a>
     <!-- Mobile hamburger (row 1) -->
     <button
-      class="md:hidden p-2 text-primary transition-transform active:scale-90"
+      class="xl:hidden p-2 text-primary transition-transform active:scale-90"
       id="menu-toggle"
       aria-label="Open menu"
       aria-expanded="false"
@@ -31,10 +31,10 @@
   </div>
 
   <!-- Row 2: Desktop nav bar -->
-  <div class="hidden md:block bg-background/98">
-    <div class="section-container h-11 flex items-center justify-end">
+  <div class="hidden xl:block bg-background/98">
+    <div class="section-container min-h-11 py-1 flex items-center justify-end">
     <!-- Desktop Nav -->
-    <nav class="flex items-center gap-6 shrink-0" aria-label="Main navigation">
+    <nav class="min-w-0 flex flex-wrap items-center justify-end gap-x-6 gap-y-2" aria-label="Main navigation">
       {% for item in navigation.main %}
         {% if item.children %}
           <div class="relative group">
@@ -46,7 +46,7 @@
               <span class="material-symbols-outlined text-base leading-none">expand_more</span>
             </button>
             <!-- Dropdown -->
-            <div class="absolute top-full left-0 mt-2 w-60 bg-background border border-outline-variant/20 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+            <div class="absolute top-full left-0 mt-2 w-60 bg-background border border-outline-variant/20 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-50">
               {% for child in item.children %}
                 <a
                   href="{{ child.href }}"

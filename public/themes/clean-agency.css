@@ -1,0 +1,144 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   THEME D — "Clean Agency"
+   Light off-white pages, Lexend headlines in deep navy with AKA-yellow
+   highlight words, deep-blue CTAs, white floating cards.
+
+   A re-skin layer over the existing Tailwind classes: content, URLs and
+   layout are untouched. Loaded by base.njk only when src/_data/theme.json
+   has "name": "clean-agency" (set "name": "" to return to the original look).
+   Every rule is scoped to html[data-theme="clean-agency"].
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-theme="clean-agency"] {
+  --ca-navy: #0B1F4B;     /* headlines, dark accents */
+  --ca-blue: #1B3A7A;     /* CTAs, links, stat numbers */
+  --ca-yellow: #F5C400;   /* AKA yellow — headline highlight words */
+  --ca-text: #2B2B2B;
+  --ca-muted: #5A5F6B;
+  --ca-page: #F8F8F7;
+  --ca-card: #FFFFFF;
+  --ca-line: #E7E7E4;
+  --ca-shadow: 0 4px 24px rgba(20, 20, 20, .07);
+}
+
+/* ── Typography ─────────────────────────────────────────────────────── */
+html[data-theme="clean-agency"] body,
+html[data-theme="clean-agency"] .font-body { font-family: 'Inter', system-ui, sans-serif !important; color: var(--ca-text); background: var(--ca-page) !important; }
+html[data-theme="clean-agency"] .font-display,
+html[data-theme="clean-agency"] h1, html[data-theme="clean-agency"] h2, html[data-theme="clean-agency"] h3 { font-family: 'Lexend', 'Inter', sans-serif !important; letter-spacing: -0.025em; }
+html[data-theme="clean-agency"] h1, html[data-theme="clean-agency"] h2 { color: var(--ca-navy) !important; font-weight: 600 !important; }
+html[data-theme="clean-agency"] h3 { color: var(--ca-text) !important; font-weight: 600 !important; }
+html[data-theme="clean-agency"] nav a, html[data-theme="clean-agency"] header a { font-family: 'Lexend', sans-serif !important; font-weight: 400; }
+html[data-theme="clean-agency"] .eyebrow {
+  font-family: 'Inter', sans-serif !important; color: var(--ca-muted) !important; background: #EFEFEC;
+  padding: 6px 12px; border-radius: 999px; display: inline-block; font-size: .875rem !important;
+  text-transform: none !important; letter-spacing: 0 !important;
+}
+
+/* ── Colour roles ───────────────────────────────────────────────────── */
+html[data-theme="clean-agency"] .text-primary { color: var(--ca-blue) !important; }
+html[data-theme="clean-agency"] .text-on-surface { color: var(--ca-text) !important; }
+html[data-theme="clean-agency"] .text-on-surface-variant { color: var(--ca-muted) !important; }
+html[data-theme="clean-agency"] [class*="text-inverse-on-surface"] { color: var(--ca-muted) !important; }
+html[data-theme="clean-agency"] .text-inverse-on-surface { color: var(--ca-text) !important; }
+html[data-theme="clean-agency"] :is(h1, h2).text-inverse-on-surface { color: var(--ca-navy) !important; }
+html[data-theme="clean-agency"] .text-primary-fixed, html[data-theme="clean-agency"] [class*="text-primary-fixed"],
+html[data-theme="clean-agency"] .text-on-primary-container { color: var(--ca-blue) !important; }
+html[data-theme="clean-agency"] .bg-primary { background-color: var(--ca-blue) !important; }
+html[data-theme="clean-agency"] [class*="bg-primary/"] { background-color: rgba(27, 58, 122, .07) !important; }
+html[data-theme="clean-agency"] .border-primary { border-color: var(--ca-blue) !important; }
+html[data-theme="clean-agency"] [class*="border-primary/"], html[data-theme="clean-agency"] [class*="border-outline-variant"] { border-color: var(--ca-line) !important; }
+html[data-theme="clean-agency"] .bg-surface-off-white, html[data-theme="clean-agency"] .bg-surface-container-low,
+html[data-theme="clean-agency"] .bg-surface-container { background-color: var(--ca-card) !important; }
+html[data-theme="clean-agency"] .bg-surface-container-lowest, html[data-theme="clean-agency"] .bg-white { background-color: var(--ca-card) !important; }
+html[data-theme="clean-agency"] .from-primary { --tw-gradient-from: var(--ca-blue) var(--tw-gradient-from-position) !important; }
+
+/* ── CTAs: all deep blue, white text ────────────────────────────────── */
+html[data-theme="clean-agency"] .btn-primary, html[data-theme="clean-agency"] .btn-ghost,
+html[data-theme="clean-agency"] .btn-secondary, html[data-theme="clean-agency"] .bg-action-yellow {
+  background: var(--ca-blue) !important; color: #FFFFFF !important; border-color: var(--ca-blue) !important; box-shadow: none !important;
+}
+html[data-theme="clean-agency"] .btn-primary, html[data-theme="clean-agency"] .btn-ghost, html[data-theme="clean-agency"] .btn-secondary {
+  font-family: 'Lexend', sans-serif !important; font-weight: 500 !important; border-radius: 8px !important;
+}
+html[data-theme="clean-agency"] .btn-primary:hover, html[data-theme="clean-agency"] .btn-ghost:hover,
+html[data-theme="clean-agency"] .btn-secondary:hover { background: var(--ca-navy) !important; }
+html[data-theme="clean-agency"] .bg-action-yellow *, html[data-theme="clean-agency"] .btn-primary *,
+html[data-theme="clean-agency"] .btn-ghost *, html[data-theme="clean-agency"] .btn-secondary * { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; }
+/* thin decorative accent bars stay AKA yellow */
+html[data-theme="clean-agency"] .bg-action-yellow.h-1, html[data-theme="clean-agency"] .bg-action-yellow.h-0\.5 { background: var(--ca-yellow) !important; }
+html[data-theme="clean-agency"] .text-action-yellow { color: var(--ca-blue) !important; }
+html[data-theme="clean-agency"] .border-action-yellow { border-color: var(--ca-blue) !important; }
+
+/* ── Headline highlight words: AKA yellow, no outline ───────────────── */
+html[data-theme="clean-agency"] :is(h1, h2) :is(.text-action-yellow, [class*="bg-clip-text"]),
+html[data-theme="clean-agency"] :is(h1, h2):is(.text-action-yellow) {
+  background: none !important; color: var(--ca-yellow) !important; -webkit-text-fill-color: var(--ca-yellow) !important; -webkit-text-stroke: 0 !important;
+}
+
+/* ── Shape: softer corners, quiet shadows, no glows ─────────────────── */
+html[data-theme="clean-agency"] .rounded-xl, html[data-theme="clean-agency"] .rounded-2xl,
+html[data-theme="clean-agency"] .rounded-3xl, html[data-theme="clean-agency"] .card { border-radius: 10px !important; }
+html[data-theme="clean-agency"] [class*="shadow-"] { box-shadow: var(--ca-shadow) !important; }
+html[data-theme="clean-agency"] [class*="blur-["], html[data-theme="clean-agency"] [class*="blur-3xl"] { opacity: 0 !important; }
+html[data-theme="clean-agency"] .card { border-color: var(--ca-line) !important; }
+
+/* ═══ Former dark bands → light ═════════════════════════════════════════
+   BAND = full-width sections / footer that used a dark background.
+   KEEP = things that stay dark / keep white text inside a band: small
+   blue tiles & badges, buttons, and text laid over photos or video. */
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-\[\#080c18\], .bg-inverse-surface, .bg-on-surface, .bg-primary, .bg-ink-deep, .bg-navy-core, [class*="from-[#060F24]"], .from-on-surface) {
+  background-color: var(--ca-page) !important; background-image: none !important; color: var(--ca-text);
+}
+/* overlays that darkened hero photos */
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  .absolute.inset-0:is([class*="bg-gradient"], [class*="bg-[#"], .bg-on-surface, [class*="bg-on-surface/"], [class*="bg-black"]) {
+  background: transparent !important;
+}
+/* hero background photos fade to a texture */
+html[data-theme="clean-agency"] section:is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  > .absolute img.object-cover,
+html[data-theme="clean-agency"] section:is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  > img.object-cover { opacity: .07 !important; }
+
+/* text that was white on the dark band */
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  :is([class*="text-white"], .text-on-primary):not(:is(.bg-primary, .bg-\[\#0d1117\], .btn-primary, .btn-ghost, .btn-secondary, .bg-action-yellow, a[class*="border-white"], .relative:has(> img.object-cover), .relative:has(> video), .relative:has(> iframe)) *):not(.bg-primary, .btn-primary, .btn-ghost, .btn-secondary, .bg-action-yellow, a[class*="border-white"]):not(:is(h1, h2), :is(h1, h2) *) {
+  color: var(--ca-text) !important;
+}
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  [class*="text-white/"]:not(:is(.bg-primary, .bg-\[\#0d1117\], a[class*="border-white"], .relative:has(> img.object-cover), .relative:has(> video), .relative:has(> iframe)) *):not(:is(h1, h2) *) {
+  color: var(--ca-muted) !important;
+}
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  :is(h1, h2):is([class*="text-white"]),
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  :is(h1, h2) [class*="text-white"] { color: var(--ca-navy) !important; }
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  [class*="border-white"] { border-color: var(--ca-line) !important; }
+/* glassy dark cards → white floating cards */
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  [class*="bg-white/"]:not(.relative:has(> img.object-cover) *) {
+  background-color: var(--ca-card) !important; box-shadow: var(--ca-shadow); border-color: #EFEFEC !important;
+}
+/* white (inverted) client & partner logos → soft charcoal */
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  img:is([class*="invert"], [class*="brightness-0"]) { filter: brightness(0) opacity(.5) !important; }
+/* dark inner cards (e.g. results panels) → white cards */
+html[data-theme="clean-agency"] :is(div, article, a).bg-on-surface:not(.absolute), html[data-theme="clean-agency"] :is(div, article, a).bg-inverse-surface:not(.absolute) {
+  background-color: var(--ca-card) !important; box-shadow: var(--ca-shadow);
+}
+html[data-theme="clean-agency"] :is(div, article, a):is(.bg-on-surface, .bg-inverse-surface):not(.absolute) [class*="text-white"]:not(.relative:has(> img.object-cover) *) { color: var(--ca-text) !important; }
+html[data-theme="clean-agency"] :is(div, article, a):is(.bg-on-surface, .bg-inverse-surface):not(.absolute) [class*="text-white/"]:not(.relative:has(> img.object-cover) *) { color: var(--ca-muted) !important; }
+html[data-theme="clean-agency"] :is(article, a):is(.bg-on-surface, .bg-inverse-surface) :is(h2, h3) { color: var(--ca-navy) !important; }
+/* text over photos/video stays white */
+html[data-theme="clean-agency"] .relative:has(> img.object-cover) [class*="text-white"],
+html[data-theme="clean-agency"] .relative:has(> video) [class*="text-white"] { color: #FFFFFF !important; }
+
+/* Outline buttons that were white-on-dark ("View Case Studies") → solid deep blue */
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  a:is([class*="border-white"], [class*="bg-white/"]):not(.relative:has(> img.object-cover) *) {
+  background: var(--ca-blue) !important; border-color: var(--ca-blue) !important; color: #FFFFFF !important; box-shadow: none !important;
+}
+html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
+  a:is([class*="border-white"], [class*="bg-white/"]):not(.relative:has(> img.object-cover) *) * { color: #FFFFFF !important; }

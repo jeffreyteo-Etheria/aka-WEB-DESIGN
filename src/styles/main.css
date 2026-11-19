@@ -438,6 +438,26 @@ nav a:hover::after {
    Applied when i18n.js sets the lang attribute on <html>
    ------------------------------------------------------------ */
 
+/* Insights cards must shrink to their grid track even when translation
+   inserts nested <font> wrappers or a long event / publication name. */
+.insights-listing .card,
+.insights-listing .card > *,
+.insights-listing .card .flex > * {
+  min-width: 0;
+}
+.insights-listing .card {
+  overflow-wrap: anywhere;
+}
+.insights-listing .card > .flex:not(.flex-col) {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.insights-listing .material-symbols-outlined {
+  flex-shrink: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
 /* Vietnamese — longer words, diacritical marks need more vertical room */
 :is(html[lang="vi"]) body {
   word-break: break-word;
@@ -454,15 +474,8 @@ nav a:hover::after {
   line-height: 1.85;
   overflow-wrap: break-word;
 }
-:is(html[lang="vi"]) .flex {
-  flex-wrap: wrap;
-}
 :is(html[lang="vi"]) .grid {
   row-gap: 1.25rem;
-}
-:is(html[lang="vi"]) .card,
-:is(html[lang="vi"]) [class*="rounded"] {
-  overflow: visible;
 }
 :is(html[lang="vi"]) .text-balance {
   text-wrap: pretty;
@@ -483,9 +496,6 @@ nav a:hover::after {
   line-height: 1.9;
   word-break: keep-all;
 }
-:is(html[lang="ko"]) .flex {
-  flex-wrap: wrap;
-}
 :is(html[lang="ko"]) .grid {
   row-gap: 1.25rem;
 }
@@ -503,17 +513,18 @@ nav a:hover::after {
 :is(html[lang="zh-Hans"]) p {
   line-height: 1.9;
 }
-:is(html[lang="zh-Hans"]) .flex {
-  flex-wrap: wrap;
-}
 :is(html[lang="zh-Hans"]) .grid {
   row-gap: 1.25rem;
 }
 
 /* Shared: prevent fixed-height containers from clipping translated text */
+/* Keep column cards in one column. Applying flex-wrap to every .flex made
+   translated descriptions flow sideways out of equal-height grid cards.
+   Horizontal controls opt into wrapping with Tailwind's flex-wrap class. */
 :is(html[lang="vi"], html[lang="ko"], html[lang="zh-Hans"]) .card {
   height: auto !important;
   min-height: 0;
+  min-width: 0;
 }
 :is(html[lang="vi"], html[lang="ko"], html[lang="zh-Hans"]) [class*="h-14"],
 :is(html[lang="vi"], html[lang="ko"], html[lang="zh-Hans"]) [class*="h-16"],

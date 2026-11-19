@@ -3,6 +3,15 @@
 All notable changes to this project will be documented here.
 Format: [date] — description
 
+## [2026-11-19] — Theme D continuation and Vietnamese Insights layout
+
+- Continued the existing Clean Agency theme and documented its toggle and local workflow.
+- Removed language-wide flex wrapping that could push vertical card content sideways; added narrow-screen wrapping and shrink constraints to Insights cards while preserving image clipping.
+- Switched desktop navigation to the drawer below 1280px; allowed desktop links to wrap and measured header height to keep content aligned. Added keyboard access to solution dropdown links.
+- Matched Insights hero button spacing, preserved navy hero headings in Theme D, and raised theme eyebrow labels to 14px.
+- Replaced the Unix-only CSS export command with Node file operations and included the theme styles in CSS exports.
+- Corrected the deployment documentation to use Hostinger Node.js and keep the legacy FTP workflow disabled.
+
 ---
 
 ## [2026-06-17] — Initial project scaffold

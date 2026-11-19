@@ -14,6 +14,15 @@
 
   if (!header || !toggle || !drawer || !backdrop) return;
 
+  // Translated desktop menus can need a second row. Keep the content below
+  // the actual header height rather than assuming a fixed 108px offset.
+  const main = document.getElementById("main-content");
+  if (main && window.ResizeObserver) {
+    new ResizeObserver(function () {
+      main.style.paddingTop = header.offsetHeight + "px";
+    }).observe(header);
+  }
+
   /* ---- Drawer open / close ---- */
   function openDrawer() {
     drawer.classList.remove("-translate-x-full");

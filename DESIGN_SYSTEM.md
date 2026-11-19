@@ -6,6 +6,21 @@
 
 ---
 
+## Active Theme D — Clean Agency
+
+The current local theme is `clean-agency`, selected by `src/_data/theme.json`.
+It layers `public/themes/clean-agency.css` over the base design below:
+Lexend headings, Inter body text, light page surfaces, white cards, deep-blue
+CTAs, and Signal Yellow headline accents. Existing Theme D surface tokens
+are defined in that stylesheet. The base tokens below remain the fallback
+when the theme name is empty.
+
+All overrides must stay scoped to `html[data-theme="clean-agency"]` so the
+original theme remains available. Keep icons untranslatable and preserve
+photographic overlays where white labels are needed for contrast.
+
+---
+
 ## Brand Identity
 
 | Attribute | Value |

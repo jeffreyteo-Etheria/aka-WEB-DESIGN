@@ -1,5 +1,28 @@
 # AKA Digital Website — Handoff Document
 
+## Current continuation — 19 November 2026
+
+- Theme D (`clean-agency`) is active through `src/_data/theme.json` and
+  `public/themes/clean-agency.css`; clear the theme name to restore the base style.
+- Resumed Claude's unfinished Vietnamese Insights layout fix: removed global
+  flex wrapping from translated layouts, preserved image clipping, and allowed
+  event/media card content to shrink and wrap within its grid track.
+- Navigation now uses the drawer below 1280px. Desktop links can wrap, with
+  a ResizeObserver keeping the main content below the actual header height.
+- Local theme development: `npm run dev` → `http://localhost:3000/`.
+  CMS: `npm start` → `http://localhost:3001/admin` (starts its own build).
+- CSS export now uses Node file operations on Windows and includes theme CSS.
+- Release authorized on 19 November 2026: commit and push the theme continuation
+  through the existing Hostinger Node.js deployment, then verify the live commit.
+- Verification: production build generated 67 pages; all 3 existing security
+  tests passed; CSS export matched its sources; 8 representative pages include
+  Theme D; all 19 local Insights assets exist. Local page, theme, script, and VI
+  locale requests returned HTTP 200. English and Vietnamese rendering were
+  observed in Chrome; full viewport regression checks remain outstanding.
+
+The older sprint notes below describe earlier project history; consult current
+source files and Git history for the latest CMS and deployment implementation.
+
 ## Project Overview
 
 Eleventy (11ty) v3 static site | Tailwind CSS v3.4 | Nunjucks templates

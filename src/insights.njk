@@ -19,9 +19,9 @@ description: MarTech insights, event recaps, media coverage and industry analysi
     <p class="text-body-lg text-inverse-on-surface/70 max-w-xl">
       Event recaps, media coverage, platform guides, and thought leadership from our team and partner ecosystem.
     </p>
-    <div class="flex gap-4 mt-8">
+    <div class="flex flex-wrap gap-4 mt-8">
       <a href="#activities" class="btn-primary">Activities &amp; Events</a>
-      <a href="#media" class="btn-ghost border-white/30 text-white/80 hover:text-white hover:border-white/60">Media Coverage</a>
+      <a href="#media" class="btn-ghost px-8 py-4 border-white/30 text-white/80 hover:text-white hover:border-white/60">Media Coverage</a>
     </div>
   </div>
 </section>
@@ -30,7 +30,7 @@ description: MarTech insights, event recaps, media coverage and industry analysi
 <!-- ============================================================
      SECTION 1: ACTIVITIES & EVENTS
      ============================================================ -->
-<section class="py-16 md:py-24" id="activities">
+<section class="insights-listing py-16 md:py-24" id="activities">
   <div class="section-container">
 
     <div class="flex items-center gap-4 mb-12">
@@ -46,7 +46,7 @@ description: MarTech insights, event recaps, media coverage and industry analysi
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {% for activity in events | publishedOnly | sort(true, false, 'date') %}
         <article class="card group flex flex-col gap-4 hover:border-primary/30 hover:shadow-[0_8px_32px_rgba(37,59,194,0.08)] transition-all duration-300">
-          <div class="relative aspect-[16/9] overflow-hidden rounded-lg bg-surface-container">
+          <div class="relative aspect-[16/9] shrink-0 overflow-hidden rounded-lg bg-surface-container">
             <img
               src="{{ activity.image }}"
               alt="{{ activity.title }}"
@@ -57,7 +57,7 @@ description: MarTech insights, event recaps, media coverage and industry analysi
               {{ activity.type }}
             </span>
           </div>
-          <div class="flex-1 flex flex-col gap-2">
+          <div class="min-w-0 flex-1 flex flex-col gap-2">
             <p class="text-label-md text-on-surface-variant">{{ activity | eventDateDisplay }}</p>
             <h3 class="text-headline-sm font-display text-on-surface group-hover:text-primary transition-colors">
               {{ activity.title }}
@@ -86,7 +86,7 @@ description: MarTech insights, event recaps, media coverage and industry analysi
 <!-- ============================================================
      SECTION 2: MEDIA COVERAGE
      ============================================================ -->
-<section class="py-16 md:py-24 bg-surface-off-white" id="media">
+<section class="insights-listing py-16 md:py-24 bg-surface-off-white" id="media">
   <div class="section-container">
 
     <div class="flex items-center gap-4 mb-12">
