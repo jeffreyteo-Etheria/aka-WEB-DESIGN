@@ -20,7 +20,7 @@
     </a>
     <!-- Mobile hamburger (row 1) -->
     <button
-      class="xl:hidden p-2 text-primary transition-transform active:scale-90"
+      class="md:hidden p-2 text-primary transition-transform active:scale-90"
       id="menu-toggle"
       aria-label="Open menu"
       aria-expanded="false"
@@ -31,10 +31,10 @@
   </div>
 
   <!-- Row 2: Desktop nav bar -->
-  <div class="hidden xl:block bg-background/98">
+  <div class="hidden md:block bg-background/98">
     <div class="section-container min-h-11 py-1 flex items-center justify-end">
     <!-- Desktop Nav -->
-    <nav class="min-w-0 flex flex-wrap items-center justify-end gap-x-6 gap-y-2" aria-label="Main navigation">
+    <nav class="w-full min-w-0 flex flex-wrap items-center justify-center lg:justify-end gap-x-4 lg:gap-x-6 gap-y-2" aria-label="Main navigation">
       {% for item in navigation.main %}
         {% if item.children %}
           <div class="relative group">

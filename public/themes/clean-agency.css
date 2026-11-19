@@ -137,8 +137,47 @@ html[data-theme="clean-agency"] .relative:has(> video) [class*="text-white"] { c
 
 /* Outline buttons that were white-on-dark ("View Case Studies") → solid deep blue */
 html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
-  a:is([class*="border-white"], [class*="bg-white/"]):not(.relative:has(> img.object-cover) *) {
+  a:is([class*="border-white"], [class*="bg-white/"]):not(.partner-card):not(.relative:has(> img.object-cover) *) {
   background: var(--ca-blue) !important; border-color: var(--ca-blue) !important; color: #FFFFFF !important; box-shadow: none !important;
 }
 html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-inverse-surface, .bg-on-surface, .bg-primary, [class*="from-[#060F24]"], .from-on-surface)
-  a:is([class*="border-white"], [class*="bg-white/"]):not(.relative:has(> img.object-cover) *) * { color: #FFFFFF !important; }
+  a:is([class*="border-white"], [class*="bg-white/"]):not(.partner-card):not(.relative:has(> img.object-cover) *) * { color: #FFFFFF !important; }
+
+/* Homepage: fade the photograph itself, without a dark overlay or grid. */
+html[data-theme="clean-agency"] #hero .hero-shade,
+html[data-theme="clean-agency"] #hero .hero-grid { display: none !important; }
+html[data-theme="clean-agency"] #hero .hero-photo { opacity: .10 !important; }
+html[data-theme="clean-agency"] #hero .hero-highlight {
+  color: var(--ca-navy) !important;
+  -webkit-text-fill-color: var(--ca-navy) !important;
+  text-decoration: underline;
+  text-decoration-color: var(--ca-yellow);
+  text-decoration-thickness: .08em;
+  text-underline-offset: .12em;
+}
+
+/* Partner links are soft-white cards, distinct from blue action buttons.
+   Explicit roles keep hover utilities and translated wrappers readable. */
+html[data-theme="clean-agency"] #partner-ecosystem .partner-card {
+  min-width: 0;
+  background: var(--ca-card) !important;
+  border: 1px solid var(--ca-line) !important;
+  color: var(--ca-navy) !important;
+  box-shadow: none !important;
+  overflow-wrap: anywhere;
+}
+html[data-theme="clean-agency"] #partner-ecosystem .partner-card:is(:hover, :focus-visible) {
+  background: var(--ca-card) !important;
+  border-color: var(--ca-blue) !important;
+  box-shadow: var(--ca-shadow) !important;
+}
+html[data-theme="clean-agency"] #partner-ecosystem .partner-name,
+html[data-theme="clean-agency"] #partner-ecosystem .partner-name * {
+  color: var(--ca-navy) !important;
+  -webkit-text-fill-color: var(--ca-navy) !important;
+}
+html[data-theme="clean-agency"] #partner-ecosystem .partner-category,
+html[data-theme="clean-agency"] #partner-ecosystem .partner-category * {
+  color: var(--ca-muted) !important;
+  -webkit-text-fill-color: var(--ca-muted) !important;
+}

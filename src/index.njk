@@ -14,15 +14,15 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
     <img
       src="/images/hero/home-summit.jpeg"
       alt="AKA Digital Martech Summit"
-      class="w-full h-full object-cover opacity-45"
+      class="hero-photo w-full h-full object-cover opacity-45"
       loading="eager"
     />
-    <div class="absolute inset-0" style="background:rgba(8,12,24,0.55)"></div>
-    <div class="absolute inset-0 bg-gradient-to-t from-[#060F24] via-transparent to-transparent"></div>
+    <div class="hero-shade absolute inset-0" style="background:rgba(8,12,24,0.55)"></div>
+    <div class="hero-shade absolute inset-0 bg-gradient-to-t from-[#060F24] via-transparent to-transparent"></div>
   </div>
 
   <!-- Subtle grid -->
-  <div class="absolute inset-0 z-0 opacity-[0.04]"
+  <div class="hero-grid absolute inset-0 z-0 opacity-[0.04]"
        style="background-image: linear-gradient(rgba(188,195,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(188,195,255,1) 1px, transparent 1px); background-size: 80px 80px;">
   </div>
 
@@ -56,7 +56,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
         <!-- Headline -->
         <h1 class="text-[48px] md:text-[64px] lg:text-[72px] font-display font-extrabold leading-[1.05] tracking-[-0.02em] text-white mb-6 text-balance">
           MarTech That<br/>
-          <span class="bg-gradient-to-r from-action-yellow via-[#FFE566] to-action-yellow bg-clip-text text-transparent">Actually Works.</span><br/>
+          <span class="hero-highlight bg-gradient-to-r from-action-yellow via-[#FFE566] to-action-yellow bg-clip-text text-transparent">Actually Works.</span><br/>
           <span class="text-white/80">In Southeast Asia.</span>
         </h1>
 
@@ -413,7 +413,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
 <!-- ============================================================
      TECH PARTNER ECOSYSTEM — Text-only partner names on dark bg
      ============================================================ -->
-<section class="py-20 bg-[#060F24] overflow-hidden">
+<section class="py-20 bg-[#060F24] overflow-hidden" id="partner-ecosystem">
   <div class="section-container">
     <div class="text-center mb-14 reveal-up">
       <p class="eyebrow text-primary-fixed mb-3">Our Partner Ecosystem</p>
@@ -424,9 +424,9 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 reveal-up" style="animation-delay:0.1s">
       {% for partner in partners %}
         <a href="/tech-partners#{{ partner.slug }}"
-           class="group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
-          <span class="font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">{{ partner.name }}</span>
-          <span class="text-[10px] text-white/25 uppercase tracking-widest group-hover:text-white/50 transition-colors" translate="no">{{ partner.category }}</span>
+           class="partner-card group flex flex-col items-start gap-1 px-4 py-4 rounded-xl hover:bg-white/5 transition-all duration-300">
+          <span class="partner-name font-display font-bold text-white/70 group-hover:text-white text-body-md md:text-body-lg tracking-tight transition-colors leading-snug" translate="no">{{ partner.name }}</span>
+          <span class="partner-category text-label-md text-white/25 uppercase tracking-wider group-hover:text-white/50 transition-colors" translate="no">{{ partner.category }}</span>
         </a>
       {% endfor %}
     </div>

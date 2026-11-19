@@ -55,7 +55,7 @@ your team; `npm run dev` is sufficient for theme work.
 For layout review, switch Insights to VI and check both Activities & Events
 and Media Coverage at phone, tablet, and desktop widths. Full editorial
 translation requires access to Google Translate. The navigation drawer is
-used below 1280px; translated desktop menus may wrap and the content offset
+used below 768px; desktop text menus may wrap and the content offset
 tracks their actual height.
 
 `npm run export:css` works on Windows and includes the theme styles under

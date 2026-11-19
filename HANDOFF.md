@@ -7,7 +7,7 @@
 - Resumed Claude's unfinished Vietnamese Insights layout fix: removed global
   flex wrapping from translated layouts, preserved image clipping, and allowed
   event/media card content to shrink and wrap within its grid track.
-- Navigation now uses the drawer below 1280px. Desktop links can wrap, with
+- Navigation uses the drawer below 768px and visible text links above it. Desktop links can wrap, with
   a ResizeObserver keeping the main content below the actual header height.
 - Local theme development: `npm run dev` → `http://localhost:3000/`.
   CMS: `npm start` → `http://localhost:3001/admin` (starts its own build).
@@ -22,6 +22,16 @@
 
 The older sprint notes below describe earlier project history; consult current
 source files and Git history for the latest CMS and deployment implementation.
+
+### Homepage readability follow-up
+
+- Removed the hero's dark overlays and decorative grid in Clean Agency; the
+  original event photograph remains visible at 10% opacity on a light surface.
+- The hero highlight uses navy lettering with a yellow underline for contrast.
+- Partner cards use white surfaces, navy names, and muted dark category labels
+  in both normal and hover/focus states; blue CTA styling excludes these cards.
+- Restored desktop text navigation from 768px, with wrapping and automatic
+  header-height tracking instead of switching laptops to a hamburger menu.
 
 ## Project Overview
 

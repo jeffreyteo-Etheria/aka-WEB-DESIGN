@@ -3,6 +3,13 @@
 All notable changes to this project will be documented here.
 Format: [date] — description
 
+## [2026-11-20] — Homepage contrast and desktop navigation corrections
+
+- Removed the homepage hero's inline dark shade and grid in Clean Agency while retaining the event photo at 10% opacity.
+- Changed the hero's yellow highlight to readable navy text with a yellow underline.
+- Restored text navigation at desktop/tablet widths from 768px, keeping wrapping and measured header spacing.
+- Changed partner links to white cards with navy names and readable 14px category labels, including hover/focus states; excluded them from blue CTA overrides.
+
 ## [2026-11-19] — Theme D continuation and Vietnamese Insights layout
 
 - Continued the existing Clean Agency theme and documented its toggle and local workflow.
