@@ -9,13 +9,16 @@
     "id":       "linkedin-vn",
     "network":  "LinkedIn",
     "label":    "AKA Digital Vietnam",
-    "page_url": "https://www.linkedin.com/company/aka-digital-vietnam/"
+    "page_url": "https://www.linkedin.com/company/aka-digital-vietnam/",
+    "enabled":  false,
+    "note":     "waiting for LinkedIn page admin access"
   },
   {
     "id":       "facebook",
     "network":  "Facebook",
     "label":    "AKA Digital Facebook page",
     "page_url": "",
-    "enabled":  false
+    "enabled":  false,
+    "note":     "coming soon"
   }
 ]

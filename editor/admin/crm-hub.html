@@ -224,8 +224,9 @@
       <div class="hub-card">
         <div class="hub-card-title">🔗 Share on Publish — LinkedIn &amp; Facebook</div>
         <div class="hub-card-desc">
-          Lets writers tick <strong>LinkedIn — AKA Digital Singapore</strong>, and/or <strong>LinkedIn — AKA Digital Vietnam</strong>
-          in the blog editor (Facebook is listed as coming soon). After Publish, the CMS sends the post to your Make.com scenario, which posts it to the ticked accounts.
+          Lets writers tick <strong>LinkedIn — AKA Digital Singapore</strong> in the blog editor (Facebook is listed as coming soon).
+          After Publish, the editor shows a preview of the post and nothing is sent until someone clicks <strong>Approve &amp; post</strong>;
+          then the CMS sends it to your Make.com scenario, which posts it to the page.
           The CMS never stores LinkedIn or Facebook logins — those connections live in Make.com.
         </div>
         <label style="font-size:13px;font-weight:700;">Make.com webhook URL (Super Admin)</label>
@@ -239,8 +240,8 @@
           <ol style="margin:10px 0 0 18px;">
             <li>In Make.com, create a scenario. First module: <strong>Webhooks → Custom webhook</strong>. Copy its URL, paste it above, Save.</li>
             <li>Publish a test post with one account ticked, so Make learns the data structure: <code>targets</code>, <code>caption</code>, <code>post.title</code>, <code>post.url</code>, <code>post.description</code>, <code>post.image</code>.</li>
-            <li>Add a <strong>Router</strong> with one route per account. Filter each route on <code>targets</code> containing <code>linkedin-sg</code> or <code>linkedin-vn</code>.</li>
-            <li>LinkedIn routes: add the LinkedIn module that creates a <strong>company page post</strong>, connect a LinkedIn user who is an <strong>admin of both company pages</strong>, and pick <em>AKA Digital Singapore</em> or <em>AKA Digital Vietnam</em>. Text = <code>caption</code>, link = <code>post.url</code>.</li>
+            <li>Add a <strong>Router</strong> with one route per account. Filter the route on <code>targets</code> containing <code>linkedin-sg</code>.</li>
+            <li>LinkedIn routes: add the LinkedIn module that creates a <strong>company page post</strong>, connect a LinkedIn user who is an <strong>admin of both company pages</strong>, and pick <em>AKADIGITAL SINGAPORE</em>. Text = <code>caption</code>, link = <code>post.url</code>.</li>
             <li><em>Later, when Facebook is switched on:</em> a third route filtered on <code>facebook</code> — add <strong>Facebook Pages → create a post</strong>, connect as a page admin, pick the AKA Digital page. Message = <code>caption</code>, link = <code>post.url</code>.</li>
             <li>Switch the scenario <strong>ON</strong>. LinkedIn and Facebook build the preview card from the article's share image automatically.</li>
           </ol>

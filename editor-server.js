@@ -30,6 +30,7 @@ const securityConfig = require('./config/security.config');
 const { renderCaseStudyPreview, renderBlogPreview, renderEventPreview, renderJobPreview } = require('./scripts/preview-renderer');
 const { generateBlogDraft, suggestSeo, describeAiError } = require('./scripts/ai-writer');
 const { buildSharePayload, sendToWebhook } = require('./scripts/social-share');
+const { runContentMigrations, REDIRECTS } = require('./scripts/content-migrations');
 
 /* Some hosts (e.g. Hostinger's Passenger/alt-nodejs runtime) run this process
    with a PATH that doesn't include the directory npm actually lives in, even
@@ -245,6 +246,47 @@ function getSession(req) {
   }
   return session;
 }
+/* Approving a social post needs the approver to sign in again, on top of
+   the CMS session: either a fresh Google sign-in of an approved, active CMS
+   user, or a team/admin username + password. Returns { who, role } or
+   { status, error }. Rate-limited like login. */
+async function verifyShareApproval(reauth, clientIp) {
+  const limit = loginLimiter(clientIp);
+  if (!limit.allowed) return { status: 429, error: 'Too many attempts — wait a few minutes and try again.' };
+  const r = reauth && typeof reauth === 'object' ? reauth : {};
+  const fail = (why) => {
+    appendSecurityLog('share_approval_failed', { clientIp, method: r.method || 'none', why });
+    return { status: 401, error: 'Sign-in not confirmed — nothing was posted. ' + why };
+  };
+
+  if (r.method === 'password') {
+    if (PASSWORD_LOGIN_DISABLED) return fail('Password sign-in is disabled; use Google.');
+    const user = USERS.find(u => u.username === String(r.username || '') && u.password === String(r.password || ''));
+    return user ? { who: user.username, role: user.role } : fail('Wrong username or password.');
+  }
+
+  if (r.method === 'google') {
+    if (!r.credential) return fail('No Google sign-in received.');
+    try {
+      const gRes = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(String(r.credential)));
+      const info = await gRes.json();
+      if (info.error || !info.email) return fail('Google sign-in could not be verified.');
+      // The token must have been issued for this CMS, not another Google app
+      if (process.env.GOOGLE_CLIENT_ID && info.aud !== process.env.GOOGLE_CLIENT_ID) return fail('Google sign-in was not for this CMS.');
+      if (info.email_verified !== 'true' && info.email_verified !== true) return fail('Google email not verified.');
+      const email = String(info.email).toLowerCase().trim();
+      if (SUPER_ADMIN_EMAILS.includes(email)) return { who: email, role: 'super' };
+      const user = readUsers().find(u => u.email === email);
+      if (!user || user.status !== 'approved' || user.active === false) return fail('That Google account is not an approved CMS user.');
+      return { who: email, role: user.role || 'team' };
+    } catch (e) {
+      return { status: 502, error: 'Could not reach Google to confirm the sign-in — nothing was posted.' };
+    }
+  }
+
+  return fail('Confirm with Google or your username and password.');
+}
+
 function isSuper(req) { const s = getSession(req); return s && s.role === 'super'; }
 function isAuthed(req) { return !!getSession(req); }
 
@@ -450,6 +492,12 @@ http.createServer(async (req, res) => {
     return res.end();
   }
 
+  /* ── 0b. Content whose URL changed (see scripts/content-migrations.js) ── */
+  if (REDIRECTS[p]) {
+    res.writeHead(301, { Location: REDIRECTS[p] + u.search });
+    return res.end();
+  }
+
   /* ── 1. Admin UI pages (/admin and /admin/*) ─────────────────────────── */
   if (p === '/admin' || p === '/admin/' || p.startsWith('/admin/')) {
     const subpath = p === '/admin' || p === '/admin/' ? '/login.html' : p.replace('/admin', '');
@@ -543,9 +591,15 @@ http.createServer(async (req, res) => {
       const b = await readBody(req);
       if (!b.credential) return j(res, 400, { error: 'No credential provided' });
       try {
-        const gRes  = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${b.credential}`);
+        const gRes  = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(String(b.credential)));
         const info  = await gRes.json();
         if (info.error || !info.email) return j(res, 401, { error: 'Invalid Google token' });
+        // The token must have been issued for this CMS's Google client, not
+        // any other Google app the person happened to sign in to
+        if (process.env.GOOGLE_CLIENT_ID && info.aud !== process.env.GOOGLE_CLIENT_ID) {
+          appendSecurityLog('google_login_wrong_audience', { clientIp });
+          return j(res, 401, { error: 'Invalid Google token' });
+        }
         if (info.email_verified !== 'true' && info.email_verified !== true)
           return j(res, 401, { error: 'Google email not verified' });
         const email = String(info.email).toLowerCase().trim();
@@ -667,7 +721,10 @@ http.createServer(async (req, res) => {
     }
 
     /* Share a published post to the ticked LinkedIn / Facebook accounts via
-       the Make.com webhook. Accounts it was already shared to are skipped
+       the Make.com webhook. Two steps, so nothing ever posts unreviewed:
+       `preview: true` returns exactly what would be sent (nothing is sent);
+       sending requires `approved: true`, set only by the editor's
+       "Approve & post" button. Accounts it was already shared to are skipped
        unless `repost` is set, so re-publishing an edit never double-posts. */
     if (/^\/api\/blogs\/[^/]+\/share$/.test(p) && m === 'POST') {
       const slug = decodeURIComponent(p.split('/')[3]);
@@ -701,6 +758,12 @@ http.createServer(async (req, res) => {
         post, blogs, settings: readData('settings'), suggestions: readData('seo_suggestions'),
         accounts, targets, caption: b.caption ? String(b.caption).slice(0, 2900) : '',
       });
+      if (b.preview === true) return j(res, 200, { ok: true, preview: payload, skipped });
+      if (b.approved !== true) {
+        return j(res, 400, { error: 'Nothing was posted: review the preview and click "Approve & post" first.' });
+      }
+      const approver = await verifyShareApproval(b.reauth, clientIp);
+      if (approver.error) return j(res, approver.status, { error: approver.error });
       let result;
       try {
         result = await sendToWebhook(webhook, payload);
@@ -711,9 +774,9 @@ http.createServer(async (req, res) => {
         return j(res, 502, { error: `The Make.com webhook rejected the post (HTTP ${result.status}). Check the scenario is switched on.` });
       }
       const by = getSession(req)?.username || '';
-      blogs[idx] = { ...post, social_shares: [...shares, { at: new Date().toISOString(), targets, by }] };
+      blogs[idx] = { ...post, social_shares: [...shares, { at: new Date().toISOString(), targets, by, approved_by: approver.who }] };
       writeData('blogs', blogs);
-      appendAuditLog('blog_shared', { user: by, slug, targets });
+      appendAuditLog('blog_shared', { user: by, slug, targets, approved_by: approver.who, approver_role: approver.role });
       return j(res, 200, { ok: true, sent: targets, skipped });
     }
 
@@ -1472,6 +1535,18 @@ http.createServer(async (req, res) => {
   console.log('╠══════════════════════════════════════════════════════════╣');
   console.log('║  Set ADMIN_USER/ADMIN_PASS and TEAM_USER/TEAM_PASS in the environment to customize credentials. ║');
   console.log('╚══════════════════════════════════════════════════════════╝\n');
+
+  // One-time CMS content changes (renames etc.) before the first build
+  const migrated = runContentMigrations({
+    readData, writeData, writeCaseStudyNjk, deleteCaseStudyNjk, publicDir: PUBLIC,
+  });
+  if (migrated.length) {
+    console.log('[startup] Content migrations applied:', migrated.join(', '));
+    // drop pages built from the old content so they can't linger in dist/
+    for (const oldPath of Object.keys(REDIRECTS)) {
+      fs.rmSync(path.join(DIST, oldPath), { recursive: true, force: true });
+    }
+  }
 
   // Auto-build on startup so dist/ is always fresh after a deployment
   console.log('[startup] Running initial build...');

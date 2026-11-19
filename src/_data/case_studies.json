@@ -659,8 +659,8 @@
     "status": "published"
   },
   {
-    "slug": "eu-holidays-influencer",
-    "client": "EU Holidays Travel",
+    "slug": "sg-travel-agency-influencer",
+    "client": "SG Travel Agency",
     "industry": "Travel & Tourism",
     "country": "Singapore",
     "year": 2023,
@@ -669,11 +669,11 @@
     "featured_home": true,
     "category": "social-influencer",
     "category_label": "Social Media & Influencer",
-    "title": "Inspiring Travel Dreams: EU Holidays KOL Campaign",
-    "summary": "AKA Digital designed and executed a travel influencer campaign for EU Holidays — leveraging aspirational lifestyle content across Instagram and YouTube to drive tour package bookings among Singapore's premium travel segment.",
-    "cover_image": "/images/case-studies/eu-holidays-social.png",
+    "title": "Inspiring Travel Dreams: A Travel KOL Campaign",
+    "summary": "AKA Digital designed and executed a travel influencer campaign for SG Travel Agency — leveraging aspirational lifestyle content across Instagram and YouTube to drive tour package bookings among Singapore's premium travel segment.",
+    "cover_image": "/images/case-studies/sg-travel-agency-cover.jpg",
     "video_youtube": "",
-    "video_thumbnail": "/images/case-studies/eu-holidays-social.png",
+    "video_thumbnail": "/images/case-studies/sg-travel-agency-cover.jpg",
     "video_wix_url": "",
     "solutions_used": [
       "social-media"
@@ -681,9 +681,9 @@
     "partners_used": [
       "SocialOS"
     ],
-    "challenge": "Post-COVID travel demand in Singapore rebounded sharply — but EU Holidays needed to cut through a crowded influencer landscape where every travel brand was claiming the same aspirational content space. Their European tour packages needed differentiated storytelling that converted social discovery into actual bookings.",
-    "approach": "AKA Digital curated a selective roster of Singapore-based travel, lifestyle, and family content creators whose audiences aligned with EU Holidays' core buyer profiles: professionals aged 30–50 planning premium European holidays. Campaign content was built around specific tour itineraries with direct call-to-actions to booking landing pages.",
-    "outcome": "EU Holidays recorded their strongest digital-attributed booking quarter, with influencer content driving significant traffic to tour package landing pages and a measurable uplift in qualified enquiry calls.",
+    "challenge": "Post-COVID travel demand in Singapore rebounded sharply — but SG Travel Agency needed to cut through a crowded influencer landscape where every travel brand was claiming the same aspirational content space. Their European tour packages needed differentiated storytelling that converted social discovery into actual bookings.",
+    "approach": "AKA Digital curated a selective roster of Singapore-based travel, lifestyle, and family content creators whose audiences aligned with SG Travel Agency's core buyer profiles: professionals aged 30–50 planning premium European holidays. Campaign content was built around specific tour itineraries with direct call-to-actions to booking landing pages.",
+    "outcome": "SG Travel Agency recorded their strongest digital-attributed booking quarter, with influencer content driving significant traffic to tour package landing pages and a measurable uplift in qualified enquiry calls.",
     "results": [
       {
         "metric": "Tour Page Traffic",

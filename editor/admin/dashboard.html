@@ -270,11 +270,24 @@
         <div class="stat"><div class="stat-num" style="color:#64748b">${drafts}</div><div class="stat-label">Drafts</div></div>`;
     });
 
+    // Lists show the first 10 rows plus a "Show all" button — older items
+    // (e.g. case study #13) must stay reachable for editing.
+    function renderList(el, items, row, first = 10) {
+      const draw = (all) => {
+        el.innerHTML = (all ? items : items.slice(0, first)).map(row).join('') +
+          (!all && items.length > first
+            ? `<button type="button" class="btn-xs" style="margin:10px 0 4px;">Show all ${items.length} ↓</button>` : '');
+        const more = el.querySelector(':scope > button');
+        if (more) more.addEventListener('click', () => draw(true));
+      };
+      draw(false);
+    }
+
     // ── Load blog posts ──────────────────────────────────────────────────
     apiFetch('/api/blogs').then(blogs => {
       const el = document.getElementById('blogList');
       if (!blogs || !blogs.length) { el.innerHTML = '<p class="empty">No blog posts yet.</p>'; return; }
-      el.innerHTML = blogs.slice(0, 10).map(b => `
+      renderList(el, blogs, b => `
         <div class="list-item">
           <div class="list-item-info">
             <span class="list-item-title">${b.title}</span>${statusBadgeHtml(b.status)}
@@ -285,14 +298,14 @@
             <a href="/admin/blog-form?edit=${b.slug}" class="btn-xs">Edit</a>
             ${role === 'super' ? `<button class="btn-xs danger" onclick="delBlog('${b.slug}')">Delete</button>` : ''}
           </div>
-        </div>`).join('');
+        </div>`);
     });
 
     // ── Load case studies ────────────────────────────────────────────────
     apiFetch('/api/case-studies').then(list => {
       const el = document.getElementById('csList');
       if (!list || !list.length) { el.innerHTML = '<p class="empty">No case studies yet.</p>'; return; }
-      el.innerHTML = list.slice(0, 10).map(c => `
+      renderList(el, list, c => `
         <div class="list-item">
           <div class="list-item-info">
             <span class="list-item-title">${c.client}: ${c.title}</span>${statusBadgeHtml(c.status)}
@@ -302,7 +315,7 @@
             <a href="/admin/case-study-form?edit=${c.slug}" class="btn-xs">Edit</a>
             ${role === 'super' ? `<button class="btn-xs danger" onclick="delCase('${c.slug}')">Delete</button>` : ''}
           </div>
-        </div>`).join('');
+        </div>`);
     });
 
     // ── Load events ──────────────────────────────────────────────────────
