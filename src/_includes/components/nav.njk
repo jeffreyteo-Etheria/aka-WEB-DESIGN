@@ -34,12 +34,12 @@
   <div class="hidden md:block bg-background/98">
     <div class="section-container min-h-11 py-1 flex items-center justify-end">
     <!-- Desktop Nav -->
-    <nav class="w-full min-w-0 flex flex-wrap items-center justify-center lg:justify-end gap-x-4 lg:gap-x-6 gap-y-2" aria-label="Main navigation">
+    <nav class="w-full min-w-0 flex flex-nowrap items-center justify-end gap-x-3 lg:gap-x-6" aria-label="Main navigation">
       {% for item in navigation.main %}
         {% if item.children %}
           <div class="relative group">
             <button
-              class="flex items-center gap-1 text-body-md text-on-surface-variant hover:text-primary transition-colors py-2"
+              class="flex items-center gap-1 whitespace-nowrap text-body-md text-on-surface-variant hover:text-primary transition-colors py-2"
               aria-haspopup="true"
             >
               {{ item.label }}
@@ -71,7 +71,7 @@
           <a
             href="{{ item.href }}"
             {% if item.external %}target="_blank" rel="noopener"{% endif %}
-            class="text-body-md text-on-surface-variant hover:text-primary transition-colors"
+            class="whitespace-nowrap text-body-md text-on-surface-variant hover:text-primary transition-colors"
           >
             {{ item.label }}
           </a>
@@ -80,7 +80,7 @@
       {% endfor %}
 
       <!-- Language switcher (desktop) -->
-      <div class="flex items-center gap-1 ml-2 border border-outline-variant/20 rounded-full px-2 py-1 text-label-md">
+      <div class="flex shrink-0 items-center gap-1 ml-1 lg:ml-2 border border-outline-variant/20 rounded-full px-1.5 lg:px-2 py-1 text-label-md">
         <button class="lang-btn px-2 py-0.5 rounded-full hover:text-primary transition-colors" data-lang="en">EN</button>
         <span class="text-outline-variant/30">·</span>
         <button class="lang-btn px-2 py-0.5 rounded-full hover:text-primary transition-colors" data-lang="vi">VI</button>
@@ -90,7 +90,7 @@
         <button class="lang-btn px-2 py-0.5 rounded-full hover:text-primary transition-colors" data-lang="zh">中文</button>
       </div>
 
-      <a href="/contact" class="btn-primary py-2 px-5 text-sm ml-2" data-i18n="cta.getInTouch">
+      <a href="/contact" class="hidden lg:inline-flex btn-primary py-2 px-5 text-sm ml-2 whitespace-nowrap" data-i18n="cta.getInTouch">
         Get In Touch
       </a>
     </nav>

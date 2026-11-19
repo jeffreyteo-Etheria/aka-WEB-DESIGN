@@ -17,7 +17,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
       class="hero-photo w-full h-full object-cover opacity-45"
       loading="eager"
     />
-    <div class="hero-shade absolute inset-0" style="background:rgba(8,12,24,0.55)"></div>
+    <div class="hero-shade absolute inset-0" style="background:rgba(255,255,255,0.68)"></div>
     <div class="hero-shade absolute inset-0 bg-gradient-to-t from-[#060F24] via-transparent to-transparent"></div>
   </div>
 
@@ -56,7 +56,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
         <!-- Headline -->
         <h1 class="text-[48px] md:text-[64px] lg:text-[72px] font-display font-extrabold leading-[1.05] tracking-[-0.02em] text-white mb-6 text-balance">
           MarTech That<br/>
-          <span class="hero-highlight bg-gradient-to-r from-action-yellow via-[#FFE566] to-action-yellow bg-clip-text text-transparent">Actually Works.</span><br/>
+          <span class="hero-highlight text-action-yellow">Actually Works.</span><br/>
           <span class="text-white/80">In Southeast Asia.</span>
         </h1>
 
@@ -161,7 +161,7 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
           </div>
 
           <!-- Floating award badge -->
-          <div class="absolute -bottom-5 -right-5 bg-action-yellow text-on-secondary-fixed rounded-2xl px-4 py-3 shadow-xl z-20 text-center">
+          <div class="absolute -top-5 -right-5 bg-action-yellow text-on-secondary-fixed rounded-2xl px-4 py-3 shadow-xl z-20 text-center">
             <span class="block font-display font-extrabold text-[24px] leading-tight">2022</span>
             <span class="text-label-md font-bold opacity-80">MMA Award</span>
           </div>
@@ -188,19 +188,19 @@ description: AKA Digital is Southeast Asia's leading B2B MarTech agency. Vietnam
   <div class="marquee-outer overflow-hidden w-full">
     <div class="marquee-track flex flex-nowrap gap-16 md:gap-24 items-center px-8" style="animation: marquee 60s linear infinite; width: max-content;">
       {% for client in sitedata.clients %}
-        <div class="shrink-0 flex items-center justify-center h-20 opacity-60 hover:opacity-100 transition-opacity duration-300" style="min-width: max-content;">
+        <div class="shrink-0 flex items-center justify-center h-24 opacity-60 hover:opacity-100 transition-opacity duration-300" style="min-width: max-content;">
           <img src="{{ client.logo }}" alt="{{ client.name }}"
             class="block h-full w-auto object-contain brightness-0 invert"
-            style="max-height: 80px;"
+            style="max-height: 96px;"
             onerror="this.parentElement.innerHTML='<span class=\'font-display font-semibold text-white/60 text-base whitespace-nowrap tracking-wide\'>{{ client.name }}</span>'" />
         </div>
       {% endfor %}
       <!-- Duplicate for seamless loop -->
       {% for client in sitedata.clients %}
-        <div class="shrink-0 flex items-center justify-center h-20 opacity-60 hover:opacity-100 transition-opacity duration-300" style="min-width: max-content;">
+        <div class="shrink-0 flex items-center justify-center h-24 opacity-60 hover:opacity-100 transition-opacity duration-300" style="min-width: max-content;">
           <img src="{{ client.logo }}" alt="{{ client.name }}"
             class="block h-full w-auto object-contain brightness-0 invert"
-            style="max-height: 80px;"
+            style="max-height: 96px;"
             onerror="this.parentElement.innerHTML='<span class=\'font-display font-semibold text-white/60 text-base whitespace-nowrap tracking-wide\'>{{ client.name }}</span>'" />
         </div>
       {% endfor %}

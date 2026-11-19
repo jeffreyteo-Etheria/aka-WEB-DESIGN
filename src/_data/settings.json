@@ -80,7 +80,7 @@
     "solution_plan_text": "Get My Custom Solution Plan",
     "solution_plan_url": "/contact",
     "book_session_text": "Book Free Session",
-    "book_session_url": "/contact",
+    "book_session_url": "/contact#lead-quiz",
     "get_started_text": "Get Started",
     "get_started_url": "/contact?market=sg"
   },
@@ -93,6 +93,6 @@
       "Receive a priority roadmap for 90-day quick wins (Actionable steps to accelerate campaigns and growth)"
     ],
     "button_text": "Book Free Session",
-    "button_url": "/contact"
+    "button_url": "/contact#lead-quiz"
   }
 }

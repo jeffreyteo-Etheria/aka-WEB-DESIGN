@@ -51,23 +51,8 @@
   }
 
   if (exitPopup) {
-    // Desktop: mouse leaves viewport from top
-    document.addEventListener("mouseleave", function (e) {
-      if (e.clientY <= 0) showExitPopup();
-    });
-
-    // Mobile: scroll rapidly upward past threshold
-    var lastScrollY = window.scrollY;
-    var scrollVelocityTimer;
-    window.addEventListener("scroll", function () {
-      var currentY = window.scrollY;
-      var delta = lastScrollY - currentY;
-      if (delta > 80 && currentY > 400) {
-        clearTimeout(scrollVelocityTimer);
-        scrollVelocityTimer = setTimeout(function () { showExitPopup(); }, 100);
-      }
-      lastScrollY = currentY;
-    }, { passive: true });
+    // Show the consultation offer after the page has had time to load.
+    setTimeout(showExitPopup, 8000);
 
     // Close handlers
     var closeBtn = exitPopup.querySelector("[data-close-exit]");

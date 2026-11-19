@@ -191,27 +191,27 @@
                 bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden">
       <!-- Top accent bar -->
       <div class="h-1.5 bg-gradient-to-r from-primary to-action-yellow"></div>
-      <div class="p-8">
+      <div class="p-7 sm:p-8">
         <button data-close-exit
                 class="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface transition-colors"
                 aria-label="Close">
           <span class="material-symbols-outlined">close</span>
         </button>
-        <div class="mb-6">
+        <div class="mb-7 pr-6">
           <div class="inline-flex items-center gap-2 bg-action-yellow/20 text-on-surface px-3 py-1 rounded-full text-label-md font-bold mb-4">
             <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">auto_awesome</span>
             Before you go
           </div>
-          <h2 class="font-display font-extrabold text-on-surface text-2xl leading-tight mb-2">
+          <h2 class="font-display font-extrabold text-on-surface text-2xl leading-tight mb-3">
             {{ settings.popup.title }}
           </h2>
-          <p class="text-on-surface-variant text-body-md">{{ settings.popup.subtitle }}</p>
+          <p class="text-on-surface-variant text-body-md leading-relaxed">{{ settings.popup.subtitle }}</p>
         </div>
-        <div class="space-y-3 mb-6">
+        <div class="space-y-4 mb-7">
           {% for bullet in settings.popup.bullets %}
           <div class="flex items-start gap-3">
             <span class="material-symbols-outlined text-primary text-base mt-0.5 shrink-0" style="font-variation-settings:'FILL' 1">check_circle</span>
-            <span class="text-label-md text-on-surface">{{ bullet }}</span>
+            <span class="text-label-md text-on-surface leading-relaxed">{{ bullet }}</span>
           </div>
           {% endfor %}
         </div>

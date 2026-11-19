@@ -67,8 +67,8 @@ html[data-theme="clean-agency"] .bg-action-yellow *, html[data-theme="clean-agen
 html[data-theme="clean-agency"] .btn-ghost *, html[data-theme="clean-agency"] .btn-secondary * { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; }
 /* thin decorative accent bars stay AKA yellow */
 html[data-theme="clean-agency"] .bg-action-yellow.h-1, html[data-theme="clean-agency"] .bg-action-yellow.h-0\.5 { background: var(--ca-yellow) !important; }
-html[data-theme="clean-agency"] .text-action-yellow { color: var(--ca-blue) !important; }
-html[data-theme="clean-agency"] .border-action-yellow { border-color: var(--ca-blue) !important; }
+html[data-theme="clean-agency"] .text-action-yellow { color: var(--ca-yellow) !important; }
+html[data-theme="clean-agency"] .border-action-yellow { border-color: var(--ca-yellow) !important; }
 
 /* ── Headline highlight words: AKA yellow, no outline ───────────────── */
 html[data-theme="clean-agency"] :is(h1, h2) :is(.text-action-yellow, [class*="bg-clip-text"]),
@@ -145,15 +145,18 @@ html[data-theme="clean-agency"] :is(section, footer):is(.bg-\[\#060F24\], .bg-in
 
 /* Homepage: fade the photograph itself, without a dark overlay or grid. */
 html[data-theme="clean-agency"] #hero .hero-shade,
-html[data-theme="clean-agency"] #hero .hero-grid { display: none !important; }
-html[data-theme="clean-agency"] #hero .hero-photo { opacity: .10 !important; }
+html[data-theme="clean-agency"] #hero .hero-grid { display: block !important; }
+html[data-theme="clean-agency"] #hero .hero-photo { opacity: .30 !important; }
+html[data-theme="clean-agency"] #hero .hero-shade[style] {
+  background: rgba(255, 255, 255, .68) !important;
+}
+html[data-theme="clean-agency"] #hero .hero-shade.bg-gradient-to-t {
+  background: transparent !important;
+}
 html[data-theme="clean-agency"] #hero .hero-highlight {
-  color: var(--ca-navy) !important;
-  -webkit-text-fill-color: var(--ca-navy) !important;
-  text-decoration: underline;
-  text-decoration-color: var(--ca-yellow);
-  text-decoration-thickness: .08em;
-  text-underline-offset: .12em;
+  color: var(--ca-yellow) !important;
+  -webkit-text-fill-color: var(--ca-yellow) !important;
+  text-decoration: none;
 }
 
 /* Partner links are soft-white cards, distinct from blue action buttons.
